@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+    <page id="1972092427" title="Safe Cheat Panel" voice="no">
+        <!-- Panel identity -->
+        <t id="1">Safe Cheat Panel</t>
+        <t id="2">Safe Cheat Panel created by Chem O`Dun.</t>
+
+        <!-- Right Click / Interact Menu -->
+        <t id="100">Spawn %s</t>
+        <t id="101">Spawn Station</t>
+        <t id="102">Spawn Ships</t>
+        <t id="103">Spawn Objects</t>
+        <t id="104">Teleport Here</t>
+        <t id="105">Teleport To</t>
+        <t id="106">Teleport to Pilot Seat</t>
+        <t id="107">Fix Station Control Entities</t>
+
+        <!-- Tab 1: Player -->
+        <t id="1000">Player</t>
+        <t id="1001">Player Cheats</t>
+        <t id="1100">Money</t>
+        <t id="1101">Entered amount will be capped between 0 and 1,000,000,000,000,000</t>
+        <t id="1102">Blueprints</t>
+        <t id="1103">Unlock blueprints</t>
+        <t id="1104">Encyclopedia</t>
+        <t id="1105">Unlock all entries</t>
+        <t id="1106">Research</t>
+        <t id="1107">Unlock all research</t>
+        <t id="1108">Research is locked</t>
+        <t id="1109">Disabled until you have unlocked research.</t>
+        <t id="1110">Entered amount will be capped between 0 and 10,000</t>
+        <t id="1111">Already unlocked</t>
+        <!-- Spacesuit Upgrades -->
+        <t id="1200">Spacesuit Upgrades</t>
+        <t id="1201">Add Upgrade</t>
+        <t id="1202">Upgrade already acquired</t>
+        <!-- Spacesuit Ammo -->
+        <t id="1300">Spacesuit Ammo</t>
+        <t id="1301">Add</t>
+
+        <!-- Tab 2: Inventory -->
+        <t id="2000">Player Inventory</t>
+        <t id="2001">Player Inventory Cheats</t>
+        <t id="2002">Press button to edit amount</t>
+        <t id="2003">Set desired amount</t>
+        <t id="2010">Choose a category</t>
+        <t id="2901">Modification Parts</t>
+        <t id="2902">Seminars</t>
+        <t id="2903">Mission-Only Items</t>
+
+        <!-- Tab 3: Research -->
+        <t id="3000">{1001,7400}</t>
+        <t id="3001">{1001,7400} Cheats</t>
+        <t id="3011">Unlock All</t>
+        <t id="3012">Nothing to Unlock</t>
+        <t id="3020">Process Research Individually</t>
+        <t id="3021">Unlock</t>
+        <t id="3022">Lock</t>
+
+        <!-- Tab 4: Blueprint -->
+        <t id="4000">{1001,98}</t>
+        <t id="4001">{1001,98} Cheats</t>
+        <t id="4010">Category</t>
+        <t id="4011">All</t>
+        <t id="4012">Sub-category</t>
+        <t id="4020">Unlock All</t>
+        <t id="4021">All Unlocked</t>
+        <t id="4022">Unlock</t>
+
+        <!-- Tab 5: Factions -->
+        <t id="5000">{1001, 7703}(Factions and Relations)</t>
+        <t id="5001">{1001, 7703} Cheats</t>
+        <t id="5002">{1001, 9928}(Relations)</t>
+        <t id="5005">Choose a faction</t>
+
+        <!-- Tab 6: Map / Sectors -->
+        <t id="6001">Reveal</t>
+        <t id="6002">Reveal All</t>
+        <t id="6003">All Revealed</t>
+        <t id="6004">Fully Revealed</t>
+        <t id="6005">Reveal Path</t>
+        <t id="6006">Reveal Gates</t>
+        <t id="6007">Reveal All Gates</t>
+
+        <!-- Tab 7: Object Spawner -->
+        <t id="7000">Objects Spawner</t>
+        <t id="7001">Objects Spawner Cheats</t>
+        <t id="7002">Station</t>
+        <t id="7003">Ships</t>
+        <t id="7004">Objects</t>
+        <t id="7005">Choose a faction</t>
+        <t id="7006">Choose a crew race</t>
+        <t id="7007">Spawner Options</t>
+        <t id="7008">Spawner Mode</t>
+        <!-- Station Spawner Mode -->
+        <t id="7100">Choose a construction plan</t>
+        <t id="7101">Plan Type</t>
+        <t id="7102">In-game Plans</t>
+        <t id="7103">Player Developed Plans</t>
+        <t id="7104">Choose a player plan</t>
+        <t id="7105">No player plans available</t>
+        <!-- Ship Spawner Mode -->
+        <t id="7200">Choose a Ship</t>
+        <t id="7201">Number per row</t>
+        <t id="7202">Number of ships to spawn per row</t>
+        <t id="7203">Number of rows</t>
+        <t id="7204">Number of rows to spawn</t>
+        <t id="7205">Spawn from center</t>
+        <t id="7206">Unchecked:</t>
+        <t id="7207">Where you clicked is the top left of where ships spawn from</t>
+        <t id="7208">Checked:</t>
+        <t id="7209">Where you clicked is the center of where ships spawn from</t>
+        <t id="7219">--- Player Defined ---</t>
+        <!-- Object Spawner Mode -->
+        <t id="7300">Choose an object</t>
+        <t id="7301">Number per row</t>
+        <t id="7302">Number of objects to spawn per row</t>
+        <t id="7303">Number of rows</t>
+        <t id="7304">Number of rows to spawn</t>
+        <t id="7305">Spacing in meters</t>
+        <t id="7306">Distance between objects in meters</t>
+
+        <!-- Tab 8: Dev Mode -->
+        <t id="8000">Dev Tools</t>
+        <t id="8001">Features useful for mod authors</t>
+
+        <!-- Settings (Options Menu) -->
+        <t id="90000">Settings</t>
+        <t id="90001">Panel Mode</t>
+        <t id="90002">Normal</t>
+        <t id="90003">Extended</t>
+        <t id="90004">Debug Level</t>
+        <t id="90005">Debug</t>
+        <t id="90006">Trace</t>
+    </page>
+</language>

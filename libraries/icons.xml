@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diff>
+    <add sel="/icons">
+        <icon name="pi_blueprints" texture="extensions\safe_cheat_panel\assets\fx\gui\textures\player_info\pi_blueprints.tga" height="128" width="128" />
+    </add>
+</diff>

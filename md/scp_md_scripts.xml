@@ -1,0 +1,512 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mdscript name="Safe_Cheat_Panel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="md.xsd">
+  <cues>
+    <cue name="Scp_Main">
+      <actions>
+        <include_actions ref="Scp_DefaultConfig" />
+        <remove_value name="$config" />
+      </actions>
+      <cues>
+        <cue name="Scp_Reveal_Sector" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_reveal_sector'" />
+          </conditions>
+          <actions>
+            <do_for_each name="$macro" in="event.param3">
+              <find_sector name="$sector" macro="macro.{$macro}" checkoperational="false" />
+              <do_if value="@$sector != null">
+                <set_known object="$sector" known="true" />
+                <set_known object="$sector.cluster" known="true" />
+              </do_if>
+            </do_for_each>
+            <raise_lua_event name="'scp_main.sectorRevealed'" />
+          </actions>
+        </cue>
+
+        <cue name="Scp_Reveal_Path" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_reveal_path'" />
+          </conditions>
+          <actions>
+            <do_for_each name="$id" in="event.param3">
+              <do_if value="component.{$id}.isknown" negate="true">
+                <set_known object="component.{$id}" known="true" />
+                <do_if value="component.{$id}.isclass.sector">
+                  <set_known object="component.{$id}.cluster" known="true" />
+                </do_if>
+              </do_if>
+            </do_for_each>
+            <raise_lua_event name="'scp_main.sectorRevealed'" />
+          </actions>
+        </cue>
+
+        <cue name="Scp_Collect_Sectors" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_collect_sectors'" />
+          </conditions>
+          <actions>
+            <find_sector name="$sectors" space="player.galaxy" multiple="true" />
+            <set_value name="player.entity.$safeCheatPanelDataExchange" exact="$sectors" />
+            <raise_lua_event name="'scp_main.collected_sectors'" />
+            <remove_value name="$sectors" />
+          </actions>
+        </cue>
+
+        <cue name="Scp_Collect_Highways_Entry_Gates" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_collect_super_highways'" />
+          </conditions>
+          <actions>
+            <find_object name="$allSuperHighwaysEntryGates" space="player.galaxy" class="[class.highwayentrygate]" multiple="true" />
+            <create_list name="$allSuperHighways" />
+            <do_for_each name="$gate" in="$allSuperHighwaysEntryGates">
+              <do_if value="@$gate.highway.issuperhighway">
+                <append_to_list name="$allSuperHighways" exact="table[
+              $entryGate = $gate,
+              $entryGateSector = $gate.sector,
+              $highway = $gate.highway,
+              $exitGate = $gate.exit,
+              $exitGateSector = $gate.exit.sector,
+            ]" />
+              </do_if>
+            </do_for_each>
+            <set_value name="player.entity.$safeCheatPanelDataExchange" exact="$allSuperHighways" />
+            <raise_lua_event name="'scp_main.collected_superhighways'" />
+            <remove_value name="$allSuperHighwaysEntryGates" />
+            <remove_value name="$allSuperHighways" />
+          </actions>
+        </cue>
+
+        <cue name="Scp_Teleport_Object" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_teleport_object'" />
+          </conditions>
+          <actions>
+            <set_value name="$teleportData" exact="event.param3" />
+            <warp object="$teleportData.$object" sector="$teleportData.$offsetComponent">
+              <position x="$teleportData.$position.$x" y="$teleportData.$position.$y" z="$teleportData.$position.$z" />
+            </warp>
+          </actions>
+        </cue>
+
+        <cue name="Scp_Spawn_Ship" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_spawn_ship'" />
+          </conditions>
+          <actions>
+            <set_value name="$spawnData" exact="event.param3" />
+            <set_value name="$rows" exact="0" />
+            <set_value name="$numPerRow" exact="0" />
+            <set_value name="$startX" exact="$spawnData.$position.$x" />
+            <!-- For scpDefault preset loadouts with a known native faction, create the ship under
+             that faction so generate_loadout picks faction-specific equipment correctly, then transfer ownership. -->
+            <set_value name="$spawnOwner" exact="$spawnData.$ownerId" />
+            <do_if value="$spawnData.$preset gt 0 and @$spawnData.$loadoutFaction != null">
+              <set_value name="$spawnOwner" exact="$spawnData.$loadoutFaction" />
+            </do_if>
+            <debug_text text="'SafeCheatPanel: Spawning ship with macro %s for faction %s at position %s'. [$spawnData.$ship, $spawnOwner, $spawnData.$position]" chance="$debugChance" />
+            <do_while value="$rows lt $spawnData.$rows">
+              <do_while value="$numPerRow lt $spawnData.$numPerRow">
+                <create_ship name="$ship" macro="$spawnData.$ship" sector="$spawnData.$offsetComponent">
+                  <owner exact="faction.{$spawnOwner}" overridenpc="true" />
+                  <pilot>
+                    <select race="race.{$spawnData.$ownerRace}" tags="tag.aipilot" />
+                  </pilot>
+                  <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
+                </create_ship>
+                <do_if value="@$ship != null">
+                  <do_if value="@$ship.aipilot != null">
+                    <do_for_each name="$skill" in="lookup.skilltype.list">
+                      <do_if value="$skill == skilltype.piloting">
+                        <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                          <set_skill entity="$ship.aipilot" type="$skill" min="10" max="14" />
+                        </do_if>
+                        <do_else>
+                          <set_skill entity="$ship.aipilot" type="$skill" min="6" max="9" />
+                        </do_else>
+                      </do_if>
+                      <do_elseif value="$skill == skilltype.morale">
+                        <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                          <set_skill entity="$ship.aipilot" type="$skill" min="8" max="12" />
+                        </do_if>
+                        <do_else>
+                          <set_skill entity="$ship.aipilot" type="$skill" min="4" max="7" />
+                        </do_else>
+                      </do_elseif>
+                      <do_else>
+                        <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                          <set_skill entity="$ship.aipilot" type="$skill" min="6" max="9" />
+                        </do_if>
+                        <do_else>
+                          <set_skill entity="$ship.aipilot" type="$skill" min="1" max="4" />
+                        </do_else>
+                      </do_else>
+                    </do_for_each>
+                  </do_if>
+                  <do_if value="$spawnData.$preset gt 0">
+                    <do_all exact="100" counter="$i">
+                      <generate_loadout result="$loadouts" macro="macro.{$spawnData.$ship}" level="$spawnData.$preset" faction="faction.{$spawnOwner}" />
+                      <debug_text text="'SafeCheatPanel: for ship %s found %s loadouts'. [$ship.debugname, $loadouts.count]" chance="$debugChance" />
+                      <do_for_each name="$loadout" in="$loadouts">
+                        <apply_loadout object="$ship" loadout="$loadout" />
+                        <find_object_component name="$engine" object="$ship" class="class.engine" />
+                        <debug_text text="'SafeCheatPanel: on ship %s loadout %s applied, Engine is: %s'. [$ship.debugname, $loadout, @$engine.name]" chance="$debugChance" />
+                        <do_if value="@$engine != null">
+                          <debug_text text="'SafeCheatPanel: on ship %s loadout applied successfully'. [$ship.debugname]" chance="$debugChance" />
+                          <break />
+                        </do_if>
+                      </do_for_each>
+                      <do_if value="@$engine != null">
+                        <break />
+                      </do_if>
+                      <do_if value="$i ge 99">
+                        <debug_text text="'SafeCheatPanel: for ship %s are no loadouts with engines found'. [$ship.debugname]" chance="$debugChance" />
+                      </do_if>
+                    </do_all>
+                  </do_if>
+                  <do_else>
+                    <get_loadout result="$loadout" macro="macro.{$spawnData.$ship}" loadout="$spawnData.$loadout" />
+                    <apply_loadout object="$ship" loadout="$loadout" />
+                  </do_else>
+                  <!-- Transfer ownership to the intended faction after loadout is applied -->
+                  <do_if value="$spawnOwner != $spawnData.$ownerId">
+                    <set_owner object="$ship" faction="faction.{$spawnData.$ownerId}" overridenpc="true" />
+                  </do_if>
+                  <do_if value="@$spawnData.$crew.$roles.count gt 0">
+                    <set_value name="$roles" exact="@$spawnData.$crew.$roles" />
+                    <do_for_each name="$role" in="$roles">
+                      <get_character_definition macro="$roleMacro" race="race.{$spawnData.$ownerRace}" tags="tag.{$role.$role}" />
+                      <do_if value="@$roleMacro != null">
+                        <do_all counter="$i" exact="$role.$count">
+                          <create_npc_template object="$ship" role="entityrole.{$role.$role}" name="$npcTemplate" macro="$roleMacro" />
+                          <do_if value="@$npcTemplate != null">
+                            <do_for_each name="$skill" in="lookup.skilltype.list">
+                              <do_if value="$role.$role == 'service' and $skill == skilltype.engineering or
+                                $role.$role == 'marine' and $skill == skilltype.boarding">
+                                <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="10" max="14" />
+                                </do_if>
+                                <do_else>
+                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="6" max="9" />
+                                </do_else>
+                              </do_if>
+                              <do_elseif value="$skill == skilltype.morale">
+                                <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="8" max="12" />
+                                </do_if>
+                                <do_else>
+                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="4" max="7" />
+                                </do_else>
+                              </do_elseif>
+                              <do_else>
+                                <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="6" max="9" />
+                                </do_if>
+                                <do_else>
+                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="1" max="4" />
+                                </do_else>
+                              </do_else>
+                            </do_for_each>
+                          </do_if>
+                        </do_all>
+                      </do_if>
+                    </do_for_each>
+                  </do_if>
+                </do_if>
+                <set_value name="$spawnData.$position.$x" exact="$spawnData.$position.$x + $ship.width * 2" />
+                <set_value name="$numPerRow" exact="$numPerRow + 1" />
+              </do_while>
+
+              <debug_text text="'SafeCheatPanel: The spawned ship has the primary race of: ' + $ship.trueowner.primaryrace.description" chance="$debugChance" />
+              <debug_text text="'SafeCheatPanel: The result of race.argon is: ' + race.argon.description" chance="$debugChance" />
+
+              <set_value name="$spawnData.$position.$z" exact="$spawnData.$position.$z - $ship.length * 2" />
+              <set_value name="$spawnData.$position.$x" exact="$startX" />
+              <set_value name="$rows" exact="$rows + 1" />
+              <set_value name="$numPerRow" exact="0" />
+            </do_while>
+          </actions>
+        </cue>
+
+        <cue name="Scp_Spawn_Station" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_spawn_station'" />
+          </conditions>
+          <actions>
+            <set_value name="$spawnData" exact="event.param3" />
+            <create_station rawname="$spawnData.$name" name="$station" sector="$spawnData.$offsetComponent" macro="macro.station_gen_factory_base_01_macro" constructionplan="$spawnData.$constructionPlan" owner="faction.{$spawnData.$ownerId}" state="componentstate.operational">
+              <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
+              <safepos includeplotbox="1" />
+            </create_station>
+            <do_if value="$station">
+              <do_if value="$station.owner != faction.player">
+                <!-- NPC-owned: the 'init station' signal triggers InitStationActions which creates trade manager, defence/engineer NPCs and AI unit -->
+                <signal_objects object="player.galaxy" param="'init station'" param2="$station" param3="true" />
+              </do_if>
+              <do_else>
+                <!-- Player-owned: mirror PlayerStationBuilt using shared libraries from InitUniverse; $controllable is required by the libraries -->
+                <set_value name="$controllable" exact="$station" />
+                <include_actions ref="md.InitUniverse.CreateDefenceControlEntity" />
+                <include_actions ref="md.InitUniverse.CreateEngineerEntity" />
+                <create_ai_unit object="$controllable" />
+                <remove_value name="$controllable" />
+              </do_else>
+            </do_if>
+          </actions>
+        </cue>
+
+        <cue name="Scp_Fix_Station" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_fix_station'" />
+          </conditions>
+          <actions>
+            <set_value name="$station" exact="event.param3.$station" />
+            <debug_text text="'SafeCheatPanel: Fixing station with id %s, defence npc: %s, engineer: %s, class station: %s'. [$station.debugname, @$station.defencenpc.debugname, @$station.engineer.debugname, $station.isclass.station]" chance="$debugChance" />
+            <do_if value="$station.isclass.station">
+              <do_if value="$station.owner != faction.player">
+                <signal_objects object="player.galaxy" param="'init station'" param2="$station" param3="true" />
+              </do_if>
+              <do_else>
+                <set_value name="$controllable" exact="$station" />
+                <include_actions ref="md.InitUniverse.CreateDefenceControlEntity" />
+                <include_actions ref="md.InitUniverse.CreateEngineerEntity" />
+                <create_ai_unit object="$controllable" />
+                <remove_value name="$controllable" />
+              </do_else>
+            </do_if>
+          </actions>
+        </cue>
+
+        <cue name="Scp_Spawn_Container" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_spawn_container'" />
+          </conditions>
+          <actions>
+            <set_value name="$spawnData" exact="event.param3" />
+
+            <create_object name="$crate" macro="macro.sm_gen_wares_rare_01_macro" sector="$spawnData.$offsetComponent">
+              <safepos x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" max="50" />
+            </create_object>
+            <add_cargo object="$crate" ware="ware.{$spawnData.$ware}" exact="$spawnData.$amount" />
+          </actions>
+        </cue>
+
+        <cue name="Scp_Remove_Research" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_remove_research'" />
+          </conditions>
+          <actions>
+            <set_value name="$researchIds" exact="@event.param3" />
+            <debug_text text="'SafeCheatPanel: remove research with id %s, count: %s.' . [@$researchIds, @$researchIds.count]" chance="$debugChance" />
+            <do_for_each name="$researchId" in="$researchIds">
+              <remove_research ware="ware.{$researchId}" />
+            </do_for_each>
+            <raise_lua_event name="'scp_main.researchRemoved'" />
+          </actions>
+        </cue>
+
+        <cue name="Scp_Get_Faction_Relation" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_get_faction_relation'" />
+          </conditions>
+          <actions>
+            <set_value name="$factionId" exact="@event.param3" />
+            <debug_text text="'SafeCheatPanel: Get relation for faction %s.' . [@$factionId]" chance="$debugChance" />
+            <include_actions ref="Scp_Get_Factions" />
+            <include_actions ref="Scp_Get_Relations" />
+            <include_actions ref="Scp_Faction_Relations_Remove_Variables" />
+          </actions>
+        </cue>
+
+        <cue name="Scp_Set_Faction_Relation" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_set_faction_relation'" />
+          </conditions>
+          <actions>
+            <set_value name="$factionId" exact="@event.param3.$factionId" />
+            <set_value name="$otherFactionId" exact="@event.param3.$otherFactionId" />
+            <set_value name="$newRelation" exact="@event.param3.$newRelation" />
+            <include_actions ref="Scp_Get_Factions" />
+            <do_if value="@$primaryFaction != null and @$secondaryFaction != null">
+              <set_faction_relation faction="$primaryFaction" otherfaction="$secondaryFaction" value="$newRelation" reason="relationchangereason.smalltalkreward" />
+              <debug_text text="'SafeCheatPanel: Relation for faction %s to faction %s is set to value %s.' . [@$primaryFaction, @$secondaryFaction, @$newRelation]" chance="$debugChance" />
+            </do_if>
+            <include_actions ref="Scp_Get_Relations" />
+            <include_actions ref="Scp_Faction_Relations_Remove_Variables" />
+          </actions>
+        </cue>
+
+
+        <library name="Scp_Get_Factions" purpose="include_actions">
+          <actions>
+            <set_value name="$factions" exact="[]" />
+            <set_value name="$primaryFaction" exact="null" />
+            <set_value name="$secondaryFaction" exact="null" />
+            <do_for_each name="$faction" in="lookup.faction.list">
+              <do_if value="$faction.id == @$otherFactionId">
+                <set_value name="$secondaryFaction" exact="$faction" />
+              </do_if>
+              <do_if value="$faction.id == @$factionId">
+                <set_value name="$primaryFaction" exact="$faction" />
+              </do_if>
+              <do_elseif value="$faction.isactive and $faction.hastag.hidden == false">
+                <append_to_list name="$factions" exact="$faction" />
+              </do_elseif>
+            </do_for_each>
+            <debug_text text="'SafeCheatPanel: Primary Faction: %s, Secondary Faction: %s, factions: count: %s, value: %s' . [@$primaryFaction, @$secondaryFaction, @$factions.count, @$factions]" chance="$debugChance" />
+          </actions>
+        </library>
+
+        <library name="Scp_Get_Relations" purpose="include_actions">
+          <actions>
+            <set_value name="$relations" exact="table[]" />
+            <do_if value="@$primaryFaction != null">
+              <do_for_each name="$faction" in="$factions">
+                <set_value name="$relations.{'$%s'.[$faction.id]}" exact="$faction.relation.{$faction.relationto.{$primaryFaction}}.uivalue" />
+              </do_for_each>
+            </do_if>
+            <debug_text text="'SafeCheatPanel: Relations: count: %s, value: %s' . [@$relations.keys.count, @$relations]" chance="$debugChance" />
+            <set_value name="player.entity.$safeCheatPanelDataExchange" exact="$relations" />
+            <raise_lua_event name="'scp_main.relationsData'" />
+          </actions>
+        </library>
+
+        <library name="Scp_Faction_Relations_Remove_Variables" purpose="include_actions">
+          <actions>
+            <remove_value name="$factionId" />
+            <remove_value name="$otherFactionId" />
+            <remove_value name="$factions" />
+            <remove_value name="$primaryFaction" />
+            <remove_value name="$secondaryFaction" />
+            <remove_value name="$relations" />
+          </actions>
+        </library>
+
+        <!-- *** Config / Options Menu *** -->
+
+        <!--
+      Reads (or initialises) player.entity.$safeCheatPanelConfig.
+      Leaves a local $config reference; caller must remove_value $config when done.
+      Forward-compat: fills any keys added in later versions.
+    -->
+        <library name="Scp_DefaultConfig" purpose="include_actions" version="1">
+          <actions>
+            <do_if value="@player.entity.$safeCheatPanelConfig == null">
+              <set_value name="player.entity.$safeCheatPanelConfig" exact="table[
+                $mode      = 'normal',
+                $debugMode = 'none',
+              ]" />
+            </do_if>
+            <set_value name="$config" exact="player.entity.$safeCheatPanelConfig" />
+            <do_if value="$config.$mode? == false">
+              <set_value name="$config.$mode" exact="'normal'" />
+            </do_if>
+            <do_if value="$config.$debugMode? == false">
+              <set_value name="$config.$debugMode" exact="'none'" />
+            </do_if>
+            <set_value name="$debugChance" exact="if $config.$debugMode != 'none' then 100 else 0" />
+          </actions>
+        </library>
+
+        <!-- Re-registers the options menu entry each time Simple_Menu_API reloads. -->
+        <cue name="Scp_Register_Menu" instantiate="true" version="1">
+          <conditions>
+            <event_cue_signalled cue="md.Simple_Menu_API.Reloaded" />
+          </conditions>
+          <actions>
+            <signal_cue_instantly cue="md.Simple_Menu_API.Register_Options_Menu"
+              param="table[
+                $id      = 'safe_cheat_panel_options',
+                $columns = 12,
+                $title   = {1972092427, 1},
+                $onOpen  = Scp_Options_Menu,
+              ]" />
+          </actions>
+        </cue>
+
+        <!-- Builds the options page when the player opens the mod's settings. -->
+        <cue name="Scp_Options_Menu" instantiate="true" version="1">
+          <conditions>
+            <event_cue_signalled />
+          </conditions>
+          <actions>
+            <include_actions ref="Scp_DefaultConfig" />
+
+            <!-- Section header -->
+            <run_actions ref="md.Options_Helper.Add_Title_Row">
+              <param name="title" value="{1972092427, 90000}" />
+              <param name="columns" value="12" />
+            </run_actions>
+
+            <!-- Panel Mode dropdown -->
+            <set_value name="$modeOptions" exact="[
+              table[$text = {1972092427, 90002}, $value = 'normal'],
+              table[$text = {1972092427, 90003}, $value = 'extended'],
+            ]" />
+            <set_value name="$currentIndex" exact="1" />
+            <do_if value="$config.$mode == 'extended'">
+              <set_value name="$currentIndex" exact="2" />
+            </do_if>
+            <run_actions ref="md.Options_Helper.Add_Dropdown">
+              <param name="id" value="'mode'" />
+              <param name="options" value="$modeOptions" />
+              <param name="currentIndex" value="$currentIndex" />
+              <param name="col" value="1" />
+              <param name="textColSpan" value="7" />
+              <param name="text" value="{1972092427, 90001}" />
+              <param name="dropdownColSpan" value="5" />
+              <param name="handle" value="Scp_Handle_Option_Changed" />
+            </run_actions>
+            <remove_value name="$modeOptions" />
+            <remove_value name="$currentIndex" />
+
+            <!-- Debug Level dropdown -->
+            <set_value name="$debugOptions" exact="[
+              table[$text = {1001, 34},          $value = 'none'],
+              table[$text = {1972092427, 90005}, $value = 'debug'],
+              table[$text = {1972092427, 90006}, $value = 'trace'],
+            ]" />
+            <set_value name="$currentIndex" exact="1" />
+            <do_if value="$config.$debugMode == 'debug'">
+              <set_value name="$currentIndex" exact="2" />
+            </do_if>
+            <do_elseif value="$config.$debugMode == 'trace'">
+              <set_value name="$currentIndex" exact="3" />
+            </do_elseif>
+            <run_actions ref="md.Options_Helper.Add_Dropdown">
+              <param name="id" value="'debugMode'" />
+              <param name="options" value="$debugOptions" />
+              <param name="currentIndex" value="$currentIndex" />
+              <param name="col" value="1" />
+              <param name="textColSpan" value="7" />
+              <param name="text" value="{1972092427, 90004}" />
+              <param name="dropdownColSpan" value="5" />
+              <param name="handle" value="Scp_Handle_Option_Changed" />
+            </run_actions>
+            <remove_value name="$debugOptions" />
+            <remove_value name="$currentIndex" />
+
+            <remove_value name="$config" />
+          </actions>
+        </cue>
+
+        <!-- Handles confirmation of any dropdown in the options menu. -->
+        <cue name="Scp_Handle_Option_Changed" instantiate="true" version="1">
+          <conditions>
+            <event_cue_signalled />
+          </conditions>
+          <actions>
+            <include_actions ref="Scp_DefaultConfig" />
+            <set_value name="$resultTable" exact="$config" />
+            <include_actions ref="md.Options_Helper.Process_Dropdown_Changed" />
+            <raise_lua_event name="'scp_main.ConfigChanged'"
+              param="table[$mode = $config.$mode, $debugMode = $config.$debugMode]" />
+            <remove_value name="$resultTable" />
+            <include_actions ref="Scp_DefaultConfig" />
+            <remove_value name="$config" />
+          </actions>
+        </cue>
+      </cues>
+    </cue>
+  </cues>
+</mdscript>
