@@ -153,10 +153,14 @@ There you can switch between **Normal** and **Extended** modes, which determines
 
 Debug logging can be enabled to write detailed information about the mod's operations to the X4 log file, which is useful for troubleshooting.
 
+## Videos
+
+- [Galaxy/Sectors Tab Demo](https://www.youtube.com/watch?v=VUtxeSGaLhc)
+
 ## Credits
 
 - **Original Idea**: Forleyor
-- **Author**: Chem O`Dun, on [Nexus Mods](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659)
+- **Author**: Chem O`Dun, on [Nexus Mods](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659) and [Steam Workshop](https://steamcommunity.com/id/chemodun/myworkshopfiles/?appid=392160)
 - *"X4: Foundations"* is a trademark of [Egosoft](https://www.egosoft.com).
 
 ## Acknowledgements
