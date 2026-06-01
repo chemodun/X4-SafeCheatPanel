@@ -1,0 +1,183 @@
+[size=4][u]Safe Cheat Panel[/u][/size]
+
+A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations, galaxy exploration state, and spawning capabilities - all through a clean, tab-based interface.
+
+[b]Warning[/b]: Spawning unusual objects (such as multiple Player HQs) can corrupt saves. Use responsibly.
+
+[size=3][u][b]Important Notice[/b][/u][/size]
+
+[i]Idea Author[/i] made decision to leave the community and removed the original Cheat UI mod. Taking in account his decision to remove all his stuff from the Nexus Mods, I decided to do all my best to replace his part in the latest version of Cheat UI maintained by me and create a new mod called Safe Cheat Panel.
+
+The new mod currently not contains the "development mode" features as I focused on the "safe" features first, but I plan to add them in the future.
+
+Take in account: id of the mod and folder is changed to [b]safe_cheat_panel[/b].
+
+[size=3][u][b]Features[/b][/u][/size]
+[list]
+[*] [b]Player Tab[/b]: Set player money and add spacesuit upgrades and ammo.
+[*] [b]Inventory Tab[/b]: Edit player inventory wares across multiple categories.
+[*] [b]Research Tab[/b]: Unlock or lock research individually, with full dependency handling.
+[*] [b]Blueprints Tab[/b]: Unlock blueprints individually, by subcategory, or all at once.
+[*] [b]Factions Tab[/b]: Edit faction relations with the player and between non-player factions.
+[*] [b]Galaxy/Sectors Tab[/b]: Reveal sectors on the map at three levels of detail, or reveal all at once.
+[*] [b]Spawner Tab[/b]: Spawn stations, ships (with loadout and crew options), and deployable objects.
+[*] [b]Right-click context menu[/b]: Spawn station, spawn ships, spawn objects, teleport ship, teleport player, fix station.
+[*] [b]Two modes[/b]: [b]Normal[/b] (player-owned spawns only) and [b]Extended[/b] (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
+[*] [b]Compatible with X4 8.00 and 9.00[/b].
+[/list]
+[size=3][u][b]Requirements[/b][/u][/size]
+[list]
+[*] [b]X4: Foundations[/b]: Version [b]8.00HF3[/b] or higher and [b]UI Extensions and HUD[/b]: Version [b]v8.0.4.0[/b] or higher by [url=https://next.nexusmods.com/profile/kuertee?gameId=2659]kuertee[/url]:
+[list]
+[*] Available on Nexus Mods: [url=https://www.nexusmods.com/x4foundations/mods/552]UI Extensions and HUD[/url]
+[/list]
+[*] [b]X4: Foundations[/b]: Version [b]9.00 beta 3[/b] or higher and [b]UI Extensions and HUD[/b]: Version [b]v9.0.0.0.3[/b] or higher by [url=https://next.nexusmods.com/profile/kuertee?gameId=2659]kuertee[/url].
+[*] [b]Mod Support APIs[/b]: Version 1.95 or higher by [url=https://next.nexusmods.com/profile/sirnukes?gameId=2659]SirNukes[/url]:
+[list]
+[*] Available on Nexus Mods: [url=https://www.nexusmods.com/x4foundations/mods/503]Mod Support APIs[/url]
+[/list]
+[*] [b]Options Helper[/b]: Version 1.00 or higher by [url=https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659]Chem O`Dun[/url]:
+[list]
+[*] Available on Nexus Mods: [url=https://www.nexusmods.com/x4foundations/mods/2089]Options Helper[/url]
+[/list]
+[/list]
+[size=3][u][b]Installation[/b][/u][/size]
+[list]
+[*] [b]Nexus Mods[/b]: [url=https://www.nexusmods.com/x4foundations/mods/1971]Safe Cheat Panel[/url]
+[/list]
+[size=3][u][b]Usage[/b][/u][/size]
+
+Open the map and click the [b]Safe Cheat Panel[/b] icon in the left sidebar to open the panel.
+
+[size=3][u][i]Player Tab[/i][/u][/size]
+[list]
+[*] Set player money (0 - 1 quadrillion).
+[*] Add spacesuit upgrades.
+[*] Add spacesuit ammo (0 - 10,000).
+[/list]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/spacesuit_upgrades.png[/img]
+
+[size=3][u][i]Inventory Tab[/i][/u][/size]
+
+Edit player inventory wares. Items are grouped by category - select a category from the dropdown to view and edit amounts (0 - 10,000).
+
+Categories: Inventory, Modification Parts, Seminars, Curiosities, Luxury Items, and Mission-Only Items.
+
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/inventory.png[/img]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/modification_parts.png[/img]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/seminars.png[/img]
+
+[size=3][u][i]Research Tab[/i][/u][/size]
+
+Shows all available research, more or less hierarchically. Research can be unlocked or locked individually with full dependency handling:
+[list]
+[*] Unlocking a research item unlocks all of its prerequisites automatically.
+[*] Locking a research item locks all research that depends on it.
+[*] An [b]Unlock All[/b] button is available at the top of the tab.
+[/list]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/research_tab.png[/img]
+
+[size=3][u][i]Blueprints Tab[/i][/u][/size]
+
+Browse and unlock blueprints by category and subcategory, or unlock all at once. Individual items can be unlocked within any subcategory. There is no option to lock back blueprints once unlocked.
+
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/blueprints_start.png[/img]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/blueprints_all_partly_expanded.png[/img]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/blueprints_modules_all.png[/img]
+
+[size=3][u][i]Factions Tab[/i][/u][/size]
+[list]
+[*] Edit faction relations with the player (-30 to +30, mapped to actual internal values).
+[*] Edit relations between non-player factions (available in extended mode).
+[*] Factions become available as they are discovered in-game.
+[*] Locked relations are shown as read-only.
+[/list]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/factions_and_relations.png[/img]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/factions_and_relations_non_player.png[/img]
+
+[size=3][u][i]Galaxy/Sectors Tab[/i][/u][/size]
+
+Reveal sectors on the map at three levels of detail:
+[list]
+[*] [b]Level 1[/b]: Reveal sector position only.
+[*] [b]Level 2[/b]: Reveal the path to the sector from the player (or from the nearest known sector if the target is not directly reachable).
+[*] [b]Level 3[/b]: Reveal all gates and super highways within the sector.
+[/list]
+A [b]Reveal All[/b] button reveals every sector at all levels at once.
+
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/sectors.png[/img]
+
+[size=3][u][i]Spawner Tab[/i][/u][/size]
+
+[size=3][u]Ship Spawner[/u][/size]
+[list]
+[*] Select a ship to spawn.
+[*] Select a loadout (game defaults: Low/Medium/High, or player-defined loadouts).
+[*] Select the owning faction (player only in normal mode; any faction in extended mode).
+[*] Select the crew race (all races available; Kha'ak, Xenon and Drones are not recommended).
+[*] Set the number of ships per row (up to 10) and the number of rows (up to 10).
+[/list]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/loadout_selection.png[/img]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/loadout_result.png[/img][img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/loadout_result_part_2.png[/img]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/crew_race_selection.png[/img]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/crew_result.png[/img]
+
+[size=3][u]Station Spawner[/u][/size]
+[list]
+[*] Select a construction plan (player-created plans, or pre-defined plans in extended mode).
+[*] Select the owning faction (player only in normal mode; any faction in extended mode).
+[/list][img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/station_spawner.png[/img]
+
+[size=3][u]Object Spawner[/u][/size]
+[list]
+[*] Select a deployable object to spawn.
+[*] Set the number per row (up to 10), number of rows (up to 10), and spacing between objects (up to 100 km).
+[/list]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/object_spawner.png[/img]
+
+[size=3][u][i]Right-click Context Menu on Map[/i][/u][/size]
+
+Right-clicking on the map gives access to the following actions, depending on the current panel mode and active tab:
+[list]
+[*] [b]Spawn Station[/b]: Spawns a station at the clicked position using the current Spawner tab settings.
+[*] [b]Fix Station[/b]: Appears only on stations that are missing control entities (defence officer or engineer). Initialises the station correctly.
+[*] [b]Spawn Ships[/b]: Spawns ships at the clicked position using the current Spawner tab settings.
+[*] [b]Spawn Objects[/b]: Spawns deployable objects at the clicked position using the current Spawner tab settings.
+[/list]  [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/spawn_objects_context_menu.png[/img]
+[list][*] [b]Teleport Here[/b]: Teleports the player's currently piloted ship to the clicked position.
+[*] [b]Teleport To[/b]: Teleports the player character to the clicked object or position.
+[/list]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/spawn_object_menu.png[/img]
+
+[size=3][u][i]Extension Options[/i][/u][/size]
+
+An options menu is available via [b]Options Menu > Extension options > Safe Cheat Panel[/b].
+
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/extension_options.png[/img]
+
+There you can switch between [b]Normal[/b] and [b]Extended[/b] modes, which determines the availability of certain features as described in the features section. You can also enable or disable debug logging.
+
+Debug logging can be enabled to write detailed information about the mod's operations to the X4 log file, which is useful for troubleshooting.
+
+[size=3][u][b]Credits[/b][/u][/size]
+[list]
+[*] [b]Original Idea[/b]: Forleyor
+[*] [b]Author[/b]: Chem O`Dun, on [url=https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659]Nexus Mods[/url]
+[*] [i]"X4: Foundations"[/i] is a trademark of [url=https://www.egosoft.com]Egosoft[/url].
+[/list]
+[size=3][u][b]Acknowledgements[/b][/u][/size]
+[list]
+[*] [url=https://www.egosoft.com]EGOSOFT[/url] - for the X series.
+[*] [b]Forleyor[/b] - for the original Cheat UI that this mod is based on.
+[*] [url=https://next.nexusmods.com/profile/kuertee?gameId=2659]kuertee[/url] - for the [b]UI Extensions and HUD[/b] that makes this extension possible.
+[*] [url=https://next.nexusmods.com/profile/sirnukes?gameId=2659]SirNukes[/url] - for the [b]Mod Support APIs[/b] that power the UI hooks and options menu.
+[/list]
+[size=3][u][b]Changelog[/b][/u][/size]
+
+[size=3][u][i][8.00.31] - 2026-06-01[/i][/u][/size]
+[list]
+[*] [b]Added[/b]
+[list]
+[*] Initial public version.
+[/list]
+[/list]
