@@ -175,7 +175,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 ### [8.00.33] - 2026-06-03
 
 - **Added**
-  - Context Menu Option to force build completion of stations.
+  - Context Menu Option to force build completion of Stations.
 
 ### [8.00.32] - 2026-06-02
 
