@@ -141,6 +141,7 @@ Right-clicking on the map gives access to the following actions, depending on th
 [list]
 [*] [b]Spawn Station[/b]: Spawns a station at the clicked position using the current Spawner tab settings.
 [*] [b]Fix Station[/b]: Appears only on stations that are missing control entities (defence officer or engineer). Initialises the station correctly.
+[*] [b]Reveal Stations in Sector[/b]: Reveals all stations in the sector of the clicked position on the map, including their names and positions.
 [*] [b]Spawn Ships[/b]: Spawns ships at the clicked position using the current Spawner tab settings.
 [*] [b]Spawn Objects[/b]: Spawns deployable objects at the clicked position using the current Spawner tab settings.
 [/list]  [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/spawn_objects_context_menu.png[/img]
@@ -166,19 +167,24 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [/list]
 [size=3][u][b]Credits[/b][/u][/size]
 [list]
-[*] [b]Original Idea[/b]: Forleyor
 [*] [b]Author[/b]: Chem O`Dun, on [url=https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659]Nexus Mods[/url] and [url=https://steamcommunity.com/id/chemodun/myworkshopfiles/?appid=392160]Steam Workshop[/url]
 [*] [i]"X4: Foundations"[/i] is a trademark of [url=https://www.egosoft.com]Egosoft[/url].
 [/list]
 [size=3][u][b]Acknowledgements[/b][/u][/size]
 [list]
 [*] [url=https://www.egosoft.com]EGOSOFT[/url] - for the X series.
-[*] [b]Forleyor[/b] - for the original Cheat UI that this mod is based on.
 [*] [url=https://next.nexusmods.com/profile/kuertee?gameId=2659]kuertee[/url] - for the [b]UI Extensions and HUD[/b] that makes this extension possible.
 [*] [url=https://next.nexusmods.com/profile/sirnukes?gameId=2659]SirNukes[/url] - for the [b]Mod Support APIs[/b] that power the UI hooks and options menu.
 [/list]
 [size=3][u][b]Changelog[/b][/u][/size]
 
+[size=3][u][i][8.00.32] - 2026-06-02[/i][/u][/size]
+[list]
+[*] [b]Added[/b]
+[list]
+[*] Context Menu Option to reveal all Stations in a Sector
+[/list]
+[/list]
 [size=3][u][i][8.00.31] - 2026-06-01[/i][/u][/size]
 [list]
 [*] [b]Added[/b]
