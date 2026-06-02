@@ -135,6 +135,7 @@ Right-clicking on the map gives access to the following actions, depending on th
 
 - **Spawn Station**: Spawns a station at the clicked position using the current Spawner tab settings.
 - **Fix Station**: Appears only on stations that are missing control entities (defence officer or engineer). Initialises the station correctly.
+- **Reveal Stations in Sector**: Reveals all stations in the sector of the clicked position on the map, including their names and positions.
 - **Spawn Ships**: Spawns ships at the clicked position using the current Spawner tab settings.
 - **Spawn Objects**: Spawns deployable objects at the clicked position using the current Spawner tab settings.
   ![Spawn Objects Context Menu](docs/images/spawn_objects_context_menu.png)
@@ -159,18 +160,21 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Credits
 
-- **Original Idea**: Forleyor
 - **Author**: Chem O`Dun, on [Nexus Mods](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659) and [Steam Workshop](https://steamcommunity.com/id/chemodun/myworkshopfiles/?appid=392160)
 - *"X4: Foundations"* is a trademark of [Egosoft](https://www.egosoft.com).
 
 ## Acknowledgements
 
 - [EGOSOFT](https://www.egosoft.com) - for the X series.
-- **Forleyor** - for the original Cheat UI that this mod is based on.
 - [kuertee](https://next.nexusmods.com/profile/kuertee?gameId=2659) - for the `UI Extensions and HUD` that makes this extension possible.
 - [SirNukes](https://next.nexusmods.com/profile/sirnukes?gameId=2659) - for the `Mod Support APIs` that power the UI hooks and options menu.
 
 ## Changelog
+
+### [8.00.32] - 2026-06-02
+
+- **Added**
+  - Context Menu Option to reveal all Stations in a Sector
 
 ### [8.00.31] - 2026-06-01
 

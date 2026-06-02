@@ -506,6 +506,46 @@
             <remove_value name="$config" />
           </actions>
         </cue>
+
+        <cue name="Scp_Add_Menu_Reveal_Stations_In_Sector" instantiate="true" version="1">
+          <conditions>
+            <event_cue_signalled cue="md.Interact_Menu_API.Get_Actions" />
+            <check_value value="@event.param.$object.isclass.{class.sector}" />
+            <check_value value="@event.param.$offsetcomponent == @event.param.$object" />
+          </conditions>
+          <actions>
+            <debug_text text="'SafeCheatPanel: Adding reveal stations action to interact menu for sector %s'. [event.param.$object.name]" chance="$debugChance" />
+            <find_station name="$stations" space="@event.param.$object" active="true" functional="true" multiple="true" known="false" checkoperational="true" />
+            <debug_text text="'SafeCheatPanel: Found %s unknown stations in sector %s that are active, functional and operational'. [$stations.count, @event.param.$object.name]" chance="$debugChance" />
+            <do_if value="@$stations.count gt 0">
+              <signal_cue_instantly cue="md.Interact_Menu_API.Add_Action" param="table[
+                $id             = 'scp_reveal_sector',
+                $section        = 'scpCheats',
+                $text           = {1972092427, 108},
+                $active         = true,
+                $callback       = Scp_Reveal_Stations_In_Sector,
+              ]" />
+            </do_if>
+          </actions>
+        </cue>
+
+        <cue name="Scp_Reveal_Stations_In_Sector" instantiate="true" version="1">
+          <conditions>
+            <event_cue_signalled />
+            <check_value value="@event.param.$object.isclass.{class.sector}" />
+            <check_value value="@event.param.$offsetcomponent == @event.param.$object" />
+          </conditions>
+          <actions>
+            <debug_text text="'SafeCheatPanel: Reveal stations action triggered from interact menu for sector %s'. [event.param.$object.name]" chance="$debugChance" />
+            <find_station name="$stations" space="@event.param.$object" active="true" functional="true" multiple="true" known="false" checkoperational="true" />
+            <debug_text text="'SafeCheatPanel: Found %s unknown stations in sector %s that are active, functional and operational to reveal'. [$stations.count, @event.param.$object.name]" chance="$debugChance" />
+            <do_for_each name="$station" in="$stations">
+              <debug_text text="'SafeCheatPanel: Revealing station %s (is known %s) with owner %s (is known %s) in sector %s'. [$station.debugname, $station.isknown, $station.owner.name, @$station.owner.isknown, @event.param.$object.name]" chance="$debugChance" />
+              <set_known object="$station" known="true" updatesnapshot="true" />
+            </do_for_each>
+          </actions>
+        </cue>
+
       </cues>
     </cue>
   </cues>
