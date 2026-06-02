@@ -21,17 +21,9 @@ ffi.cdef [[
 	  GameVersion GetGameVersion();
 
     RelationDetails GetFactionRelationStatus2(const char* factionid);
-    UniverseID GetPlayerID(void);
-    UniverseID GetPlayerShipID(void);
-    UniverseID GetPlayerZoneID(void);
-    int64_t GetCurrentUTCDataTime(void);
     bool CanResearch(void);
-    const char* GetPlayerName(void);
-    void SetFactionRelationToPlayerFaction(const char* factionid, const char* reason, float newrelation);
     bool IsComponentClass(UniverseID componentid, const char* classname);
-    uint32_t GetNumWares(const char* tags, bool research, const char* licenceownerid, const char* exclusiontags);
-    uint32_t GetWares(const char** result, uint32_t resultlen, const char* tags, bool research, const char* licenceownerid, const char* exclusiontags);
-    void LearnBlueprint(const char* wareid);
+    void ForceBuildCompletion(UniverseID containerid);
 ]]
 --endregion
 
@@ -153,8 +145,9 @@ local config = {
         scp.spawner.SpawnObject(s.object.macro, s.object.rows, s.object.numPerRow, s.object.spacing, s.object.ownerId)
       end
     },
-    ["teleportObject"] = { text = ReadText(1972092427, 104), scriptFunction = function() scp.player.TeleportObject(menu, interactMenu, scp.helpers) end },
-    ["teleportPlayer"] = { text = ReadText(1972092427, 105), scriptFunction = function() scp.player.TeleportPlayer(menu, interactMenu) end },
+    ["forceBuildCompletion"] = { text = ReadText(1972092427, 109), scriptFunction = function() scp.ForceBuildCompletion() end },
+    ["teleportObject"] = { text = ReadText(1972092427, 104), scriptFunction = function() scp.TeleportObject() end },
+    ["teleportPlayer"] = { text = ReadText(1972092427, 105), scriptFunction = function() scp.player.TeleportPlayer(false) end },
     -- ["teleportPlayerSeat"] = { text = ReadText(1972092427, 106), scriptFunction = function() scp.player.TeleportPlayer(true) end }
   },
 
@@ -181,6 +174,11 @@ local config = {
       type = "scp_cheat",
       actiontype = "lua;fixStation",
       fixStation = true
+    },
+    {
+      type = "scp_cheat",
+      actiontype = "lua;forceBuildCompletion",
+      forceBuildCompletion = true
     },
     {
       type = "scp_cheat",
@@ -338,10 +336,12 @@ function scp.prepareActions(actions, definedActions)
         isToBeDisplayed = scp.spawner.showSpawnOption(action.spawnMode, scp.tableMode, nil)
       elseif action.fixStation then
         isToBeDisplayed = scp.spawner.isStationMissingControlEntities()
+      elseif action.forceBuildCompletion then
+        isToBeDisplayed = scp.isValidForceBuildCompletion()
       elseif action.teleportObject then
-        isToBeDisplayed = scp.spawner.isValidTeleportObject()
+        isToBeDisplayed = scp.isValidTeleportObject()
       elseif action.teleportPlayer then
-        isToBeDisplayed = scp.spawner.isValidTeleportPlayer(false)
+        isToBeDisplayed = scp.player.isValidTeleportPlayer()
       end
       if isToBeDisplayed then
         scp.addAction(actions, definedActions, action, isToBeDisplayed)
@@ -389,6 +389,55 @@ function scp.addAction(actions, definedActions, action, isToBeDisplayed)
     istobedisplayed = isToBeDisplayed
   })
   definedActions[action.actiontype] = #actions
+end
+
+function scp.isValidForceBuildCompletion()
+  if interactMenu.componentSlot.component == nil then return false end
+  local object64 = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
+  local owner, realclassid = GetComponentData(object64, "owner", "realclassid")
+  if not Helper.isComponentClass(realclassid, "station") then return false end
+  if owner == nil or owner ~= "player" then return false end
+  if IsComponentConstruction(object64) then return true end
+  if C.GetNumPlannedStationModules(object64, false) > 0 then return true end
+  return false
+end
+
+function scp.ForceBuildCompletion()
+  if interactMenu.componentSlot.component == nil then return false end
+  C.ForceBuildCompletion(interactMenu.componentSlot.component)
+  scp.helpers.interactMenuFinishAction()
+end
+
+
+function scp.isValidTeleportObject()
+  local component = C.GetPlayerShipID()
+  local convertedComponent = ConvertStringTo64Bit(tostring(C.GetPlayerShipID()))
+  if component ~= nil and convertedComponent ~= 0 then
+    local pilot = GetComponentData(convertedComponent, "pilot")
+    local isPlayerPilot = GetComponentData(pilot, "name") == ffi.string(C.GetPlayerName())
+    return isPlayerPilot
+  end
+  return false
+end
+
+function scp.TeleportObject()
+  local targetObject
+  if menu.selectedcomponent ~= nil then
+    targetObject = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
+  else
+    targetObject = ConvertStringToLuaID(tostring(C.GetPlayerShipID()))
+  end
+  local data = {
+    object = targetObject,
+    offsetComponent = ConvertStringToLuaID(tostring(interactMenu.offsetcomponent)),
+    position = {
+      x = interactMenu.offset.x,
+      y = interactMenu.offset.y,
+      z = interactMenu.offset.z
+    }
+  }
+  AddUITriggeredEvent("scp_main", "scp_teleport_object", data)
+  scp.helpers.interactMenuFinishAction()
 end
 
 --endregion

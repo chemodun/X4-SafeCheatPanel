@@ -15,6 +15,7 @@
         <t id="106">Teleport to Pilot Seat</t>
         <t id="107">Fix Station Control Entities</t>
         <t id="108">Reveal Stations in Sector</t>
+        <t id="109">Force Build Completion</t>
 
         <!-- Tab 1: Player -->
         <t id="1000">Player</t>

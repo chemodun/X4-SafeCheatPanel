@@ -469,32 +469,6 @@ function scpSpawner.isStationMissingControlEntities()
   return (defencenpc == nil or defencenpc == 0) or (engineer == nil or engineer == 0)
 end
 
-function scpSpawner.isValidTeleportObject()
-  local component = C.GetPlayerShipID()
-  local convertedComponent = ConvertStringTo64Bit(tostring(C.GetPlayerShipID()))
-  if component ~= nil and convertedComponent ~= 0 then
-    local pilot = GetComponentData(convertedComponent, "pilot")
-    local isPlayerPilot = GetComponentData(pilot, "name") == ffi.string(C.GetPlayerName())
-    return isPlayerPilot
-  end
-  return false
-end
-
-function scpSpawner.isValidTeleportPlayer(seat)
-  local isValid = false
-  if interactMenu.componentSlot.component ~= nil then
-    local object64 = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
-    if C.IsComponentClass(object64, "ship") or C.IsComponentClass(object64, "station") then
-      isValid = true
-      if seat then
-        isValid = C.IsComponentClass(object64, "ship_s") or C.IsComponentClass(object64, "ship_m")
-            and GetComponentData(object64, "owner") == "player" and GetComponentData(object64, "assignedpilot")
-      end
-    end
-  end
-  return isValid
-end
-
 -- *** Data mutation callbacks ***
 
 local function isPresetLoadout(loadoutId)

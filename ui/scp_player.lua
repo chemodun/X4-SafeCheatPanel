@@ -7,8 +7,8 @@ ffi.cdef [[
 	void AddPlayerMoney(int64_t money);
 ]]
 
-local mapMenu = Helper.getMenu("MapMenu")
-local scpMenuHelper = require("extensions.safe_cheat_panel.ui.scp_menu_helper")
+local menu         = Helper.getMenu("MapMenu")
+local interactMenu = Helper.getMenu("InteractMenu")
 
 local PAGE_ID = 1972092427
 
@@ -16,7 +16,7 @@ local scpPlayer = {}
 
 function scpPlayer.SetPlayerMoney(newBalance)
   if not newBalance then
-    mapMenu.refreshInfoFrame()
+    menu.refreshInfoFrame()
     return
   end
   local maxMoney = 1e15
@@ -24,7 +24,7 @@ function scpPlayer.SetPlayerMoney(newBalance)
   local currentBalance = GetPlayerMoney()
   C.AddPlayerMoney(-currentBalance * 100)
   C.AddPlayerMoney(newBalance * 100)
-  mapMenu.refreshInfoFrame()
+  menu.refreshInfoFrame()
 end
 
 function scpPlayer.createSection(frameTable, numDisplayed, scp)
@@ -141,28 +141,22 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
   return numDisplayed
 end
 
-
-function scpPlayer.TeleportObject(menu, interactMenu, scpHelpers)
-  local targetObject
-  if menu.selectedcomponent ~= nil then
-    targetObject = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
-  else
-    targetObject = ConvertStringToLuaID(tostring(C.GetPlayerShipID()))
+function scpPlayer.isValidTeleportPlayer(seat)
+  local isValid = false
+  if interactMenu.componentSlot.component ~= nil then
+    local object64 = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
+    if C.IsComponentClass(object64, "ship") or C.IsComponentClass(object64, "station") then
+      isValid = true
+      if seat then
+        isValid = C.IsComponentClass(object64, "ship_s") or C.IsComponentClass(object64, "ship_m")
+            and GetComponentData(object64, "owner") == "player" and GetComponentData(object64, "assignedpilot")
+      end
+    end
   end
-  local data = {
-    object = targetObject,
-    offsetComponent = ConvertStringToLuaID(tostring(interactMenu.offsetcomponent)),
-    position = {
-      x = interactMenu.offset.x,
-      y = interactMenu.offset.y,
-      z = interactMenu.offset.z
-    }
-  }
-  AddUITriggeredEvent("scp_main", "scp_teleport_object", data)
-  scpHelpers.interactMenuFinishAction()
+  return isValid
 end
 
-function scpPlayer.TeleportPlayer(menu, interactMenu)
+function scpPlayer.TeleportPlayer(seat)
   C.TeleportPlayerTo(interactMenu.componentSlot.component, true, true, true)
   interactMenu.onCloseElement("close")
 end
