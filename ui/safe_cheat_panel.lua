@@ -112,8 +112,12 @@ local config = {
     },
   },
 
-  luaActions = {
+  contextMenuActions = {
     ["spawnStation"] = {
+      type = "scp_cheat",
+      actiontype = "lua;spawnStation",
+      spawnMode = "spawnModeStation",
+      spawner = true,
       text = ReadText(1972092427, 101),
       scriptFunction = function()
         local s = scp.spawner.state
@@ -121,12 +125,19 @@ local config = {
       end
     },
     ["fixStation"] = {
+      type = "scp_cheat",
+      actiontype = "lua;fixStation",
+      fixStation = true,
       text = ReadText(1972092427, 107),
       scriptFunction = function()
         scp.spawner.FixStation()
       end
     },
     ["spawnShip"] = {
+      type = "scp_cheat",
+      actiontype = "lua;spawnShip",
+      spawnMode = "spawnModeShip",
+      spawner = true,
       text = ReadText(1972092427, 102),
       scriptFunction = function()
         local s = scp.spawner.state
@@ -139,62 +150,44 @@ local config = {
       end
     },
     ["spawnObject"] = {
+      type = "scp_cheat",
+      actiontype = "lua;spawnObject",
+      spawnMode = "spawnModeObject",
+      spawner = true,
       text = ReadText(1972092427, 103),
       scriptFunction = function()
         local s = scp.spawner.state
         scp.spawner.SpawnObject(s.object.macro, s.object.rows, s.object.numPerRow, s.object.spacing, s.object.ownerId)
       end
     },
-    ["forceBuildCompletion"] = { text = ReadText(1972092427, 109), scriptFunction = function() scp.ForceBuildCompletion() end },
-    ["teleportObject"] = { text = ReadText(1972092427, 104), scriptFunction = function() scp.TeleportObject() end },
-    ["teleportPlayer"] = { text = ReadText(1972092427, 105), scriptFunction = function() scp.player.TeleportPlayer(false) end },
-    -- ["teleportPlayerSeat"] = { text = ReadText(1972092427, 106), scriptFunction = function() scp.player.TeleportPlayer(true) end }
-  },
-
-  actions = {
-    {
-      type = "scp_cheat",
-      actiontype = "lua;spawnStation",
-      spawnMode = "spawnModeStation",
-      spawner = true
-    },
-    {
-      type = "scp_cheat",
-      actiontype = "lua;spawnShip",
-      spawnMode = "spawnModeShip",
-      spawner = true
-    },
-    {
-      type = "scp_cheat",
-      actiontype = "lua;spawnObject",
-      spawnMode = "spawnModeObject",
-      spawner = true
-    },
-    {
-      type = "scp_cheat",
-      actiontype = "lua;fixStation",
-      fixStation = true
-    },
-    {
+    ["forceBuildCompletion"] = {
       type = "scp_cheat",
       actiontype = "lua;forceBuildCompletion",
-      forceBuildCompletion = true
+      forceBuildCompletion = true,
+      text = ReadText(1972092427, 109),
+      scriptFunction = function() scp.ForceBuildCompletion() end
     },
-    {
+    ["teleportObject"] = {
       type = "scp_cheat",
       actiontype = "lua;teleportObject",
-      teleportObject = true
+      teleportObject = true,
+      text = ReadText(1972092427, 104),
+      scriptFunction = function() scp.TeleportObject() end
     },
-    {
+    ["teleportPlayer"] = {
       type = "scp_cheat",
       actiontype = "lua;teleportPlayer",
-      teleportPlayer = true
+      teleportPlayer = true,
+      text = ReadText(1972092427, 105),
+      scriptFunction = function() scp.player.TeleportPlayer(false) end
     },
-    -- {
-    --     type = "scp_cheat",
-    --     actiontype = "lua;teleportPlayerSeat",
-    --     teleportPlayerSeat = true
-    -- },
+    -- ["teleportPlayerSeat"] = {
+    --   type = "scp_cheat",
+    --   actiontype = "lua;teleportPlayerSeat",
+    --   teleportPlayerSeat = true,
+    --   text = ReadText(1972092427, 106),
+    --   scriptFunction = function() scp.player.TeleportPlayer(true) end
+    -- }
   },
 
   blacklistedFactions = { ["civilian"] = true, ["criminal"] = true, ["outlaw"] = true, ["smuggler"] = true, ["visitor"] = true },
@@ -313,13 +306,13 @@ end
 
 --endregion
 
---region Lua Actions
+--region Context Menu Actions
 function scp.insertLuaAction(actionType, _)
-  if scp.isSectionAdded then
+  if scp.isSectionAdded and config.contextMenuActions[actionType] then
     interactMenu.insertInteractionContent("scpCheats", {
       type = "scp_cheat",
-      text = config.luaActions[actionType].text,
-      script = config.luaActions[actionType].scriptFunction,
+      text = config.contextMenuActions[actionType].text,
+      script = config.contextMenuActions[actionType].scriptFunction,
       mouseOverText = "",
       helpOverlayID = "",
       helpOverlayText = "",
@@ -331,7 +324,7 @@ end
 function scp.prepareActions(actions, definedActions)
   if scp.isSectionAdded then
     local isToBeDisplayed = false
-    for _, action in pairs(config.actions) do
+    for _, action in pairs(config.contextMenuActions) do
       if action.spawner then
         isToBeDisplayed = scp.spawner.showSpawnOption(action.spawnMode, scp.tableMode, nil)
       elseif action.fixStation then
