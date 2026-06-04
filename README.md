@@ -24,6 +24,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, force station build completion, teleport ship, teleport player, reveal all stations in sector.
 - **Two modes**: **Normal** (player-owned spawns only) and **Extended** (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
 - **Compatible with X4 8.00 and 9.00**.
+- **Can work with SWI** - please use with the [kuertee UI Extensions and HUD for SW Interworlds adoption mod](https://www.nexusmods.com/x4foundations/mods/2134).
 
 ## Requirements
 
