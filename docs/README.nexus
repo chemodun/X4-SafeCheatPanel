@@ -179,6 +179,13 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [/list]
 [size=3][u][b]Changelog[/b][/u][/size]
 
+[size=3][u][i][8.00.34] - 2026-06-04[/i][/u][/size]
+[list]
+[*] [b]Fixed[/b]
+[list]
+[*] Context menu disappearing in some cases (legacy issue).
+[/list]
+[/list]
 [size=3][u][i][8.00.33] - 2026-06-03[/i][/u][/size]
 [list]
 [*] [b]Added[/b]
