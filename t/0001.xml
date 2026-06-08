@@ -15,7 +15,7 @@
         <t id="106">Teleport to Pilot Seat</t>
         <t id="107">Fix Station Control Entities</t>
         <t id="108">Reveal Stations in Sector</t>
-        <t id="109">Force Build Completion: Station</t>
+        <t id="109">Force Build Completion: Current Station</t>
         <t id="110">Force Build Completion: All Faction Stations</t>
         <t id="111">Restock: Current Station</t>
         <t id="112">Restock: All Faction Stations</t>

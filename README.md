@@ -21,7 +21,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Factions Tab**: Edit faction relations with the player and between non-player factions.
 - **Galaxy/Sectors Tab**: Reveal sectors on the map at three levels of detail, or reveal all at once.
 - **Spawner Tab**: Spawn stations, ships (with loadout and crew options), and deployable objects.
-- **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, force station build completion, teleport ship, teleport player, reveal all stations in sector.
+- **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector.
 - **Two modes**: **Normal** (player-owned spawns only) and **Extended** (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
 - **Compatible with X4 8.00 and 9.00**.
 - **Can work with SWI** - please use with the [kuertee UI Extensions and HUD for SW Interworlds adoption mod](https://www.nexusmods.com/x4foundations/mods/2134).
@@ -140,7 +140,12 @@ Right-clicking on the map gives access to the following actions, depending on th
 - **Spawn Ships**: Spawns ships at the clicked position using the current Spawner tab settings.
 - **Spawn Objects**: Spawns deployable objects at the clicked position using the current Spawner tab settings.
   ![Spawn Objects Context Menu](docs/images/spawn_objects_context_menu.png)
-- **Force Build Completion**: Instantly completes the construction of a station that is currently building, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction.
+- **Force Build Completion: Current Station**: Instantly completes the construction of a station that is currently building, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *In* **extended** *mode available for non-player faction stations*.
+- **Force Build Completion: All Faction Stations**: Instantly completes the construction of all stations belonging to the same faction, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
+- **Restock: Current Station**: Instantly restocks the current station with all required resources. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *In* **extended** *mode available for non-player faction stations*.
+- **Restock: All Faction Stations**: Instantly restocks all stations belonging to the same faction with all required resources. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
+- **Restock: Current Build Storage**: Instantly restocks the current station's build storage with all required resources. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *In* **extended** *mode available for non-player faction stations*.
+- **Restock: All Faction Build Storages**: Instantly restocks all stations belonging to the same faction with all required resources in their build storages. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
 - **Teleport Here**: Teleports the player's currently piloted ship to the clicked position.
 - **Teleport To**: Teleports the player character to the clicked object or position.
 
@@ -172,6 +177,12 @@ Debug logging can be enabled to write detailed information about the mod's opera
 - [SirNukes](https://next.nexusmods.com/profile/sirnukes?gameId=2659) - for the `Mod Support APIs` that power the UI hooks and options menu.
 
 ## Changelog
+
+### [8.00.35] - 2026-06-09
+
+- **Added**
+  - Context Menu Option to force build completion of all faction stations.
+  - Context Menu Option to restock station and station build storage (current and all faction stations).
 
 ### [8.00.34] - 2026-06-04
 
