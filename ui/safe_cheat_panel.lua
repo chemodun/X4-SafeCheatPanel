@@ -115,7 +115,8 @@ local config = {
   },
 
   contextMenuActions = {
-    ["spawnStation"] = {
+    {
+      id = "spawnStation",
       type = "scp_cheat",
       actiontype = "lua;spawnStation",
       spawnMode = "spawnModeStation",
@@ -126,7 +127,8 @@ local config = {
         scp.spawner.spawnStation(s.station.name, s.station.plan, s.station.ownerId)
       end
     },
-    ["fixStation"] = {
+    {
+      id = "fixStation",
       type = "scp_cheat",
       actiontype = "lua;fixStation",
       isValidFunction = function() return scp.spawner.isStationMissingControlEntities() end,
@@ -135,7 +137,8 @@ local config = {
         scp.spawner.fixStation()
       end
     },
-    ["spawnShip"] = {
+    {
+      id = "spawnShip",
       type = "scp_cheat",
       actiontype = "lua;spawnShip",
       spawnMode = "spawnModeShip",
@@ -151,7 +154,8 @@ local config = {
           s.ships_sel.loadoutFaction)
       end
     },
-    ["spawnObject"] = {
+    {
+      id = "spawnObject",
       type = "scp_cheat",
       actiontype = "lua;spawnObject",
       spawnMode = "spawnModeObject",
@@ -162,35 +166,64 @@ local config = {
         scp.spawner.spawnObject(s.object.macro, s.object.rows, s.object.numPerRow, s.object.spacing, s.object.ownerId)
       end
     },
-    ["forceBuildCompletion"] = {
+    {
+      id = "forceBuildCompletion",
       type = "scp_cheat",
       actiontype = "lua;forceBuildCompletion",
       isValidFunction = function() return scp.station.isValidForceBuildCompletion() end,
       text = ReadText(1972092427, 109),
       scriptFunction = function() scp.station.forceBuildCompletion() end
     },
-    ["fillWaresGapStation"] = {
+    {
+      id = "forceBuildCompletionForAllFaction",
+      type = "scp_cheat",
+      actiontype = "lua;forceBuildCompletionForAllFaction",
+      isValidFunction = function() return scp.isExtendedMode() and scp.station.isValidForceBuildCompletionForAllFaction() end,
+      text = ReadText(1972092427, 110),
+      scriptFunction = function() scp.station.forceBuildCompletionForAllFaction() end
+    },
+    {
+      id = "fillWaresGapStation",
       type = "scp_cheat",
       actiontype = "lua;fillWaresGapStation",
       isValidFunction = function() return scp.station.isValidFillWaresGapStation() end,
-      text = ReadText(1972092427, 110),
+      text = ReadText(1972092427, 111),
       scriptFunction = function() scp.station.fillWaresGapStation() end
     },
-    ["fillWaresGapBuildStorage"] = {
+    {
+      id = "fillWaresGapStationForAllFaction",
+      type = "scp_cheat",
+      actiontype = "lua;fillWaresGapStationForAllFaction",
+      isValidFunction = function() return scp.isExtendedMode() and scp.station.isValidFillWaresGapStationForAllFaction() end,
+      text = ReadText(1972092427, 112),
+      scriptFunction = function() scp.station.fillWaresGapStationForAllFaction() end
+    },
+    {
+      id = "fillWaresGapBuildStorage",
       type = "scp_cheat",
       actiontype = "lua;fillWaresGapBuildStorage",
       isValidFunction = function() return scp.station.isValidFillWaresGapBuildStorage() end,
-      text = ReadText(1972092427, 111),
+      text = ReadText(1972092427, 113),
       scriptFunction = function() scp.station.fillWaresGapBuildStorage() end
     },
-    ["teleportObject"] = {
+    {
+      id = "fillWaresGapBuildStorageForAllFaction",
+      type = "scp_cheat",
+      actiontype = "lua;fillWaresGapBuildStorageForAllFaction",
+      isValidFunction = function() return scp.isExtendedMode() and scp.station.isValidFillWaresGapBuildStorageForAllFaction() end,
+      text = ReadText(1972092427, 114),
+      scriptFunction = function() scp.station.fillWaresGapBuildStorageForAllFaction() end
+    },
+    {
+      id = "teleportObject",
       type = "scp_cheat",
       actiontype = "lua;teleportObject",
       isValidFunction = function() return scp.isValidTeleportObject() end,
       text = ReadText(1972092427, 104),
       scriptFunction = function() scp.teleportObject() end
     },
-    ["teleportPlayer"] = {
+    {
+      id = "teleportPlayer",
       type = "scp_cheat",
       actiontype = "lua;teleportPlayer",
       isValidFunction = function() return scp.player.isValidTeleportPlayer() end,
@@ -324,11 +357,19 @@ end
 
 --region Context Menu Actions
 function scp.insertLuaAction(actionType, _)
-  if scp.isSectionAdded and config.contextMenuActions[actionType] then
+  if scp.isSectionAdded then
+    local actionData = nil
+    for i = 1, #config.contextMenuActions do
+      local action = config.contextMenuActions[i]
+      if action.id == actionType then
+        actionData = action
+        break
+      end
+    end
     interactMenu.insertInteractionContent("scpCheats", {
       type = "scp_cheat",
-      text = config.contextMenuActions[actionType].text,
-      script = config.contextMenuActions[actionType].scriptFunction,
+      text = actionData.text,
+      script = actionData.scriptFunction,
       mouseOverText = "",
       helpOverlayID = "",
       helpOverlayText = "",
@@ -340,7 +381,8 @@ end
 function scp.prepareActions(actions, definedActions)
   if scp.isSectionAdded then
     local isToBeDisplayed = false
-    for _, action in pairs(config.contextMenuActions) do
+    for i = 1, #config.contextMenuActions do
+      local action = config.contextMenuActions[i]
       if action.isValidFunction() then
         scp.addAction(actions, definedActions, action, isToBeDisplayed)
       end

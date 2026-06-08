@@ -296,13 +296,16 @@
             <event_ui_triggered screen="'scp_main'" control="'scp_add_wares'" />
           </conditions>
           <actions>
-            <set_value name="$addWaresData" exact="event.param3" />
-            <debug_text text="'SafeCheatPanel: Adding wares to object %s, wares: %s, amounts: %s'. [$addWaresData.$object.debugname, @$addWaresData.$wares, @$addWaresData.$amounts]" chance="$debugChance" />
-            <set_value name="$object" exact="$addWaresData.$object" />
-            <set_value name="$wares" exact="$addWaresData.$wares" />
-            <set_value name="$amounts" exact="$addWaresData.$amounts" />
-            <do_for_each name="$ware" in="$wares" counter="$i">
-              <add_wares object="$object" ware="ware.{$ware}" exact="$amounts.{$i}" />
+            <set_value name="$allWaresData" exact="event.param3" />
+            <debug_text text="'SafeCheatPanel: Count record in all wares data: %s'. [@$allWaresData.count]" chance="$debugChance" />
+            <do_for_each name="$addWaresData" in="$allWaresData">
+              <debug_text text="'SafeCheatPanel: Adding wares to object %s, wares: %s, amounts: %s'. [$addWaresData.$object.debugname, @$addWaresData.$wares, @$addWaresData.$amounts]" chance="$debugChance" />
+              <set_value name="$object" exact="$addWaresData.$object" />
+              <set_value name="$wares" exact="$addWaresData.$wares" />
+              <set_value name="$amounts" exact="$addWaresData.$amounts" />
+              <do_for_each name="$ware" in="$wares" counter="$i">
+                <add_wares object="$object" ware="ware.{$ware}" exact="$amounts.{$i}" />
+              </do_for_each>
             </do_for_each>
           </actions>
         </cue>
@@ -441,7 +444,7 @@
         </cue>
 
         <!-- Builds the options page when the player opens the mod's settings. -->
-        <cue name="Scp_Options_Menu" instantiate="true" version="1">
+        <cue name="Scp_Options_Menu" instantiate="true" version="2">
           <conditions>
             <event_cue_signalled />
           </conditions>
@@ -456,20 +459,25 @@
 
             <!-- Panel Mode dropdown -->
             <set_value name="$modeOptions" exact="[
-              table[$text = {1972092427, 90002}, $value = 'normal'],
-              table[$text = {1972092427, 90003}, $value = 'extended'],
+              table[$text = {1972092427, 90011}, $value = 'normal'],
+              table[$text = {1972092427, 90012}, $value = 'extended'],
             ]" />
+            <!-- 
+              table[$text = {1972092427, 90013}, $value = 'developer'], -->
             <set_value name="$currentIndex" exact="1" />
             <do_if value="$config.$mode == 'extended'">
               <set_value name="$currentIndex" exact="2" />
             </do_if>
+            <do_elseif value="$config.$mode == 'developer'">
+              <set_value name="$currentIndex" exact="3" />
+            </do_elseif>
             <run_actions ref="md.Options_Helper.Add_Dropdown">
               <param name="id" value="'mode'" />
               <param name="options" value="$modeOptions" />
               <param name="currentIndex" value="$currentIndex" />
               <param name="col" value="1" />
               <param name="textColSpan" value="7" />
-              <param name="text" value="{1972092427, 90001}" />
+              <param name="text" value="{1972092427, 90010}" />
               <param name="dropdownColSpan" value="5" />
               <param name="handle" value="Scp_Handle_Option_Changed" />
             </run_actions>
@@ -479,8 +487,8 @@
             <!-- Debug Level dropdown -->
             <set_value name="$debugOptions" exact="[
               table[$text = {1001, 34},          $value = 'none'],
-              table[$text = {1972092427, 90005}, $value = 'debug'],
-              table[$text = {1972092427, 90006}, $value = 'trace'],
+              table[$text = {1972092427, 90091}, $value = 'debug'],
+              table[$text = {1972092427, 90092}, $value = 'trace'],
             ]" />
             <set_value name="$currentIndex" exact="1" />
             <do_if value="$config.$debugMode == 'debug'">
@@ -495,7 +503,7 @@
               <param name="currentIndex" value="$currentIndex" />
               <param name="col" value="1" />
               <param name="textColSpan" value="7" />
-              <param name="text" value="{1972092427, 90004}" />
+              <param name="text" value="{1972092427, 90090}" />
               <param name="dropdownColSpan" value="5" />
               <param name="handle" value="Scp_Handle_Option_Changed" />
             </run_actions>

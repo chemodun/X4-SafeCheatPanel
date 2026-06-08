@@ -15,9 +15,12 @@
         <t id="106">Teleport to Pilot Seat</t>
         <t id="107">Fix Station Control Entities</t>
         <t id="108">Reveal Stations in Sector</t>
-        <t id="109">Force Build Completion</t>
-        <t id="110">Fill Wares Gap on Station</t>
-        <t id="111">Fill Wares Gap on Build Storage</t>
+        <t id="109">Force Build Completion: Station</t>
+        <t id="110">Force Build Completion: All Faction Stations</t>
+        <t id="111">Restock: Current Station</t>
+        <t id="112">Restock: All Faction Stations</t>
+        <t id="113">Restock: Current Build Storage</t>
+        <t id="114">Restock: All Faction Build Storages</t>
 
         <!-- Tab 1: Player -->
         <t id="1000">Player</t>
@@ -130,11 +133,12 @@
 
         <!-- Settings (Options Menu) -->
         <t id="90000">Settings</t>
-        <t id="90001">Panel Mode</t>
-        <t id="90002">Normal</t>
-        <t id="90003">Extended</t>
-        <t id="90004">Debug Level</t>
-        <t id="90005">Debug</t>
-        <t id="90006">Trace</t>
+        <t id="90010">Panel Mode</t>
+        <t id="90011">Normal</t>
+        <t id="90012">Extended</t>
+        <t id="90013">Developer</t>
+        <t id="90090">Debug Level</t>
+        <t id="90091">Debug</t>
+        <t id="90092">Trace</t>
     </page>
 </language>

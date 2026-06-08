@@ -57,12 +57,12 @@ end
 --- Logs a debug message when debug level is "debug" or "trace".
 
 function scp.info(msg)
-  DebugError("SafeCheatPanel: " .. msg)
+  DebugError("SafeCheatPanel [info]: " .. msg)
 end
 
 function scp.debug(msg)
   if debugLevel ~= "none" then
-    DebugError("SafeCheatPanel: " .. msg)
+    DebugError("SafeCheatPanel [debug]: " .. msg)
   end
 end
 
