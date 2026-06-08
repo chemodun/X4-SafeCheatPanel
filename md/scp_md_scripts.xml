@@ -291,6 +291,22 @@
           </actions>
         </cue>
 
+        <cue name="Scp_Add_Wares" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_add_wares'" />
+          </conditions>
+          <actions>
+            <set_value name="$addWaresData" exact="event.param3" />
+            <debug_text text="'SafeCheatPanel: Adding wares to object %s, wares: %s, amounts: %s'. [$addWaresData.$object.debugname, @$addWaresData.$wares, @$addWaresData.$amounts]" chance="$debugChance" />
+            <set_value name="$object" exact="$addWaresData.$object" />
+            <set_value name="$wares" exact="$addWaresData.$wares" />
+            <set_value name="$amounts" exact="$addWaresData.$amounts" />
+            <do_for_each name="$ware" in="$wares" counter="$i">
+              <add_wares object="$object" ware="ware.{$ware}" exact="$amounts.{$i}" />
+            </do_for_each>
+          </actions>
+        </cue>
+
         <cue name="Scp_Remove_Research" instantiate="true">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_remove_research'" />

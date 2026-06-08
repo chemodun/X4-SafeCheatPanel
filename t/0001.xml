@@ -16,6 +16,8 @@
         <t id="107">Fix Station Control Entities</t>
         <t id="108">Reveal Stations in Sector</t>
         <t id="109">Force Build Completion</t>
+        <t id="110">Fill Wares Gap on Station</t>
+        <t id="111">Fill Wares Gap on Build Storage</t>
 
         <!-- Tab 1: Player -->
         <t id="1000">Player</t>

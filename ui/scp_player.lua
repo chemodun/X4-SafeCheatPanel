@@ -156,7 +156,7 @@ function scpPlayer.isValidTeleportPlayer(seat)
   return isValid
 end
 
-function scpPlayer.TeleportPlayer(seat)
+function scpPlayer.teleportPlayer(seat)
   C.TeleportPlayerTo(interactMenu.componentSlot.component, true, true, true)
   interactMenu.onCloseElement("close")
 end

@@ -5,6 +5,7 @@
     <file name="ui/scp_menu_helper.lua" />
     <file name="ui/scp_blueprints.lua" />
     <file name="ui/scp_spawner.lua" />
+    <file name="ui/scp_station.lua" />
     <file name="ui/scp_player.lua" />
     <file name="ui/scp_research.lua" />
     <file name="ui/scp_inventory.lua" />

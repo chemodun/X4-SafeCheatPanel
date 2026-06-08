@@ -977,7 +977,7 @@ scpSpawner.state = state
 
 -- *** Spawn action functions (called from safe_cheat_panel luaActions) ***
 
-function scpSpawner.SpawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow, loadoutFaction)
+function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow, loadoutFaction)
   local preset, crew = scpSpawner.PresetAndCrewForSpawnShip(ship, loadout)
   local data = {
     ship = ship,
@@ -1000,7 +1000,7 @@ function scpSpawner.SpawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow
   scpHelpers.interactMenuFinishAction()
 end
 
-function scpSpawner.SpawnStation(stationName, constructionPlan, ownerId)
+function scpSpawner.spawnStation(stationName, constructionPlan, ownerId)
   local data = {
     name = stationName,
     offsetComponent = ConvertStringToLuaID(tostring(interactMenu.offsetcomponent)),
@@ -1016,7 +1016,7 @@ function scpSpawner.SpawnStation(stationName, constructionPlan, ownerId)
   scpHelpers.interactMenuFinishAction()
 end
 
-function scpSpawner.FixStation()
+function scpSpawner.fixStation()
   local data = {
     station = ConvertStringToLuaID(tostring(interactMenu.componentSlot.component)),
   }
@@ -1024,7 +1024,7 @@ function scpSpawner.FixStation()
   scpHelpers.interactMenuFinishAction()
 end
 
-function scpSpawner.SpawnObject(macro, rows, numPerRow, spacing, ownerId)
+function scpSpawner.spawnObject(macro, rows, numPerRow, spacing, ownerId)
   macro = macro or "eq_arg_satellite_02_macro"
   rows = rows or 1
   numPerRow = numPerRow or 1

@@ -65,6 +65,8 @@ scp.menuHelper = require("extensions.safe_cheat_panel.ui.scp_menu_helper")
 scp.blueprints = require("extensions.safe_cheat_panel.ui.scp_blueprints")
 scp.spawner    = require("extensions.safe_cheat_panel.ui.scp_spawner")
 scp.player     = require("extensions.safe_cheat_panel.ui.scp_player")
+scp.station    = require("extensions.safe_cheat_panel.ui.scp_station")
+scp.station.join(scp)
 scp.research   = require("extensions.safe_cheat_panel.ui.scp_research")
 scp.inventory  = require("extensions.safe_cheat_panel.ui.scp_inventory")
 scp.factions   = require("extensions.safe_cheat_panel.ui.scp_factions")
@@ -117,31 +119,31 @@ local config = {
       type = "scp_cheat",
       actiontype = "lua;spawnStation",
       spawnMode = "spawnModeStation",
-      spawner = true,
+      isValidFunction = function() return scp.spawner.showSpawnOption("spawnModeStation", scp.tableMode, nil) end,
       text = ReadText(1972092427, 101),
       scriptFunction = function()
         local s = scp.spawner.state
-        scp.spawner.SpawnStation(s.station.name, s.station.plan, s.station.ownerId)
+        scp.spawner.spawnStation(s.station.name, s.station.plan, s.station.ownerId)
       end
     },
     ["fixStation"] = {
       type = "scp_cheat",
       actiontype = "lua;fixStation",
-      fixStation = true,
+      isValidFunction = function() return scp.spawner.isStationMissingControlEntities() end,
       text = ReadText(1972092427, 107),
       scriptFunction = function()
-        scp.spawner.FixStation()
+        scp.spawner.fixStation()
       end
     },
     ["spawnShip"] = {
       type = "scp_cheat",
       actiontype = "lua;spawnShip",
       spawnMode = "spawnModeShip",
-      spawner = true,
+      isValidFunction = function() return scp.spawner.showSpawnOption("spawnModeShip", scp.tableMode, nil) end,
       text = ReadText(1972092427, 102),
       scriptFunction = function()
         local s = scp.spawner.state
-        scp.spawner.SpawnShip(
+        scp.spawner.spawnShip(
           s.ships_sel.id, s.ships_sel.loadout,
           s.ships_sel.ownerId, s.ships_sel.ownerRace,
           s.ships_sel.rows,
@@ -153,40 +155,54 @@ local config = {
       type = "scp_cheat",
       actiontype = "lua;spawnObject",
       spawnMode = "spawnModeObject",
-      spawner = true,
+      isValidFunction = function() return scp.spawner.showSpawnOption("spawnModeObject", scp.tableMode, nil) end,
       text = ReadText(1972092427, 103),
       scriptFunction = function()
         local s = scp.spawner.state
-        scp.spawner.SpawnObject(s.object.macro, s.object.rows, s.object.numPerRow, s.object.spacing, s.object.ownerId)
+        scp.spawner.spawnObject(s.object.macro, s.object.rows, s.object.numPerRow, s.object.spacing, s.object.ownerId)
       end
     },
     ["forceBuildCompletion"] = {
       type = "scp_cheat",
       actiontype = "lua;forceBuildCompletion",
-      forceBuildCompletion = true,
+      isValidFunction = function() return scp.station.isValidForceBuildCompletion() end,
       text = ReadText(1972092427, 109),
-      scriptFunction = function() scp.ForceBuildCompletion() end
+      scriptFunction = function() scp.station.forceBuildCompletion() end
+    },
+    ["fillWaresGapStation"] = {
+      type = "scp_cheat",
+      actiontype = "lua;fillWaresGapStation",
+      isValidFunction = function() return scp.station.isValidFillWaresGapStation() end,
+      text = ReadText(1972092427, 110),
+      scriptFunction = function() scp.station.fillWaresGapStation() end
+    },
+    ["fillWaresGapBuildStorage"] = {
+      type = "scp_cheat",
+      actiontype = "lua;fillWaresGapBuildStorage",
+      isValidFunction = function() return scp.station.isValidFillWaresGapBuildStorage() end,
+      text = ReadText(1972092427, 111),
+      scriptFunction = function() scp.station.fillWaresGapBuildStorage() end
     },
     ["teleportObject"] = {
       type = "scp_cheat",
       actiontype = "lua;teleportObject",
-      teleportObject = true,
+      isValidFunction = function() return scp.isValidTeleportObject() end,
       text = ReadText(1972092427, 104),
-      scriptFunction = function() scp.TeleportObject() end
+      scriptFunction = function() scp.teleportObject() end
     },
     ["teleportPlayer"] = {
       type = "scp_cheat",
       actiontype = "lua;teleportPlayer",
-      teleportPlayer = true,
+      isValidFunction = function() return scp.player.isValidTeleportPlayer() end,
       text = ReadText(1972092427, 105),
-      scriptFunction = function() scp.player.TeleportPlayer(false) end
+      scriptFunction = function() scp.player.teleportPlayer(false) end
     },
     -- ["teleportPlayerSeat"] = {
     --   type = "scp_cheat",
     --   actiontype = "lua;teleportPlayerSeat",
     --   teleportPlayerSeat = true,
     --   text = ReadText(1972092427, 106),
-    --   scriptFunction = function() scp.player.TeleportPlayer(true) end
+    --   scriptFunction = function() scp.player.teleportPlayer(true) end
     -- }
   },
 
@@ -325,18 +341,7 @@ function scp.prepareActions(actions, definedActions)
   if scp.isSectionAdded then
     local isToBeDisplayed = false
     for _, action in pairs(config.contextMenuActions) do
-      if action.spawner then
-        isToBeDisplayed = scp.spawner.showSpawnOption(action.spawnMode, scp.tableMode, nil)
-      elseif action.fixStation then
-        isToBeDisplayed = scp.spawner.isStationMissingControlEntities()
-      elseif action.forceBuildCompletion then
-        isToBeDisplayed = scp.isValidForceBuildCompletion()
-      elseif action.teleportObject then
-        isToBeDisplayed = scp.isValidTeleportObject()
-      elseif action.teleportPlayer then
-        isToBeDisplayed = scp.player.isValidTeleportPlayer()
-      end
-      if isToBeDisplayed then
+      if action.isValidFunction() then
         scp.addAction(actions, definedActions, action, isToBeDisplayed)
       end
     end
@@ -384,24 +389,6 @@ function scp.addAction(actions, definedActions, action, isToBeDisplayed)
   definedActions[action.actiontype] = #actions
 end
 
-function scp.isValidForceBuildCompletion()
-  if interactMenu.componentSlot.component == nil then return false end
-  local object64 = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
-  local owner, realclassid = GetComponentData(object64, "owner", "realclassid")
-  if not Helper.isComponentClass(realclassid, "station") then return false end
-  if owner == nil or owner ~= "player" then return false end
-  if IsComponentConstruction(object64) then return true end
-  if C.GetNumPlannedStationModules(object64, false) > 0 then return true end
-  return false
-end
-
-function scp.ForceBuildCompletion()
-  if interactMenu.componentSlot.component == nil then return false end
-  C.ForceBuildCompletion(interactMenu.componentSlot.component)
-  scp.helpers.interactMenuFinishAction()
-end
-
-
 function scp.isValidTeleportObject()
   local component = C.GetPlayerShipID()
   local convertedComponent = ConvertStringTo64Bit(tostring(C.GetPlayerShipID()))
@@ -413,7 +400,7 @@ function scp.isValidTeleportObject()
   return false
 end
 
-function scp.TeleportObject()
+function scp.teleportObject()
   local targetObject
   if menu.selectedcomponent ~= nil then
     targetObject = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
