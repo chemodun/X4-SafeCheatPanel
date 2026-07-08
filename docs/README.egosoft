@@ -184,6 +184,14 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [/list]
 [size=130][u]Changelog[/u][/size]
 
+[size=125][u][8.00.36] - 2026-07-09[/u][/size]
+[list]
+[*] [b]Fixed[/b]
+[list]
+[*] [b]insertLuaAction[/b] crashing (and breaking the whole map interact menu) when another mod registered its own custom Lua action via kuertee's shared callback, since SCP dereferenced its action data without checking it belonged to SCP.
+[*] [b]rowgroup:addRow() Disconnected row group detected[/b] errors on the Player tab (spacesuit upgrades list) caused by mixing grouped and ungrouped rows in the same list.
+[/list]
+[/list]
 [size=125][u][8.00.35] - 2026-06-09[/u][/size]
 [list]
 [*] [b]Added[/b]
