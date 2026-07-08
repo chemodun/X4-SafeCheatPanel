@@ -366,6 +366,9 @@ function scp.insertLuaAction(actionType, _)
         break
       end
     end
+    if not actionData then
+      return
+    end
     interactMenu.insertInteractionContent("scpCheats", {
       type = "scp_cheat",
       text = actionData.text,

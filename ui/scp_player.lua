@@ -98,7 +98,7 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
         isHeader        = nil,
       })
     else
-      numDisplayed = scp.menuHelper.createDoubleText(frameTable, false, {
+      numDisplayed = scp.menuHelper.createDoubleText(rowGroup, false, {
         text               = upgrade.name,
         mouseOverText      = "",
         secondText         = ReadText(PAGE_ID, 1202),
