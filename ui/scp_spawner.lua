@@ -210,10 +210,10 @@ local function getAllShips()
     excludeTags = "deprecated"
   end
   local n = C.GetNumWares("ship", false, "", excludeTags)
-  DebugError("scp_main. Num ships: " .. n)
+  scpHelpers.debug("Num ships: " .. n)
   local buf = ffi.new("const char*[?]", n)
   n = C.GetWares(buf, n, "ship", false, "", excludeTags)
-  DebugError("scp_main. Num ships after filtering: " .. n)
+  scpHelpers.debug("Num ships after filtering: " .. n)
   for i = 0, n - 1 do
     local ware = ffi.string(buf[i])
     local name, macro = GetWareData(ware, "name", "component")
