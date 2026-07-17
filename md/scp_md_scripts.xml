@@ -99,6 +99,62 @@
           </actions>
         </cue>
 
+        <!-- Promote Crew: sets role-relevant skills to the target value (stars * 3) and scales
+             the remaining skills by the same relative change, capped at 15. -->
+        <cue name="Scp_Promote_Crew" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_promote_crew'" />
+          </conditions>
+          <actions>
+            <set_value name="$promoteData" exact="event.param3" />
+            <set_value name="$ship" exact="$promoteData.$ship" />
+            <do_if value="$promoteData.$pilot? and $ship.pilot.exists">
+              <set_value name="$pilot" exact="$ship.pilot" />
+              <set_value name="$current" exact="$pilot.combinedskill" />
+              <set_value name="$target15" exact="$promoteData.$pilot * 3" />
+              <do_if value="$current gt 0">
+                <set_value name="$ratio" exact="($promoteData.$pilot * 20.0) / $current" />
+                <set_skill entity="$pilot" type="skilltype.management" exact="[15, (($pilot.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
+                <set_skill entity="$pilot" type="skilltype.engineering" exact="[15, (($pilot.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
+                <set_skill entity="$pilot" type="skilltype.boarding" exact="[15, (($pilot.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
+              </do_if>
+              <set_skill entity="$pilot" type="skilltype.piloting" exact="$target15" />
+              <set_skill entity="$pilot" type="skilltype.morale" exact="$target15" />
+            </do_if>
+            <do_if value="$promoteData.$marine? or $promoteData.$service?">
+              <do_all exact="$ship.people.list.count" counter="$i">
+                <set_value name="$template" exact="$ship.people.list.{$i}" />
+                <set_value name="$entry" exact="$ship.people.{$template}" />
+                <do_if value="$promoteData.$marine? and $entry.role == entityrole.marine">
+                  <set_value name="$current" exact="$entry.combinedskill" />
+                  <set_value name="$target15" exact="$promoteData.$marine * 3" />
+                  <do_if value="$current gt 0">
+                    <set_value name="$ratio" exact="($promoteData.$marine * 20.0) / $current" />
+                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($entry.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($entry.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="[15, (($entry.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
+                  </do_if>
+                  <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="$target15" />
+                  <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
+                </do_if>
+                <do_elseif value="$promoteData.$service? and $entry.role == entityrole.service">
+                  <set_value name="$current" exact="$entry.combinedskill" />
+                  <set_value name="$target15" exact="$promoteData.$service * 3" />
+                  <do_if value="$current gt 0">
+                    <set_value name="$ratio" exact="($promoteData.$service * 20.0) / $current" />
+                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($entry.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($entry.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="[15, (($entry.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
+                  </do_if>
+                  <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="$target15" />
+                  <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
+                </do_elseif>
+              </do_all>
+            </do_if>
+            <raise_lua_event name="'scp_main.crewPromoted'" />
+          </actions>
+        </cue>
+
         <cue name="Scp_Spawn_Ship" instantiate="true">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_ship'" />

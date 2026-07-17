@@ -22,6 +22,7 @@
         <t id="113">Restock: Current Build Storage</t>
         <t id="114">Restock: All Faction Build Storages</t>
         <t id="115">Destroy Object</t>
+        <t id="116">Promote Crew</t>
 
         <!-- Tab 1: Player -->
         <t id="1000">Player</t>
@@ -138,6 +139,13 @@
         <t id="9010">No object selected. Keep this tab open and use the right-click menu on a map object.</t>
         <t id="9020">Confirm destruction of the selected object</t>
         <t id="9030">Destroy</t>
+
+        <!-- Tab 10: Promote Crew -->
+        <t id="10000">Promote Crew</t>
+        <t id="10001">Promote the crew of a player ship</t>
+        <t id="10010">No ship selected. Keep this tab open and use the right-click menu on a player ship.</t>
+        <t id="10011">Not assigned</t>
+        <t id="10031">Apply</t>
 
         <!-- Settings (Options Menu) -->
         <t id="90000">Settings</t>

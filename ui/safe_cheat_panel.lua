@@ -73,6 +73,8 @@ scp.factions   = require("extensions.safe_cheat_panel.ui.scp_factions")
 scp.map        = require("extensions.safe_cheat_panel.ui.scp_map")
 scp.destroy    = require("extensions.safe_cheat_panel.ui.scp_destroy")
 scp.destroy.join(scp)
+scp.promote    = require("extensions.safe_cheat_panel.ui.scp_promote")
+scp.promote.join(scp)
 
 -- Canonical isExtendedMode lives in scp_helpers; alias it onto scp for use in
 -- display functions and scp.reset().
@@ -105,6 +107,7 @@ local config = {
     { category = "scpMap",         name = ReadText(1001, 9181),    icon = "tlt_map",        helpOverlayID = "help_category_cheatsmap",       helpOverlayText = ReadText(1001, 9181), display = function() return true end },
     { category = "scpObjectSpawn", name = ReadText(1972092427, 7000), icon = "mapst_cheats",   helpOverlayID = "help_category_cheatsspawn",     helpOverlayText = ReadText(1972092427, 7001), display = function() return true end },
     { category = "scpDestroy",     name = ReadText(1972092427, 9000), icon = "order_attack",   helpOverlayID = "help_category_cheatsdestroy",   helpOverlayText = ReadText(1972092427, 9001), display = function() return true end },
+    { category = "scpPromote",     name = ReadText(1972092427, 10000), icon = "shipbuildst_crew", helpOverlayID = "help_category_cheatspromote", helpOverlayText = ReadText(1972092427, 10001), display = function() return true end },
     {
       category = "scpDevMode",
       name = ReadText(1972092427, 8000),
@@ -241,6 +244,14 @@ local config = {
       text = ReadText(1972092427, 115),
       scriptFunction = function() scp.destroy.startDestroy() end
     },
+    {
+      id = "promoteCrew",
+      type = "scp_cheat",
+      actiontype = "lua;promoteCrew",
+      isValidFunction = function() return scp.promote.isValidPromoteCrew() end,
+      text = ReadText(1972092427, 116),
+      scriptFunction = function() scp.promote.startPromote() end
+    },
     -- ["teleportPlayerSeat"] = {
     --   type = "scp_cheat",
     --   actiontype = "lua;teleportPlayerSeat",
@@ -319,6 +330,7 @@ local function init()
   scp.factions.init(scp.playerId, config.variableId, config.blacklistedFactions)
   scp.spawner.shipConfigurationMenu = shipConfigurationMenu
   scp.map.init(scp, config)
+  scp.promote.init()
   scp.menuHelper.init()
 end
 
@@ -510,6 +522,8 @@ function scp.createCheatMenu(frame, _)
     numdisplayed = scp.spawner.createSection(mainTable, numdisplayed, scp.isV9, scp.helpers.getConsumables, config.consumableTypes, nil)
   elseif scp.tableMode == "scpDestroy" then
     numdisplayed = scp.destroy.createSection(mainTable, numdisplayed, scp)
+  elseif scp.tableMode == "scpPromote" then
+    numdisplayed = scp.promote.createSection(mainTable, numdisplayed, scp)
   elseif scp.tableMode == "scpBlueprint" then
     numdisplayed = scp.blueprints.createSection(mainTable, numdisplayed, scp)
   end
