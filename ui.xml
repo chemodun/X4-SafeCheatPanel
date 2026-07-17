@@ -11,6 +11,7 @@
     <file name="ui/scp_inventory.lua" />
     <file name="ui/scp_factions.lua" />
     <file name="ui/scp_map.lua" />
+    <file name="ui/scp_destroy.lua" />
     <file name="ui/safe_cheat_panel.lua" />
     <dependency name="sn_mod_support_apis" />
     <dependency name="ego_detailmonitor" />

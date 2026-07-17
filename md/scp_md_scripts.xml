@@ -89,6 +89,16 @@
           </actions>
         </cue>
 
+        <cue name="Scp_Destroy_Object" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_destroy_object'" />
+          </conditions>
+          <actions>
+            <set_value name="$destroyData" exact="event.param3" />
+            <destroy_object object="$destroyData.$object" explosion="false" />
+          </actions>
+        </cue>
+
         <cue name="Scp_Spawn_Ship" instantiate="true">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_ship'" />

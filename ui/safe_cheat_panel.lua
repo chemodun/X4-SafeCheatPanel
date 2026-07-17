@@ -71,6 +71,8 @@ scp.research   = require("extensions.safe_cheat_panel.ui.scp_research")
 scp.inventory  = require("extensions.safe_cheat_panel.ui.scp_inventory")
 scp.factions   = require("extensions.safe_cheat_panel.ui.scp_factions")
 scp.map        = require("extensions.safe_cheat_panel.ui.scp_map")
+scp.destroy    = require("extensions.safe_cheat_panel.ui.scp_destroy")
+scp.destroy.join(scp)
 
 -- Canonical isExtendedMode lives in scp_helpers; alias it onto scp for use in
 -- display functions and scp.reset().
@@ -102,6 +104,7 @@ local config = {
     { category = "scpFactions",    name = ReadText(1972092427, 5000), icon = "pi_diplomacy",   helpOverlayID = "help_category_cheatsfactions",  helpOverlayText = ReadText(1972092427, 5001), display = function() return true end },
     { category = "scpMap",         name = ReadText(1001, 9181),    icon = "tlt_map",        helpOverlayID = "help_category_cheatsmap",       helpOverlayText = ReadText(1001, 9181), display = function() return true end },
     { category = "scpObjectSpawn", name = ReadText(1972092427, 7000), icon = "mapst_cheats",   helpOverlayID = "help_category_cheatsspawn",     helpOverlayText = ReadText(1972092427, 7001), display = function() return true end },
+    { category = "scpDestroy",     name = ReadText(1972092427, 9000), icon = "order_attack",   helpOverlayID = "help_category_cheatsdestroy",   helpOverlayText = ReadText(1972092427, 9001), display = function() return true end },
     {
       category = "scpDevMode",
       name = ReadText(1972092427, 8000),
@@ -229,6 +232,14 @@ local config = {
       isValidFunction = function() return scp.player.isValidTeleportPlayer() end,
       text = ReadText(1972092427, 105),
       scriptFunction = function() scp.player.teleportPlayer(false) end
+    },
+    {
+      id = "destroyObject",
+      type = "scp_cheat",
+      actiontype = "lua;destroyObject",
+      isValidFunction = function() return scp.destroy.isValidDestroyObject() end,
+      text = ReadText(1972092427, 115),
+      scriptFunction = function() scp.destroy.startDestroy() end
     },
     -- ["teleportPlayerSeat"] = {
     --   type = "scp_cheat",
@@ -497,6 +508,8 @@ function scp.createCheatMenu(frame, _)
     numdisplayed = scp.factions.createSection(mainTable, numdisplayed, scp)
   elseif scp.tableMode == "scpObjectSpawn" then
     numdisplayed = scp.spawner.createSection(mainTable, numdisplayed, scp.isV9, scp.helpers.getConsumables, config.consumableTypes, nil)
+  elseif scp.tableMode == "scpDestroy" then
+    numdisplayed = scp.destroy.createSection(mainTable, numdisplayed, scp)
   elseif scp.tableMode == "scpBlueprint" then
     numdisplayed = scp.blueprints.createSection(mainTable, numdisplayed, scp)
   end

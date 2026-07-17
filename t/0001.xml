@@ -21,6 +21,7 @@
         <t id="112">Restock: All Faction Stations</t>
         <t id="113">Restock: Current Build Storage</t>
         <t id="114">Restock: All Faction Build Storages</t>
+        <t id="115">Destroy Object</t>
 
         <!-- Tab 1: Player -->
         <t id="1000">Player</t>
@@ -130,6 +131,13 @@
         <!-- Tab 8: Dev Mode -->
         <t id="8000">Dev Tools</t>
         <t id="8001">Features useful for mod authors</t>
+
+        <!-- Tab 9: Destroy Object -->
+        <t id="9000">Destroy Object</t>
+        <t id="9001">Destroy any map object</t>
+        <t id="9010">No object selected. Keep this tab open and use the right-click menu on a map object.</t>
+        <t id="9020">Confirm destruction of the selected object</t>
+        <t id="9030">Destroy</t>
 
         <!-- Settings (Options Menu) -->
         <t id="90000">Settings</t>
