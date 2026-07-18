@@ -95,6 +95,7 @@
           </conditions>
           <actions>
             <set_value name="$destroyData" exact="event.param3" />
+            <debug_text text="'SafeCheatPanel: Destroying object %s'. [@$destroyData.$object.knownname]" chance="$debugChance" />
             <destroy_object object="$destroyData.$object" explosion="false" />
           </actions>
         </cue>
@@ -108,7 +109,8 @@
           <actions>
             <set_value name="$promoteData" exact="event.param3" />
             <set_value name="$ship" exact="$promoteData.$ship" />
-            <do_if value="$promoteData.$pilot? and $ship.pilot.exists">
+            <debug_text text="'SafeCheatPanel: Promoting crew on %s (pilot: %s, marines: %s, service: %s)'. [@$ship.knownname, @$promoteData.$pilot, @$promoteData.$marine, @$promoteData.$service]" chance="$debugChance" />
+            <do_if value="$promoteData.$pilot? and @$ship.pilot.exists">
               <set_value name="$pilot" exact="$ship.pilot" />
               <set_value name="$current" exact="$pilot.combinedskill" />
               <set_value name="$target15" exact="$promoteData.$pilot * 3" />
@@ -120,6 +122,7 @@
               </do_if>
               <set_skill entity="$pilot" type="skilltype.piloting" exact="$target15" />
               <set_skill entity="$pilot" type="skilltype.morale" exact="$target15" />
+              <debug_text text="'SafeCheatPanel: Pilot %s promoted to skill %s'. [@$pilot.knownname, $target15]" chance="$debugChance" />
             </do_if>
             <do_if value="$promoteData.$marine? or $promoteData.$service?">
               <do_all exact="$ship.people.list.count" counter="$i">
@@ -136,6 +139,7 @@
                   </do_if>
                   <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="$target15" />
                   <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
+                  <debug_text text="'SafeCheatPanel: Marine %s promoted to skill %s'. [@$entry.name, $target15]" chance="$debugChance" />
                 </do_if>
                 <do_elseif value="$promoteData.$service? and $entry.role == entityrole.service">
                   <set_value name="$current" exact="$entry.combinedskill" />
@@ -148,6 +152,7 @@
                   </do_if>
                   <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="$target15" />
                   <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
+                  <debug_text text="'SafeCheatPanel: Service crew %s promoted to skill %s'. [@$entry.name, $target15]" chance="$debugChance" />
                 </do_elseif>
               </do_all>
             </do_if>

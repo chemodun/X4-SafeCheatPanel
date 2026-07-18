@@ -50,11 +50,13 @@ end
 function scpDestroy.startDestroy()
   scpDestroy.state.object = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
   scpDestroy.state.confirmed = false
+  scpDestroy.scp.debug("Destroy: target set to " .. tostring(scpDestroy.state.object))
   scpDestroy.scp.helpers.interactMenuFinishAction()
   menu.refreshInfoFrame()
 end
 
 function scpDestroy.cancel()
+  scpDestroy.scp.debug("Destroy: cancelled")
   scpDestroy.state.object = nil
   scpDestroy.state.confirmed = false
   menu.refreshInfoFrame()
@@ -62,10 +64,12 @@ end
 
 function scpDestroy.executeDestroy()
   local object = scpDestroy.state.object
+  scpDestroy.scp.debug("Destroy: button pressed, object = " .. tostring(object) .. ", confirmed = " .. tostring(scpDestroy.state.confirmed))
   if object == nil or not scpDestroy.state.confirmed then
     return
   end
   AddUITriggeredEvent("scp_main", "scp_destroy_object", { object = object })
+  scpDestroy.scp.debug("Destroy: destroy event sent")
   scpDestroy.state.object = nil
   scpDestroy.state.confirmed = false
   menu.refreshInfoFrame()
@@ -105,6 +109,7 @@ function scpDestroy.createSection(frameTable, numDisplayed, scp)
   row[1]:setColSpan(7):createText(ReadText(PAGE_ID, 9020), { color = Color["text_normal"] })
   row[8]:createCheckBox(scpDestroy.state.confirmed, { active = true, width = config.mapRowHeight, height = config.mapRowHeight })
   row[8].handlers.onClick = function(_, checked)
+    scpDestroy.scp.debug("Destroy: confirmation set to " .. tostring(checked))
     scpDestroy.state.confirmed = checked
     menu.refreshInfoFrame()
   end

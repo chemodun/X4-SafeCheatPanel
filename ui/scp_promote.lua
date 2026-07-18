@@ -55,6 +55,7 @@ function scpPromote.init()
 end
 
 function scpPromote.onCrewPromoted()
+  scpPromote.scp.debug("Promote: MD confirmed promotion, refreshing")
   scpPromote.state.targets = {}
   menu.refreshInfoFrame()
 end
@@ -81,11 +82,13 @@ end
 function scpPromote.startPromote()
   scpPromote.state.object = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
   scpPromote.state.targets = {}
+  scpPromote.scp.debug("Promote: ship set to " .. tostring(scpPromote.state.object))
   scpPromote.scp.helpers.interactMenuFinishAction()
   menu.refreshInfoFrame()
 end
 
 function scpPromote.reset()
+  scpPromote.scp.debug("Promote: reset pressed")
   scpPromote.state.targets = {}
   menu.refreshInfoFrame()
 end
@@ -102,16 +105,20 @@ end
 function scpPromote.apply()
   local data = { ship = scpPromote.state.object }
   local anyChange = false
+  local changes = ""
   for category, value in pairs(scpPromote.state.targets) do
     if value ~= scpPromote.state.initial[category] then
       data[category] = value
       anyChange = true
+      changes = changes .. string.format(" %s=%d", category, value)
     end
   end
+  scpPromote.scp.debug("Promote: apply pressed, changes:" .. (anyChange and changes or " none"))
   if not anyChange then
     return
   end
   AddUITriggeredEvent("scp_main", "scp_promote_crew", data)
+  scpPromote.scp.debug("Promote: promote event sent")
 end
 
 ---Average role-relative combined skill (0-15) over all persons of a role on the ship.
@@ -205,7 +212,10 @@ local function addCategorySliderRow(frameTable, category, labelText, avg15)
     suffix = config.starSuffix,
     mouseOverText = mouseOverText,
   })
-  row[7].handlers.onSliderCellChanged = function(_, value) scpPromote.state.targets[category] = math.floor(value + 0.5) end
+  row[7].handlers.onSliderCellChanged = function(_, value)
+    scpPromote.state.targets[category] = math.floor(value + 0.5)
+    scpPromote.scp.trace("Promote: slider " .. category .. " -> " .. tostring(scpPromote.state.targets[category]))
+  end
   row[7].handlers.onSliderCellActivated = function() menu.noupdate = true end
   row[7].handlers.onSliderCellDeactivated = function() menu.noupdate = false end
   return row
