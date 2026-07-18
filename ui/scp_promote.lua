@@ -34,7 +34,6 @@ local interactMenu = Helper.getMenu("InteractMenu")
 local PAGE_ID = 1972092427
 
 local config = {
-  mapRowHeight = Helper.standardTextHeight,
   starSuffix = "\27[menu_star_04]",
 }
 
@@ -203,27 +202,26 @@ function scpPromote.collectData()
   return data
 end
 
-local function addCategorySliderRow(frameTable, category, labelText, avg15)
-  local row = frameTable:addRow("promote_" .. category, { fixed = true, bgColor = Color["row_background_unselectable"] })
+local function addCategorySliderRow(frameTable, numDisplayed, category, labelText, avg15, scp)
   local mouseOverText = string.format("%.2f / 5", avg15 / 3)
-  row[1]:setColSpan(6):createText(labelText .. " " .. Helper.displaySkill(math.floor(avg15 + 0.5)), { mouseOverText = mouseOverText })
   local start = scpPromote.state.targets[category] or scpPromote.state.initial[category]
-  row[7]:setColSpan(6):createSliderCell({
-    height = config.mapRowHeight,
-    min = 1,
-    max = 5,
-    start = start,
-    step = 1,
-    suffix = config.starSuffix,
-    mouseOverText = mouseOverText,
+  return scp.menuHelper.createSliderRow(frameTable, "promote_" .. category, numDisplayed, {
+    text                = labelText .. " " .. Helper.displaySkill(math.floor(avg15 + 0.5)),
+    mouseOverText       = mouseOverText,
+    startValue          = start,
+    onSliderChanged     = function(_, value)
+      scpPromote.state.targets[category] = math.floor(value + 0.5)
+      scpPromote.scp.trace("Promote: slider " .. category .. " -> " .. tostring(scpPromote.state.targets[category]))
+    end,
+    onSliderActivated   = function() menu.noupdate = true end,
+    onSliderDeactivated = function() menu.noupdate = false end,
+    min                 = 1,
+    max                 = 5,
+    step                = 1,
+    suffix              = config.starSuffix,
+    sliderColIndex      = 7,
+    fixed               = true,
   })
-  row[7].handlers.onSliderCellChanged = function(_, value)
-    scpPromote.state.targets[category] = math.floor(value + 0.5)
-    scpPromote.scp.trace("Promote: slider " .. category .. " -> " .. tostring(scpPromote.state.targets[category]))
-  end
-  row[7].handlers.onSliderCellActivated = function() menu.noupdate = true end
-  row[7].handlers.onSliderCellDeactivated = function() menu.noupdate = false end
-  return row
 end
 
 function scpPromote.createSection(frameTable, numDisplayed, scp)
@@ -249,43 +247,49 @@ function scpPromote.createSection(frameTable, numDisplayed, scp)
   local factionColor = owner and Helper.convertColorToText(GetFactionData(owner, "color")) or ""
   local displayIcon = (icon ~= nil and icon ~= "") and icon or "menu_info"
 
-  local row = frameTable:addRow("promote_ship_info", { fixed = true, bgColor = Color["row_background_unselectable"] })
-  local iconCell = row[1]:setColSpan(12):createIcon(displayIcon, { height = config.mapRowHeight, width = config.mapRowHeight })
-  iconCell:setText(string.format("%s%s (%s)", factionColor, name, idcode), { x = config.mapRowHeight, halign = "left" })
-  iconCell:setText2(sector or "", { halign = "right" })
-  numDisplayed = numDisplayed + 1
+  numDisplayed = scp.menuHelper.createIconWithTextRow(frameTable, "promote_ship_info", numDisplayed, {
+    icon      = displayIcon,
+    textLeft  = string.format("%s%s (%s)", factionColor, name, idcode),
+    textRight = sector or "",
+    fixed     = true,
+  })
 
   local data = scpPromote.collectData()
+  local row
 
   if data.pilot.exists then
-    addCategorySliderRow(frameTable, "pilot", string.format("%s: %s", data.pilot.title, data.pilot.name), data.pilot.avg15)
+    numDisplayed = addCategorySliderRow(frameTable, numDisplayed, "pilot", string.format("%s: %s", data.pilot.title, data.pilot.name), data.pilot.avg15, scp)
   else
     row = frameTable:addRow(nil, { bgColor = Color["row_background_unselectable"] })
     row[1]:setColSpan(12):createText(string.format("%s: %s", data.pilot.title, ReadText(PAGE_ID, 10011)), { color = Color["text_inactive"] })
+    numDisplayed = numDisplayed + 1
   end
-  numDisplayed = numDisplayed + 1
 
   for _, category in ipairs({ "marine", "service" }) do
     local categoryData = data[category]
     local labelText = string.format("%s (%d)", categoryData.name, categoryData.count)
     if categoryData.count > 0 then
-      addCategorySliderRow(frameTable, category, labelText, categoryData.avg15)
+      numDisplayed = addCategorySliderRow(frameTable, numDisplayed, category, labelText, categoryData.avg15, scp)
     else
       row = frameTable:addRow(nil, { bgColor = Color["row_background_unselectable"] })
       row[1]:setColSpan(12):createText(labelText, { color = Color["text_inactive"] })
+      numDisplayed = numDisplayed + 1
     end
-    numDisplayed = numDisplayed + 1
   end
 
-  row = frameTable:addRow("promote_all_skills", { fixed = true, bgColor = Color["row_background_unselectable"] })
-  row[1]:createCheckBox(scpPromote.state.allSkills, { active = true, width = config.mapRowHeight, height = config.mapRowHeight })
-  row[1].handlers.onClick = function(_, checked)
-    scpPromote.scp.debug("Promote: set-all-skills toggled to " .. tostring(checked))
-    scpPromote.state.allSkills = checked
-    menu.refreshInfoFrame()
-  end
-  row[2]:setColSpan(11):createText(ReadText(PAGE_ID, 10040), { color = Color["text_normal"] })
-  numDisplayed = numDisplayed + 1
+  numDisplayed = scp.menuHelper.createCheckBoxOnLeft(frameTable, "promote_all_skills", numDisplayed, {
+    active      = true,
+    checked     = scpPromote.state.allSkills,
+    text        = ReadText(PAGE_ID, 10040),
+    textColIndex = 2,
+    textColor   = Color["text_normal"],
+    fixed       = true,
+    onClick     = function(_, checked)
+      scpPromote.scp.debug("Promote: set-all-skills toggled to " .. tostring(checked))
+      scpPromote.state.allSkills = checked
+      menu.refreshInfoFrame()
+    end,
+  })
 
   row = frameTable:addRow("promote_buttons", { fixed = true, bgColor = Color["row_background_unselectable"] })
   row[1]:setColSpan(6):createButton({ active = function() return scpPromote.hasChanges() end }):setText(ReadText(1001, 3318), { halign = "center" }) -- Reset

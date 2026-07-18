@@ -13,10 +13,6 @@ local interactMenu = Helper.getMenu("InteractMenu")
 
 local PAGE_ID = 1972092427
 
-local config = {
-  mapRowHeight = Helper.standardTextHeight,
-}
-
 local scpDestroy = {
   state = {
     object = nil, -- 64-bit converted component id, set only via the interact menu action
@@ -101,23 +97,28 @@ function scpDestroy.createSection(frameTable, numDisplayed, scp)
   local factionColor = owner and Helper.convertColorToText(GetFactionData(owner, "color")) or ""
   local displayIcon = (icon ~= nil and icon ~= "") and icon or "menu_info"
 
-  local row = frameTable:addRow("destroy_object_info", { fixed = true, bgColor = Color["row_background_unselectable"] })
-  local iconCell = row[1]:setColSpan(12):createIcon(displayIcon, { height = config.mapRowHeight, width = config.mapRowHeight })
-  iconCell:setText(string.format("%s%s (%s)", factionColor, name, idcode), { x = config.mapRowHeight, halign = "left" })
-  iconCell:setText2(sector or "", { halign = "right" })
-  numDisplayed = numDisplayed + 1
+  numDisplayed = scp.menuHelper.createIconWithTextRow(frameTable, "destroy_object_info", numDisplayed, {
+    icon      = displayIcon,
+    textLeft  = string.format("%s%s (%s)", factionColor, name, idcode),
+    textRight = sector or "",
+    fixed     = true,
+  })
 
-  row = frameTable:addRow("destroy_confirm", { fixed = true, bgColor = Color["row_background_unselectable"] })
-  row[1]:createCheckBox(scpDestroy.state.confirmed, { active = true, width = config.mapRowHeight, height = config.mapRowHeight })
-  row[1].handlers.onClick = function(_, checked)
-    scpDestroy.scp.debug("Destroy: confirmation set to " .. tostring(checked))
-    scpDestroy.state.confirmed = checked
-    menu.refreshInfoFrame()
-  end
-  row[2]:setColSpan(11):createText(ReadText(PAGE_ID, 9020), { color = Color["text_normal"] })
-  numDisplayed = numDisplayed + 1
+  numDisplayed = scp.menuHelper.createCheckBoxOnLeft(frameTable, "destroy_confirm", numDisplayed, {
+    active      = true,
+    checked     = scpDestroy.state.confirmed,
+    text        = ReadText(PAGE_ID, 9020),
+    textColIndex = 2,
+    textColor   = Color["text_normal"],
+    fixed       = true,
+    onClick     = function(_, checked)
+      scpDestroy.scp.debug("Destroy: confirmation set to " .. tostring(checked))
+      scpDestroy.state.confirmed = checked
+      menu.refreshInfoFrame()
+    end,
+  })
 
-  row = frameTable:addRow("destroy_buttons", { fixed = true, bgColor = Color["row_background_unselectable"] })
+  local row = frameTable:addRow("destroy_buttons", { fixed = true, bgColor = Color["row_background_unselectable"] })
   row[1]:setColSpan(6):createButton({ active = true }):setText(ReadText(1001, 64), { halign = "center" })
   row[1].handlers.onClick = scpDestroy.cancel
   row[7]:setColSpan(6):createButton({ active = scpDestroy.state.confirmed }):setText(ReadText(PAGE_ID, 9030), { halign = "center", color = Color["text_negative"] })

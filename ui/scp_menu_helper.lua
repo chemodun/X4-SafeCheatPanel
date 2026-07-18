@@ -87,7 +87,7 @@ end
 ---@param frameTable table
 ---@param id any
 ---@param numDisplayed integer
----@param options table { active, text, mouseOverText, textColIndex, checkBoxColIndex, textColor, fixed }
+---@param options table { checked, active, onClick, text, mouseOverText, textColIndex, checkBoxColIndex, textColor, fixed }
 ---@return integer
 function scp.createCheckBoxOnLeft(frameTable, id, numDisplayed, options)
   local checkboxColumnIndex = options.checkBoxColIndex or config.defaultFirstColumn
@@ -98,8 +98,8 @@ function scp.createCheckBoxOnLeft(frameTable, id, numDisplayed, options)
   local rowProps = { width = config.mapRowHeight, height = config.mapRowHeight }
   if options.fixed then rowProps.fixed = true end
   local row = frameTable:addRow(id, rowProps)
-  row[checkboxColumnIndex]:createCheckBox(scp.spawnCentered, { active = options.active, width = Helper.standardButtonHeight, mouseOverText = options.mouseOverText })
-  row[checkboxColumnIndex].handlers.onClick = function(_, checked) scp.spawnCentered = checked end
+  row[checkboxColumnIndex]:createCheckBox(options.checked, { active = options.active, width = Helper.standardButtonHeight, mouseOverText = options.mouseOverText })
+  row[checkboxColumnIndex].handlers.onClick = options.onClick
   row[textColumnIndex]:setColSpan(textColumnSpan):createText(options.text, { mouseOverText = options.mouseOverText, color = options.textColor })
   return numDisplayed + 1
 end
@@ -190,7 +190,7 @@ end
 ---@param frameTable table
 ---@param id any
 ---@param numDisplayed integer
----@param options table { text, mouseOverText, startValue, onSliderChanged, onSliderConfirm, onSliderActivated, onSliderDeactivated, min, max, step, fromCenter, readOnly, rowBgColor, textColIndex, sliderColIndex, sliderSpan, textColor }
+---@param options table { text, mouseOverText, startValue, onSliderChanged, onSliderConfirm, onSliderActivated, onSliderDeactivated, min, max, step, suffix, fromCenter, readOnly, rowBgColor, textColIndex, sliderColIndex, sliderSpan, textColor, fixed }
 ---@return integer
 function scp.createSliderRow(frameTable, id, numDisplayed, options)
   local textColumnIndex = options.textColIndex or config.defaultFirstColumn
@@ -202,9 +202,10 @@ function scp.createSliderRow(frameTable, id, numDisplayed, options)
   local step = options.step or 1
 
   local rowProps = { bgColor = options.rowBgColor or Color["row_background_unselectable"] }
+  if options.fixed then rowProps.fixed = true end
   local row = frameTable:addRow(id, rowProps)
   row[textColumnIndex]:setColSpan(sliderColumnIndex - 1):createText(options.text, { mouseOverText = options.mouseOverText, color = options.textColor })
-  row[sliderColumnIndex]:setColSpan(sliderColumnSpan):createSliderCell({ min = min, max = max, start = options.startValue, mouseOverText = options.mouseOverText, fromCenter = options.fromCenter or false, step = step, readOnly = options.readOnly or false, height = Helper.standardTextHeight })
+  row[sliderColumnIndex]:setColSpan(sliderColumnSpan):createSliderCell({ min = min, max = max, start = options.startValue, mouseOverText = options.mouseOverText, fromCenter = options.fromCenter or false, step = step, suffix = options.suffix, readOnly = options.readOnly or false, height = Helper.standardTextHeight })
   row[sliderColumnIndex].handlers.onSliderCellChanged = options.onSliderChanged
   if options.onSliderConfirm then
     row[sliderColumnIndex].handlers.onSliderCellConfirm = options.onSliderConfirm
@@ -222,11 +223,12 @@ end
 ---@param frameTable table
 ---@param id any
 ---@param numDisplayed integer
----@param options table { icon, textLeft, textRight, mouseOverText, rowBgColor, textLeftColor, textRightColor }
+---@param options table { icon, textLeft, textRight, mouseOverText, rowBgColor, textLeftColor, textRightColor, fixed }
 ---@return integer
 function scp.createIconWithTextRow(frameTable, id, numDisplayed, options)
   local numColumns = frameTable.table and frameTable.table.numcolumns or frameTable.numcolumns or 12
   local rowProps = { bgColor = options.rowBgColor or Color["row_background_unselectable"] }
+  if options.fixed then rowProps.fixed = true end
   local row = frameTable:addRow(id, rowProps)
   local iconColumn = config.defaultFirstColumn
   local iconColumnSpan = numColumns - iconColumn + 1
