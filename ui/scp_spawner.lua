@@ -137,7 +137,6 @@ ffi.cdef [[
 	bool TeleportPlayerTo(UniverseID controllableid, bool allowcontrolling, bool instant, bool force);
 ]]
 
-local scpMenuHelper = require("extensions.safe_cheat_panel.ui.scp_menu_helper")
 local scpHelpers    = require("extensions.safe_cheat_panel.ui.scp_helpers")
 
 local menu         = Helper.getMenu("MapMenu")
@@ -563,19 +562,20 @@ end
 
 -- *** UI section ***
 
-function scpSpawner.createSection(frameTable, numDisplayed, isV9, getConsumables, consumableTypes)
+function scpSpawner.createSection(frameTable, numDisplayed, consumableTypes, scp)
+  local isV9 = scp.isV9
   if #state.factions == 0 then
     -- factions not yet loaded (first open before reset was called)
     state.factions = getSpawnerFactions({})
   end
 
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7000),
     fixed = nil,
   })
 
   local rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = true,
     dropDownData     = spawnModes,
     startOption      = state.mode.id,
@@ -591,25 +591,26 @@ function scpSpawner.createSection(frameTable, numDisplayed, isV9, getConsumables
   })
 
   if state.mode.id == "spawnModeStation" then
-    numDisplayed = scpSpawner.createStationMenu(frameTable, numDisplayed, isV9)
+    numDisplayed = scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
   elseif state.mode.id == "spawnModeShip" then
-    numDisplayed = scpSpawner.createShipMenu(frameTable, numDisplayed, isV9)
+    numDisplayed = scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
   elseif state.mode.id == "spawnModeObject" then
-    numDisplayed = scpSpawner.createObjectMenu(frameTable, numDisplayed, isV9, getConsumables, consumableTypes)
+    numDisplayed = scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, scp)
   end
 
   return numDisplayed
 end
 
-function scpSpawner.createStationMenu(frameTable, numDisplayed, isV9)
+function scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
+  local isV9 = scp.isV9
   scpSpawner.initStations()
 
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7101),
     fixed = nil,
   })
   local rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = true,
     dropDownData     = stationPlanTypes,
     startOption      = state.station.planType,
@@ -625,13 +626,13 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, isV9)
   })
 
   if state.station.planType == "player" then
-    numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
       text  = ReadText(1972092427, 7104),
       fixed = nil,
     })
     if #state.playerPlans > 0 then
       rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-      numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+      numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
         active           = #state.playerPlans > 1,
         dropDownData     = state.playerPlans,
         startOption      = state.station.plan,
@@ -646,18 +647,18 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, isV9)
         isHeader         = nil,
       })
     else
-      numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+      numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
         text  = ReadText(1972092427, 7105),
         fixed = nil,
       })
     end
   else
-    numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
       text  = ReadText(1972092427, 7100),
       fixed = nil,
     })
     rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-    numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+    numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
       active           = true,
       dropDownData     = state.constructionPlans,
       startOption      = state.station.plan,
@@ -672,12 +673,12 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, isV9)
       isHeader         = nil,
     })
 
-    numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
       text  = ReadText(1972092427, 7005),
       fixed = nil,
     })
     rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-    numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+    numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
       active           = #state.factions > 1,
       dropDownData     = state.factions,
       startOption      = state.station.ownerId,
@@ -696,15 +697,16 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, isV9)
   return numDisplayed
 end
 
-function scpSpawner.createShipMenu(frameTable, numDisplayed, isV9)
+function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
+  local isV9 = scp.isV9
   scpSpawner.initShips()
 
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7200),
     fixed = nil,
   })
   local rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = true,
     dropDownData     = state.ships,
     startOption      = state.ships_sel.id,
@@ -720,12 +722,12 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, isV9)
   })
 
   local loadoutOptions = getShipLoadouts(state.ships_sel.id)
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1001, 7905),
     fixed = nil,
   })
   rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = true,
     dropDownData     = loadoutOptions,
     startOption      = state.ships_sel.loadout,
@@ -740,12 +742,12 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, isV9)
     isHeader         = nil,
   })
 
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7005),
     fixed = nil,
   })
   rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = #state.factions > 1,
     dropDownData     = state.factions,
     startOption      = state.ships_sel.ownerId,
@@ -760,12 +762,12 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, isV9)
     isHeader         = nil,
   })
 
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7006),
     fixed = nil,
   })
   rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = state.ships_sel.ownerId == "player",
     dropDownData     = state.races,
     startOption      = state.ships_sel.ownerRace,
@@ -780,12 +782,12 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, isV9)
     isHeader         = nil,
   })
 
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7007),
     fixed = nil,
   })
   rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
+  numDisplayed = scp.menuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
     text                = ReadText(1972092427, 7201),
     mouseOverText       = ReadText(1972092427, 7202),
     startValue          = state.ships_sel.numPerRow,
@@ -801,7 +803,7 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, isV9)
     sliderSpan          = nil,
     textColor           = nil,
   })
-  numDisplayed = scpMenuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
+  numDisplayed = scp.menuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
     text                = ReadText(1972092427, 7203),
     mouseOverText       = ReadText(1972092427, 7204),
     startValue          = state.ships_sel.rows,
@@ -821,14 +823,16 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, isV9)
   return numDisplayed
 end
 
-function scpSpawner.createObjectMenu(frameTable, numDisplayed, isV9, getConsumables, consumableTypes)
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+function scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, scp)
+  local isV9 = scp.isV9
+  local getConsumables = scp.helpers.getConsumables
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7300),
     fixed = nil,
   })
 
   local rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = true,
     dropDownData     = consumableTypes,
     startOption      = state.object.consumableType,
@@ -849,7 +853,7 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, isV9, getConsumab
     state.object.name  = itemOptions[1].text
   end
 
-  numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = #itemOptions > 0,
     dropDownData     = itemOptions,
     startOption      = state.object.macro,
@@ -864,12 +868,12 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, isV9, getConsumab
     isHeader         = nil,
   })
 
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7005),
     fixed = nil,
   })
   rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createDropDown(rowGroup, true, numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = #state.factions > 1,
     dropDownData     = state.factions,
     startOption      = state.object.ownerId,
@@ -884,12 +888,12 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, isV9, getConsumab
     isHeader         = nil,
   })
 
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7007),
     fixed = nil,
   })
   rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scpMenuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
+  numDisplayed = scp.menuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
     text                = ReadText(1972092427, 7301),
     mouseOverText       = ReadText(1972092427, 7302),
     startValue          = state.object.numPerRow,
@@ -905,7 +909,7 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, isV9, getConsumab
     sliderSpan          = nil,
     textColor           = nil,
   })
-  numDisplayed = scpMenuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
+  numDisplayed = scp.menuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
     text                = ReadText(1972092427, 7303),
     mouseOverText       = ReadText(1972092427, 7304),
     startValue          = state.object["rows"],
@@ -921,7 +925,7 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, isV9, getConsumab
     sliderSpan          = nil,
     textColor           = nil,
   })
-  numDisplayed = scpMenuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
+  numDisplayed = scp.menuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
     text                = ReadText(1972092427, 7305),
     mouseOverText       = ReadText(1972092427, 7306),
     startValue          = state.object["spacing"],

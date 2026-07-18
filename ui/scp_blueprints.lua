@@ -17,7 +17,6 @@ ffi.cdef [[
 ]]
 
 local menu              = Helper.getMenu("MapMenu")
-local scpMenuHelper   = require("extensions.safe_cheat_panel.ui.scp_menu_helper")
 
 -- *** Static config ***
 
@@ -560,7 +559,7 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
   local data = blueprint.data
 
   -- Title (fixed - does not scroll)
-  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(PAGE_ID, 4000),
     fixed = true,
   })
@@ -573,7 +572,7 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
     { id = "equipment", text = primaryTagNames[3],      icon = "", displayremoveoption = false },
   }
 
-  numDisplayed = scpMenuHelper.createDropDown(frameTable, "blueprint_primary", numDisplayed, {
+  numDisplayed = scp.menuHelper.createDropDown(frameTable, "blueprint_primary", numDisplayed, {
     active           = true,
     dropDownData     = primaryOptions,
     startOption      = blueprint.primaryTag,
@@ -635,7 +634,7 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
     end
   end
   if secondaryOptions then
-    numDisplayed = scpMenuHelper.createDropDown(frameTable, "blueprint_secondary", numDisplayed, {
+    numDisplayed = scp.menuHelper.createDropDown(frameTable, "blueprint_secondary", numDisplayed, {
       active           = true,
       dropDownData     = secondaryOptions,
       startOption      = blueprint.secondaryTag,

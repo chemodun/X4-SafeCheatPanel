@@ -6,7 +6,6 @@ ffi.cdef [[
 ]]
 
 local mapMenu = Helper.getMenu("MapMenu")
-local scpMenuHelper = require("extensions.safe_cheat_panel.ui.scp_menu_helper")
 
 local PAGE_ID = 1972092427
 

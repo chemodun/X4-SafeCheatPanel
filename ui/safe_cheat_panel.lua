@@ -519,7 +519,7 @@ function scp.createCheatMenu(frame, _)
   elseif scp.tableMode == "scpFactions" then
     numdisplayed = scp.factions.createSection(mainTable, numdisplayed, scp)
   elseif scp.tableMode == "scpObjectSpawn" then
-    numdisplayed = scp.spawner.createSection(mainTable, numdisplayed, scp.isV9, scp.helpers.getConsumables, config.consumableTypes, nil)
+    numdisplayed = scp.spawner.createSection(mainTable, numdisplayed, config.consumableTypes, scp)
   elseif scp.tableMode == "scpDestroy" then
     numdisplayed = scp.destroy.createSection(mainTable, numdisplayed, scp)
   elseif scp.tableMode == "scpPromote" then
