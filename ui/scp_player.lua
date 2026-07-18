@@ -50,21 +50,19 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
   table.sort(spacesuitAmmo, Helper.sortName)
 
   -- Header: Player
-  numDisplayed = scp.menuHelper.createTitle(frameTable, {
-    text         = ReadText(20203, 101),
-    numDisplayed = numDisplayed,
-    fixed        = nil,
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(20203, 101),
+    fixed = nil,
   })
 
   local rowGroup = scp.isV9 and frameTable:addRowGroup({}) or frameTable
   -- Player Money
-  numDisplayed = scp.menuHelper.createEditBox(rowGroup, "player_money", {
+  numDisplayed = scp.menuHelper.createEditBox(rowGroup, "player_money", numDisplayed, {
     active               = true,
     text                 = ReadText(PAGE_ID, 1100),
     mouseOverText        = ReadText(PAGE_ID, 1101),
     editText             = function() return ConvertMoneyString(GetPlayerMoney(), false, false, 0, true) end,
     onEditBoxDeactivated = function(_, text) scpPlayer.SetPlayerMoney(tonumber(text)) end,
-    numDisplayed         = numDisplayed,
     textColIndex         = nil,
     editBoxColIndex      = nil,
     textColor            = nil,
@@ -73,23 +71,21 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
   })
 
   -- Title: Spacesuit Upgrades
-  numDisplayed = scp.menuHelper.createTitle(frameTable, {
-    text         = ReadText(PAGE_ID, 1200),
-    numDisplayed = numDisplayed,
-    fixed        = nil,
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(PAGE_ID, 1200),
+    fixed = nil,
   })
 
   rowGroup = scp.isV9 and frameTable:addRowGroup({}) or frameTable
 
   for _, upgrade in pairs(spacesuitUpgrades) do
     if upgrade.amount == 0 then
-      numDisplayed = scp.menuHelper.createButton(rowGroup, true, {
+      numDisplayed = scp.menuHelper.createButton(rowGroup, true, numDisplayed, {
         text            = upgrade.name,
         active          = true,
         mouseOverText   = nil,
         buttonText      = ReadText(PAGE_ID, 1201),
         onClick         = function() scp.inventory.SetWare(upgrade.id, 0, 1) end,
-        numDisplayed    = numDisplayed,
         textColIndex    = nil,
         buttonColIndex  = nil,
         textColor       = Color["text_inactive"],
@@ -98,11 +94,10 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
         isHeader        = nil,
       })
     else
-      numDisplayed = scp.menuHelper.createDoubleText(rowGroup, false, {
+      numDisplayed = scp.menuHelper.createDoubleText(rowGroup, false, numDisplayed, {
         text               = upgrade.name,
         mouseOverText      = "",
         secondText         = ReadText(PAGE_ID, 1202),
-        numDisplayed       = numDisplayed,
         textColIndex       = nil,
         secondTextColIndex = nil,
         textColor          = nil,
@@ -114,22 +109,20 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
   end
 
   -- Title: Spacesuit Ammo
-  numDisplayed = scp.menuHelper.createTitle(frameTable, {
-    text         = ReadText(PAGE_ID, 1300),
-    numDisplayed = numDisplayed,
-    fixed        = nil,
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(PAGE_ID, 1300),
+    fixed = nil,
   })
 
   rowGroup = scp.isV9 and frameTable:addRowGroup({}) or frameTable
 
   for _, ammo in pairs(spacesuitAmmo) do
-    numDisplayed = scp.menuHelper.createEditBox(rowGroup, true, {
+    numDisplayed = scp.menuHelper.createEditBox(rowGroup, true, numDisplayed, {
       active               = true,
       text                 = ammo.name,
       mouseOverText        = ReadText(PAGE_ID, 1110),
       editText             = ammo.amount,
       onEditBoxDeactivated = function(_, text) scp.inventory.SetWare(ammo.id, ammo.amount, tonumber(text)) end,
-      numDisplayed         = numDisplayed,
       textColIndex         = nil,
       editBoxColIndex      = nil,
       textColor            = nil,

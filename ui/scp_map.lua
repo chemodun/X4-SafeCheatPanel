@@ -112,15 +112,14 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
   table.sort(sectors, Helper.sortName)
 
   -- Header
-  numDisplayed = scp.menuHelper.createTitle(frameTable, {
-    text         = ReadText(1001, 9181),
-    numDisplayed = numDisplayed,
-    fixed        = true,
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1001, 9181),
+    fixed = true,
   })
 
   if isAllRevealed then
     if isUnknownGates then
-      numDisplayed = scp.menuHelper.createButton(frameTable, "map_reveal_all", {
+      numDisplayed = scp.menuHelper.createButton(frameTable, "map_reveal_all", numDisplayed, {
         text            = ReadText(1001, 2809),
         active          = isUnknownGates,
         mouseOverText   = "",
@@ -135,7 +134,6 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
             AddUITriggeredEvent("scp_main", "scp_reveal_path", gates)
           end
         end,
-        numDisplayed    = numDisplayed,
         textColIndex    = nil,
         buttonColIndex  = nil,
         textColor       = nil,
@@ -144,11 +142,10 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
         isHeader        = true,
       })
     else
-        numDisplayed = scp.menuHelper.createDoubleText(frameTable, false, {
+        numDisplayed = scp.menuHelper.createDoubleText(frameTable, false, numDisplayed, {
         text               = ReadText(1001, 2809),
         mouseOverText      = "",
         secondText         = ReadText(1001, 12),
-        numDisplayed       = numDisplayed,
         textColIndex       = nil,
         secondTextColIndex = nil,
         textColor          = nil,
@@ -158,7 +155,7 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
         })
     end
   else
-    numDisplayed = scp.menuHelper.createButton(frameTable, "map_reveal_all", {
+    numDisplayed = scp.menuHelper.createButton(frameTable, "map_reveal_all", numDisplayed, {
       text            = ReadText(1001, 2809),
       active          = true,
       mouseOverText   = "",
@@ -173,7 +170,6 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
         end
         AddUITriggeredEvent("scp_main", "scp_reveal_sector", unknownMacros)
       end,
-      numDisplayed    = numDisplayed,
       textColIndex    = nil,
       buttonColIndex  = nil,
       textColor       = nil,
@@ -322,7 +318,7 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
       local pathKnown = hasKnownPath(sector.id)
       if pathKnown then
         if sector.hasUnknownGates then
-          numDisplayed = scp.menuHelper.createButton(rowGroup, sector.id, {
+          numDisplayed = scp.menuHelper.createButton(rowGroup, sector.id, numDisplayed, {
             text            = sector.name,
             active          = true,
             mouseOverText   = nil,
@@ -334,7 +330,6 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
                 AddUITriggeredEvent("scp_main", "scp_reveal_path", gates)
               end
             end,
-            numDisplayed    = numDisplayed,
             textColIndex    = nil,
             buttonColIndex  = nil,
             textColor       = nameColor,
@@ -343,11 +338,10 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
             isHeader        = nil,
           })
         else
-          numDisplayed = scp.menuHelper.createDoubleText(rowGroup, sector.id, {
+          numDisplayed = scp.menuHelper.createDoubleText(rowGroup, sector.id, numDisplayed, {
             text               = sector.name,
             mouseOverText      = nil,
             secondText         = ReadText(PAGE_ID, 6004),
-            numDisplayed       = numDisplayed,
             textColIndex       = nil,
             secondTextColIndex = nil,
             textColor          = nameColor,
@@ -357,7 +351,7 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
           })
         end
       else
-        numDisplayed = scp.menuHelper.createButton(rowGroup, sector.id, {
+        numDisplayed = scp.menuHelper.createButton(rowGroup, sector.id, numDisplayed, {
           text            = sector.name,
           active          = true,
           mouseOverText   = nil,
@@ -373,7 +367,6 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
               AddUITriggeredEvent("scp_main", "scp_reveal_path", path)
             end
           end,
-          numDisplayed    = numDisplayed,
           textColIndex    = nil,
           buttonColIndex  = nil,
           textColor       = nameColor,
@@ -383,7 +376,7 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
         })
       end
     else
-      numDisplayed = scp.menuHelper.createButton(rowGroup, -1, {
+      numDisplayed = scp.menuHelper.createButton(rowGroup, -1, numDisplayed, {
         text            = sector.name,
         active          = true,
         mouseOverText   = nil,
@@ -392,7 +385,6 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
           menu.noupdate = true
           AddUITriggeredEvent("scp_main", "scp_reveal_sector", { sector.macro })
         end,
-        numDisplayed    = numDisplayed,
         textColIndex    = nil,
         buttonColIndex  = nil,
         textColor       = nameColor,

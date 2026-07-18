@@ -79,10 +79,9 @@ function scpDestroy.executeDestroy()
 end
 
 function scpDestroy.createSection(frameTable, numDisplayed, scp)
-  numDisplayed = scp.menuHelper.createTitle(frameTable, {
-    text         = ReadText(PAGE_ID, 9000),
-    numDisplayed = numDisplayed,
-    fixed        = true,
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(PAGE_ID, 9000),
+    fixed = true,
   })
 
   local object = scpDestroy.state.object

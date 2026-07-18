@@ -560,10 +560,9 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
   local data = blueprint.data
 
   -- Title (fixed - does not scroll)
-  numDisplayed = scpMenuHelper.createTitle(frameTable, {
-    text         = ReadText(PAGE_ID, 4000),
-    numDisplayed = numDisplayed,
-    fixed        = true,
+  numDisplayed = scpMenuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(PAGE_ID, 4000),
+    fixed = true,
   })
 
   -- Filter dropdowns (fixed - does not scroll)
@@ -574,7 +573,7 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
     { id = "equipment", text = primaryTagNames[3],      icon = "", displayremoveoption = false },
   }
 
-  numDisplayed = scpMenuHelper.createDropDown(frameTable, "blueprint_primary", {
+  numDisplayed = scpMenuHelper.createDropDown(frameTable, "blueprint_primary", numDisplayed, {
     active           = true,
     dropDownData     = primaryOptions,
     startOption      = blueprint.primaryTag,
@@ -588,7 +587,6 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
       SetTopRow(menu.infoTable, scp.table.numfixedrows + 1)
       menu.refreshInfoFrame()
     end,
-    numDisplayed     = numDisplayed,
     textColIndex     = nil,
     dropDownColIndex = nil,
     dropDownSpan     = nil,
@@ -637,7 +635,7 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
     end
   end
   if secondaryOptions then
-    numDisplayed = scpMenuHelper.createDropDown(frameTable, "blueprint_secondary", {
+    numDisplayed = scpMenuHelper.createDropDown(frameTable, "blueprint_secondary", numDisplayed, {
       active           = true,
       dropDownData     = secondaryOptions,
       startOption      = blueprint.secondaryTag,
@@ -648,7 +646,6 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
         blueprint.secondaryTag = value
         menu.refreshInfoFrame()
       end,
-      numDisplayed     = numDisplayed,
       textColIndex     = nil,
       dropDownColIndex = nil,
       dropDownSpan     = nil,

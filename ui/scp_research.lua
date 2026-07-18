@@ -74,19 +74,17 @@ end
 
 function scpResearch.createSection(frameTable, numDisplayed, scp)
   local researchItems, isAllUnlocked = scp.helpers.getAllResearch()
-  numDisplayed = scp.menuHelper.createTitle(frameTable, {
-    text         = ReadText(PAGE_ID, 3000),
-    numDisplayed = numDisplayed,
-    fixed        = true,
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(PAGE_ID, 3000),
+    fixed = true,
   })
 
-  numDisplayed = scp.menuHelper.createButton(frameTable, "player_add_research", {
+  numDisplayed = scp.menuHelper.createButton(frameTable, "player_add_research", numDisplayed, {
     text            = ReadText(PAGE_ID, 3000),
     active          = isAllUnlocked == false,
     mouseOverText   = "",
     buttonText      = isAllUnlocked and ReadText(PAGE_ID, 3012) or ReadText(PAGE_ID, 3011),
     onClick         = function() scpResearch.processResearch(researchItems, 0) end,
-    numDisplayed    = numDisplayed,
     textColIndex    = nil,
     buttonColIndex  = nil,
     textColor       = nil,
@@ -99,13 +97,12 @@ function scpResearch.createSection(frameTable, numDisplayed, scp)
   for i = 1, #researchItems do
     local research = researchItems[i]
     if research ~= nil then
-      numDisplayed = scp.menuHelper.createButton(rowGroup, "player_add_research", {
+      numDisplayed = scp.menuHelper.createButton(rowGroup, "player_add_research", numDisplayed, {
         text            = string.rep(" ", research.depth) .. research.name,
         active          = true,
         mouseOverText   = research.description,
         buttonText      = research.completed and ReadText(PAGE_ID, 3022) or ReadText(PAGE_ID, 3021),
         onClick         = function() scpResearch.processResearch(researchItems, i) end,
-        numDisplayed    = numDisplayed,
         textColIndex    = nil,
         buttonColIndex  = nil,
         textColor       = not research.completed and Color["text_inactive"] or nil,

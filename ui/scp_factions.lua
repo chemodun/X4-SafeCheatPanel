@@ -146,21 +146,19 @@ function scpFactions.createSection(frameTable, numDisplayed, scp)
     table.insert(factionsOptions, 1, playerFactionOptions)
   end
 
-  numDisplayed = scp.menuHelper.createTitle(frameTable, {
-    text         = ReadText(PAGE_ID, 5000),
-    numDisplayed = numDisplayed,
-    fixed        = nil,
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(PAGE_ID, 5000),
+    fixed = nil,
   })
 
   local rowGroup = scp.isV9 and frameTable:addRowGroup({}) or frameTable
-  numDisplayed = scp.menuHelper.createDropDown(rowGroup, "faction", {
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, "faction", numDisplayed, {
     active           = scp.helpers.isExtendedMode(),
     dropDownData     = factionsOptions,
     startOption      = state.factionFor,
     text             = ReadText(PAGE_ID, 5005),
     textOverride     = "",
     onConfirmed      = function(_, value) scpFactions.requestFactionRelations(value) end,
-    numDisplayed     = numDisplayed,
     textColIndex     = nil,
     dropDownColIndex = nil,
     dropDownSpan     = nil,
@@ -183,7 +181,7 @@ function scpFactions.createSection(frameTable, numDisplayed, scp)
       local factionTextColor = GetFactionData(faction.id, "color") or Color["text_normal"]
       local isLocked = faction.isrelationlocked or isRelationLocked
 
-      numDisplayed = scp.menuHelper.createSliderRow(rowGroup, nil, {
+      numDisplayed = scp.menuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
         text                = faction.text,
         mouseOverText       = faction.name,
         startValue          = relationValue,
@@ -196,7 +194,6 @@ function scpFactions.createSection(frameTable, numDisplayed, scp)
         end or nil,
         onSliderActivated   = nil,
         onSliderDeactivated = nil,
-        numDisplayed        = numDisplayed,
         min                 = SLIDER_MIN,
         max                 = SLIDER_MAX,
         step                = 1,

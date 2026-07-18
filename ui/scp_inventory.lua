@@ -137,16 +137,15 @@ end
 
 function scpInventory.createSection(frameTable, numDisplayed, scp)
   local policeFaction = GetComponentData(ConvertStringToLuaID(tostring(C.GetPlayerZoneID())), "policefaction")
-  numDisplayed = scp.menuHelper.createTitle(frameTable, {
-    text         = ReadText(1001, 2202),
-    numDisplayed = numDisplayed,
-    fixed        = true,
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1001, 2202),
+    fixed = true,
   })
 
   local playerInventory = GetPlayerInventory()
   local onlineItems     = OnlineGetUserItems()
 
-  numDisplayed = scp.menuHelper.createDropDown(frameTable, "inventory_category", {
+  numDisplayed = scp.menuHelper.createDropDown(frameTable, "inventory_category", numDisplayed, {
     active           = true,
     dropDownData     = state.categoryOptions,
     startOption      = state.category,
@@ -158,7 +157,6 @@ function scpInventory.createSection(frameTable, numDisplayed, scp)
       SetTopRow(menu.infoTable, scp.table.numfixedrows + 1)
       return scpInventory.setCategory(value)
     end,
-    numDisplayed     = numDisplayed,
     textColIndex     = nil,
     dropDownColIndex = nil,
     dropDownSpan     = nil,
@@ -170,10 +168,9 @@ function scpInventory.createSection(frameTable, numDisplayed, scp)
   local category = state.categories[state.category]
   if category ~= nil and #category.data > 0 then
     table.sort(category.data, function(a, b) return state.wares[a].name < state.wares[b].name end)
-    numDisplayed = scp.menuHelper.createTitle(frameTable, {
-      text         = category.name,
-      numDisplayed = numDisplayed,
-      fixed        = true,
+    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+      text  = category.name,
+      fixed = true,
     })
     local wareRowGroup = scp.isV9 and frameTable:addRowGroup({}) or frameTable
     for j = 1, #category.data do
@@ -185,7 +182,7 @@ function scpInventory.createSection(frameTable, numDisplayed, scp)
           local isIllegal = policeFaction and IsWareIllegalTo(wareId, "player", policeFaction)
           local textColor = amount == 0 and Color["text_inactive"] or isIllegal and Color["text_illegal"] or nil
           if state.selected == wareId then
-            numDisplayed = scp.menuHelper.createSliderRow(wareRowGroup, true, {
+            numDisplayed = scp.menuHelper.createSliderRow(wareRowGroup, true, numDisplayed, {
               text                = ware.name,
               mouseOverText       = ReadText(PAGE_ID, 2003),
               startValue          = amount,
@@ -202,7 +199,6 @@ function scpInventory.createSection(frameTable, numDisplayed, scp)
               end,
               onSliderActivated   = function() menu.noupdate = true end,
               onSliderDeactivated = function() menu.noupdate = false end,
-              numDisplayed        = numDisplayed,
               min                 = 0,
               max                 = 10000,
               step                = 1,
@@ -212,7 +208,7 @@ function scpInventory.createSection(frameTable, numDisplayed, scp)
               textColor           = textColor,
             })
           else
-            numDisplayed = scp.menuHelper.createButton(wareRowGroup, true, {
+            numDisplayed = scp.menuHelper.createButton(wareRowGroup, true, numDisplayed, {
               text            = ware.name,
               active          = true,
               mouseOverText   = ReadText(PAGE_ID, 2002),
@@ -221,7 +217,6 @@ function scpInventory.createSection(frameTable, numDisplayed, scp)
                 state.selected = state.selected == wareId and nil or wareId
                 return menu.refreshInfoFrame()
               end,
-              numDisplayed    = numDisplayed,
               textColIndex    = nil,
               buttonColIndex  = nil,
               textColor       = textColor,

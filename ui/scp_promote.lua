@@ -227,10 +227,9 @@ local function addCategorySliderRow(frameTable, category, labelText, avg15)
 end
 
 function scpPromote.createSection(frameTable, numDisplayed, scp)
-  numDisplayed = scp.menuHelper.createTitle(frameTable, {
-    text         = ReadText(PAGE_ID, 10000),
-    numDisplayed = numDisplayed,
-    fixed        = true,
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(PAGE_ID, 10000),
+    fixed = true,
   })
 
   local object = scpPromote.state.object
