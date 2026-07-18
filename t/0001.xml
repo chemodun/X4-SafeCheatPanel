@@ -146,6 +146,7 @@
         <t id="10010">No ship selected. Keep this tab open and use the right-click menu on a player ship.</t>
         <t id="10011">Not assigned</t>
         <t id="10031">Apply</t>
+        <t id="10040">Set all skills to the selected level (not just the ones relevant to the current role)</t>
 
         <!-- Settings (Options Menu) -->
         <t id="90000">Settings</t>

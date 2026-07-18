@@ -43,6 +43,7 @@ local scpPromote = {
     object = nil, -- 64-bit converted player ship id, set only via the interact menu action
     targets = {}, -- category id -> slider stars (1-5) set by the user
     initial = {}, -- category id -> slider start stars, derived from the current averages
+    allSkills = false, -- set every skill (not just the role-relevant ones) to the target level
   },
 }
 
@@ -82,6 +83,7 @@ end
 function scpPromote.startPromote()
   scpPromote.state.object = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
   scpPromote.state.targets = {}
+  scpPromote.state.allSkills = false
   scpPromote.scp.debug("Promote: ship set to " .. tostring(scpPromote.state.object))
   scpPromote.scp.helpers.interactMenuFinishAction()
   menu.refreshInfoFrame()
@@ -106,7 +108,7 @@ function scpPromote.apply()
   -- MD receives event.param3 via AddUITriggeredEvent; component references crossing that
   -- boundary must be LuaID-converted (ConvertStringToLuaID), not the C-style 64bit id used
   -- for local GetComponentData/FFI calls elsewhere in this module.
-  local data = { ship = ConvertStringToLuaID(tostring(scpPromote.state.object)) }
+  local data = { ship = ConvertStringToLuaID(tostring(scpPromote.state.object)), allSkills = scpPromote.state.allSkills }
   local anyChange = false
   local changes = ""
   for category, value in pairs(scpPromote.state.targets) do
@@ -116,7 +118,7 @@ function scpPromote.apply()
       changes = changes .. string.format(" %s=%d", category, value)
     end
   end
-  scpPromote.scp.debug("Promote: apply pressed, changes:" .. (anyChange and changes or " none"))
+  scpPromote.scp.debug("Promote: apply pressed, allSkills=" .. tostring(scpPromote.state.allSkills) .. ", changes:" .. (anyChange and changes or " none"))
   if not anyChange then
     return
   end
@@ -275,6 +277,16 @@ function scpPromote.createSection(frameTable, numDisplayed, scp)
     end
     numDisplayed = numDisplayed + 1
   end
+
+  row = frameTable:addRow("promote_all_skills", { fixed = true, bgColor = Color["row_background_unselectable"] })
+  row[1]:createCheckBox(scpPromote.state.allSkills, { active = true, width = config.mapRowHeight, height = config.mapRowHeight })
+  row[1].handlers.onClick = function(_, checked)
+    scpPromote.scp.debug("Promote: set-all-skills toggled to " .. tostring(checked))
+    scpPromote.state.allSkills = checked
+    menu.refreshInfoFrame()
+  end
+  row[2]:setColSpan(11):createText(ReadText(PAGE_ID, 10040), { color = Color["text_normal"] })
+  numDisplayed = numDisplayed + 1
 
   row = frameTable:addRow("promote_buttons", { fixed = true, bgColor = Color["row_background_unselectable"] })
   row[1]:setColSpan(6):createButton({ active = function() return scpPromote.hasChanges() end }):setText(ReadText(1001, 3318), { halign = "center" }) -- Reset

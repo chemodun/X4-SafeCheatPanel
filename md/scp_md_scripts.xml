@@ -109,17 +109,24 @@
           <actions>
             <set_value name="$promoteData" exact="event.param3" />
             <set_value name="$ship" exact="$promoteData.$ship" />
-            <debug_text text="'SafeCheatPanel: Promoting crew on %s (pilot: %s, marines: %s, service: %s)'. [@$ship.knownname, @$promoteData.$pilot, @$promoteData.$marine, @$promoteData.$service]" chance="$debugChance" />
+            <debug_text text="'SafeCheatPanel: Promoting crew on %s (pilot: %s, marines: %s, service: %s, allSkills: %s)'. [@$ship.knownname, @$promoteData.$pilot, @$promoteData.$marine, @$promoteData.$service, @$promoteData.$allSkills]" chance="$debugChance" />
             <do_if value="$promoteData.$pilot? and @$ship.pilot.exists">
               <set_value name="$pilot" exact="$ship.pilot" />
-              <set_value name="$current" exact="$pilot.combinedskill" />
               <set_value name="$target15" exact="$promoteData.$pilot * 3" />
-              <do_if value="$current gt 0">
-                <set_value name="$ratio" exact="($promoteData.$pilot * 20.0) / $current" />
-                <set_skill entity="$pilot" type="skilltype.management" exact="[15, (($pilot.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
-                <set_skill entity="$pilot" type="skilltype.engineering" exact="[15, (($pilot.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
-                <set_skill entity="$pilot" type="skilltype.boarding" exact="[15, (($pilot.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
+              <do_if value="@$promoteData.$allSkills == true">
+                <set_skill entity="$pilot" type="skilltype.management" exact="$target15" />
+                <set_skill entity="$pilot" type="skilltype.engineering" exact="$target15" />
+                <set_skill entity="$pilot" type="skilltype.boarding" exact="$target15" />
               </do_if>
+              <do_else>
+                <set_value name="$current" exact="$pilot.combinedskill" />
+                <do_if value="$current gt 0">
+                  <set_value name="$ratio" exact="($promoteData.$pilot * 20.0) / $current" />
+                  <set_skill entity="$pilot" type="skilltype.management" exact="[15, (($pilot.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
+                  <set_skill entity="$pilot" type="skilltype.engineering" exact="[15, (($pilot.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
+                  <set_skill entity="$pilot" type="skilltype.boarding" exact="[15, (($pilot.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
+                </do_if>
+              </do_else>
               <set_skill entity="$pilot" type="skilltype.piloting" exact="$target15" />
               <set_skill entity="$pilot" type="skilltype.morale" exact="$target15" />
               <debug_text text="'SafeCheatPanel: Pilot %s promoted to skill %s'. [@$pilot.knownname, $target15]" chance="$debugChance" />
@@ -132,27 +139,41 @@
               <do_for_each name="$template" in="$ship.people.list" counter="$i">
                 <debug_text text="'SafeCheatPanel: crew[%s] template=%s name=%s role=%s'. [$i, $template, $ship.people.{$template}.name, $ship.people.{$template}.role]" chance="$debugChance" />
                 <do_if value="$promoteData.$marine? and $ship.people.{$template}.role == entityrole.marine">
-                  <set_value name="$current" exact="$ship.people.{$template}.combinedskill" />
                   <set_value name="$target15" exact="$promoteData.$marine * 3" />
-                  <do_if value="$current gt 0">
-                    <set_value name="$ratio" exact="($promoteData.$marine * 20.0) / $current" />
-                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($ship.people.{$template}.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
-                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($ship.people.{$template}.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
-                    <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="[15, (($ship.people.{$template}.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
+                  <do_if value="@$promoteData.$allSkills">
+                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="$target15" />
+                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="$target15" />
+                    <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="$target15" />
                   </do_if>
+                  <do_else>
+                    <set_value name="$current" exact="$ship.people.{$template}.combinedskill" />
+                    <do_if value="$current gt 0">
+                      <set_value name="$ratio" exact="($promoteData.$marine * 20.0) / $current" />
+                      <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($ship.people.{$template}.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
+                      <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($ship.people.{$template}.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
+                      <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="[15, (($ship.people.{$template}.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
+                    </do_if>
+                  </do_else>
                   <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="$target15" />
                   <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
                   <debug_text text="'SafeCheatPanel: Marine %s promoted to skill %s'. [@$ship.people.{$template}.name, $target15]" chance="$debugChance" />
                 </do_if>
                 <do_elseif value="$promoteData.$service? and $ship.people.{$template}.role == entityrole.service">
-                  <set_value name="$current" exact="$ship.people.{$template}.combinedskill" />
                   <set_value name="$target15" exact="$promoteData.$service * 3" />
-                  <do_if value="$current gt 0">
-                    <set_value name="$ratio" exact="($promoteData.$service * 20.0) / $current" />
-                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($ship.people.{$template}.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
-                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($ship.people.{$template}.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
-                    <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="[15, (($ship.people.{$template}.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
+                  <do_if value="@$promoteData.$allSkills">
+                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="$target15" />
+                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="$target15" />
+                    <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="$target15" />
                   </do_if>
+                  <do_else>
+                    <set_value name="$current" exact="$ship.people.{$template}.combinedskill" />
+                    <do_if value="$current gt 0">
+                      <set_value name="$ratio" exact="($promoteData.$service * 20.0) / $current" />
+                      <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($ship.people.{$template}.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
+                      <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($ship.people.{$template}.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
+                      <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="[15, (($ship.people.{$template}.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
+                    </do_if>
+                  </do_else>
                   <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="$target15" />
                   <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
                   <debug_text text="'SafeCheatPanel: Service crew %s promoted to skill %s'. [@$ship.people.{$template}.name, $target15]" chance="$debugChance" />

@@ -109,13 +109,13 @@ function scpDestroy.createSection(frameTable, numDisplayed, scp)
   numDisplayed = numDisplayed + 1
 
   row = frameTable:addRow("destroy_confirm", { fixed = true, bgColor = Color["row_background_unselectable"] })
-  row[1]:setColSpan(7):createText(ReadText(PAGE_ID, 9020), { color = Color["text_normal"] })
-  row[8]:createCheckBox(scpDestroy.state.confirmed, { active = true, width = config.mapRowHeight, height = config.mapRowHeight })
-  row[8].handlers.onClick = function(_, checked)
+  row[1]:createCheckBox(scpDestroy.state.confirmed, { active = true, width = config.mapRowHeight, height = config.mapRowHeight })
+  row[1].handlers.onClick = function(_, checked)
     scpDestroy.scp.debug("Destroy: confirmation set to " .. tostring(checked))
     scpDestroy.state.confirmed = checked
     menu.refreshInfoFrame()
   end
+  row[2]:setColSpan(11):createText(ReadText(PAGE_ID, 9020), { color = Color["text_normal"] })
   numDisplayed = numDisplayed + 1
 
   row = frameTable:addRow("destroy_buttons", { fixed = true, bgColor = Color["row_background_unselectable"] })
