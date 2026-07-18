@@ -103,7 +103,10 @@ function scpPromote.hasChanges()
 end
 
 function scpPromote.apply()
-  local data = { ship = scpPromote.state.object }
+  -- MD receives event.param3 via AddUITriggeredEvent; component references crossing that
+  -- boundary must be LuaID-converted (ConvertStringToLuaID), not the C-style 64bit id used
+  -- for local GetComponentData/FFI calls elsewhere in this module.
+  local data = { ship = ConvertStringToLuaID(tostring(scpPromote.state.object)) }
   local anyChange = false
   local changes = ""
   for category, value in pairs(scpPromote.state.targets) do

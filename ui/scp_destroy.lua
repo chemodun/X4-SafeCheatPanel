@@ -68,7 +68,10 @@ function scpDestroy.executeDestroy()
   if object == nil or not scpDestroy.state.confirmed then
     return
   end
-  AddUITriggeredEvent("scp_main", "scp_destroy_object", { object = object })
+  -- MD receives event.param3 via AddUITriggeredEvent; component references crossing that
+  -- boundary must be LuaID-converted (ConvertStringToLuaID), not the C-style 64bit id used
+  -- for local GetComponentData/FFI calls above.
+  AddUITriggeredEvent("scp_main", "scp_destroy_object", { object = ConvertStringToLuaID(tostring(object)) })
   scpDestroy.scp.debug("Destroy: destroy event sent")
   scpDestroy.state.object = nil
   scpDestroy.state.confirmed = false
