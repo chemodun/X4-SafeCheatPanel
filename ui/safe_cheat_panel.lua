@@ -471,7 +471,7 @@ end
 function scp.teleportObject()
   local targetObject
   if menu.selectedcomponent ~= nil then
-    targetObject = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
+    targetObject = ConvertStringToLuaID(tostring(interactMenu.componentSlot.component))
   else
     targetObject = ConvertStringToLuaID(tostring(C.GetPlayerShipID()))
   end
