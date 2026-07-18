@@ -125,36 +125,39 @@
               <debug_text text="'SafeCheatPanel: Pilot %s promoted to skill %s'. [@$pilot.knownname, $target15]" chance="$debugChance" />
             </do_if>
             <do_if value="$promoteData.$marine? or $promoteData.$service?">
-              <do_all exact="$ship.people.list.count" counter="$i">
-                <set_value name="$template" exact="$ship.people.list.{$i}" />
-                <set_value name="$entry" exact="$ship.people.{$template}" />
-                <do_if value="$promoteData.$marine? and $entry.role == entityrole.marine">
-                  <set_value name="$current" exact="$entry.combinedskill" />
+              <debug_text text="'SafeCheatPanel: crew loop starting, people.list.count = %s'. [$ship.people.list.count]" chance="$debugChance" />
+              <!-- $ship.people.{$template} is a pseudo/live accessor (npctemplateentry), never
+                   stored via set_value and reused; every property access below re-chains
+                   $ship.people.{$template}.xxx directly, matching vanilla usage everywhere. -->
+              <do_for_each name="$template" in="$ship.people.list" counter="$i">
+                <debug_text text="'SafeCheatPanel: crew[%s] template=%s name=%s role=%s'. [$i, $template, $ship.people.{$template}.name, $ship.people.{$template}.role]" chance="$debugChance" />
+                <do_if value="$promoteData.$marine? and $ship.people.{$template}.role == entityrole.marine">
+                  <set_value name="$current" exact="$ship.people.{$template}.combinedskill" />
                   <set_value name="$target15" exact="$promoteData.$marine * 3" />
                   <do_if value="$current gt 0">
                     <set_value name="$ratio" exact="($promoteData.$marine * 20.0) / $current" />
-                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($entry.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
-                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($entry.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
-                    <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="[15, (($entry.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($ship.people.{$template}.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($ship.people.{$template}.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="[15, (($ship.people.{$template}.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
                   </do_if>
                   <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="$target15" />
                   <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
-                  <debug_text text="'SafeCheatPanel: Marine %s promoted to skill %s'. [@$entry.name, $target15]" chance="$debugChance" />
+                  <debug_text text="'SafeCheatPanel: Marine %s promoted to skill %s'. [@$ship.people.{$template}.name, $target15]" chance="$debugChance" />
                 </do_if>
-                <do_elseif value="$promoteData.$service? and $entry.role == entityrole.service">
-                  <set_value name="$current" exact="$entry.combinedskill" />
+                <do_elseif value="$promoteData.$service? and $ship.people.{$template}.role == entityrole.service">
+                  <set_value name="$current" exact="$ship.people.{$template}.combinedskill" />
                   <set_value name="$target15" exact="$promoteData.$service * 3" />
                   <do_if value="$current gt 0">
                     <set_value name="$ratio" exact="($promoteData.$service * 20.0) / $current" />
-                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($entry.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
-                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($entry.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
-                    <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="[15, (($entry.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($ship.people.{$template}.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($ship.people.{$template}.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
+                    <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="[15, (($ship.people.{$template}.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
                   </do_if>
                   <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="$target15" />
                   <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
-                  <debug_text text="'SafeCheatPanel: Service crew %s promoted to skill %s'. [@$entry.name, $target15]" chance="$debugChance" />
+                  <debug_text text="'SafeCheatPanel: Service crew %s promoted to skill %s'. [@$ship.people.{$template}.name, $target15]" chance="$debugChance" />
                 </do_elseif>
-              </do_all>
+              </do_for_each>
             </do_if>
             <raise_lua_event name="'scp_main.crewPromoted'" />
           </actions>
@@ -533,7 +536,7 @@
               table[$text = {1972092427, 90011}, $value = 'normal'],
               table[$text = {1972092427, 90012}, $value = 'extended'],
             ]" />
-            <!-- 
+            <!--
               table[$text = {1972092427, 90013}, $value = 'developer'], -->
             <set_value name="$currentIndex" exact="1" />
             <do_if value="$config.$mode == 'extended'">
