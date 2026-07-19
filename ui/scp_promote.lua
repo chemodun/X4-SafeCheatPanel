@@ -121,6 +121,7 @@ function scpPromote.apply()
   if not anyChange then
     return
   end
+  scpPromote.state.allSkills = false
   AddUITriggeredEvent("scp_main", "scp_promote_crew", data)
   scpPromote.scp.debug("Promote: promote event sent")
 end
