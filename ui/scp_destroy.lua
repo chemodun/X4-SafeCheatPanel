@@ -35,12 +35,17 @@ function scpDestroy.isValidDestroyObject()
   end
   if not C.IsComponentClass(component, "destructible") then
     return false
+  elseif C.IsComponentClass(component, "gate") or C.IsComponentClass(component, "highway") or C.IsComponentClass(component, "highwayentrygate") or C.IsComponentClass(component, "highwayexitgate") then
+    return false
   end
   if component == C.GetPlayerObjectID() then
     return false
   end
   local convertedComponent = ConvertStringTo64Bit(tostring(component))
-  return convertedComponent ~= 0 and IsValidComponent(convertedComponent)
+  if convertedComponent == nil or convertedComponent == 0 or not IsValidComponent(convertedComponent) then
+    return false
+  end
+  return true
 end
 
 function scpDestroy.startDestroy()
