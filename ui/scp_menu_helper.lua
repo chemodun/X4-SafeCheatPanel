@@ -74,11 +74,19 @@ end
 function scp.createCheckBox(frameTable, id, numDisplayed, options)
   local textColumnIndex = options.textColIndex or config.defaultFirstColumn
   local checkboxColumnIndex = options.checkBoxColIndex or config.defaultSecondColumn
-  local rowProps = { width = config.mapRowHeight, height = config.mapRowHeight }
+
+  local rowProps = { bgColor = Color["row_background_unselectable"] }
   if options.fixed then rowProps.fixed = true end
   local row = frameTable:addRow(id, rowProps)
+
   row[textColumnIndex]:setColSpan(checkboxColumnIndex - 1):createText(options.text, { mouseOverText = options.mouseOverText, color = options.textColor })
-  row[checkboxColumnIndex]:createCheckBox(scp.spawnCentered, { active = options.active, width = Helper.standardButtonHeight, mouseOverText = options.mouseOverText })
+
+  local checkboxCellWidth = row[checkboxColumnIndex]:getWidth()
+  local checkBoxCellHeight = row:getHeight()
+  local checkBoxSize = math.min(checkboxCellWidth, checkBoxCellHeight)
+  local x = checkboxCellWidth > checkBoxSize and math.floor((checkboxCellWidth - checkBoxSize) / 2) or 0
+
+  row[checkboxColumnIndex]:createCheckBox(scp.spawnCentered, { active = options.active, x = x, width = checkBoxSize, mouseOverText = options.mouseOverText, scaling = false })
   row[checkboxColumnIndex].handlers.onClick = function(_, checked) scp.spawnCentered = checked end
   return numDisplayed + 1
 end
@@ -95,12 +103,19 @@ function scp.createCheckBoxOnLeft(frameTable, id, numDisplayed, options)
   local numColumns = frameTable.table and frameTable.table.numcolumns or frameTable.numcolumns or 12
   local textColumnSpan = numColumns - textColumnIndex + 1
 
-  local rowProps = { width = config.mapRowHeight, height = config.mapRowHeight }
+  local rowProps = { bgColor = Color["row_background_unselectable"] }
   if options.fixed then rowProps.fixed = true end
   local row = frameTable:addRow(id, rowProps)
-  row[checkboxColumnIndex]:createCheckBox(options.checked, { active = options.active, width = Helper.standardButtonHeight, mouseOverText = options.mouseOverText })
-  row[checkboxColumnIndex].handlers.onClick = options.onClick
+
   row[textColumnIndex]:setColSpan(textColumnSpan):createText(options.text, { mouseOverText = options.mouseOverText, color = options.textColor })
+
+  local checkboxCellWidth = row[checkboxColumnIndex]:getWidth()
+  local checkBoxCellHeight = row:getHeight()
+  local checkBoxSize = math.min(checkboxCellWidth, checkBoxCellHeight)
+  local x = checkboxCellWidth > checkBoxSize and math.floor((checkboxCellWidth - checkBoxSize) / 2) or 0
+
+  row[checkboxColumnIndex]:createCheckBox(options.checked, { active = options.active, x = x, width = checkBoxSize, mouseOverText = options.mouseOverText, scaling = false })
+  row[checkboxColumnIndex].handlers.onClick = options.onClick
   return numDisplayed + 1
 end
 
