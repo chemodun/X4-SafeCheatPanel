@@ -2,14 +2,14 @@
 <content
   id="safe_cheat_panel"
   name="Safe Cheat Panel"
-  description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations, galaxy exploration state, and spawning capabilities - all through a clean, tab-based interface."
+  description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations, galaxy exploration state, spawning capabilities, object destruction, and ship crew promotion - all through a clean, tab-based interface."
   author="Chem O`Dun"
-  version="80036"
-  date="2026-07-09"
+  version="80037"
+  date="2026-07-18"
   save="false"
   enabled="true"
   sync="false"
-  lastupdate="1783546165">
+  lastupdate="1784539301">
   <dependency id="kuerteeUIExtensionsAndHUD" optional="false" name="kuertee UI Extensions and HUD" />
   <dependency id="ws_2042901274" optional="false" name="SirNukes Mod Support APIs" version="195"></dependency>
   <dependency id="ws_3715253556" optional="false" name="Options Helper" version="100"></dependency>
