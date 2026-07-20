@@ -1,6 +1,6 @@
 [size=4][u]Safe Cheat Panel[/u][/size]
 
-A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations, galaxy exploration state, and spawning capabilities - all through a clean, tab-based interface.
+A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations, galaxy exploration state, spawning capabilities, object destruction, and ship crew promotion - all through a clean, tab-based interface.
 
 [b]Warning[/b]: Spawning unusual objects (such as multiple Player HQs) can corrupt saves. Use responsibly.
 
@@ -10,7 +10,7 @@ A UI-based cheat panel accessible from the left sidebar in the map menu. Provide
 
 The new mod currently not contains the "development mode" features as I focused on the "safe" features first, but I plan to add them in the future.
 
-Take in account: id of the mod and folder is changed to [b]safe_cheat_panel[/b].
+Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 
 [size=3][u][b]Features[/b][/u][/size]
 [list]
@@ -21,7 +21,9 @@ Take in account: id of the mod and folder is changed to [b]safe_cheat_panel[/b].
 [*] [b]Factions Tab[/b]: Edit faction relations with the player and between non-player factions.
 [*] [b]Galaxy/Sectors Tab[/b]: Reveal sectors on the map at three levels of detail, or reveal all at once.
 [*] [b]Spawner Tab[/b]: Spawn stations, ships (with loadout and crew options), and deployable objects.
-[*] [b]Right-click context menu[/b]: Spawn station, fix station, spawn ships, spawn objects, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector.
+[*] [b]Destroy Object Tab[/b]: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
+[*] [b]Promote Crew Tab[/b]: Set a player ship's Pilot/Captain, Marines, and Service Crew skill levels via star sliders, with an option to set every skill (not just the role-relevant ones) to the chosen level.
+[*] [b]Right-click context menu[/b]: Spawn station, fix station, spawn ships, spawn objects, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector, destroy object, promote crew.
 [*] [b]Two modes[/b]: [b]Normal[/b] (player-owned spawns only) and [b]Extended[/b] (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
 [*] [b]Compatible with X4 8.00 and 9.00[/b].
 [*] [b]Can work with SWI[/b] - please use with the [url=https://www.nexusmods.com/x4foundations/mods/2134]kuertee UI Extensions and HUD for SW Interworlds adoption mod[/url].
@@ -127,7 +129,8 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [list]
 [*] Select a construction plan (player-created plans, or pre-defined plans in extended mode).
 [*] Select the owning faction (player only in normal mode; any faction in extended mode).
-[/list][img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/station_spawner.png[/img]
+[/list]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/station_spawner.png[/img]
 
 [size=3][u]Object Spawner[/u][/size]
 [list]
@@ -135,6 +138,26 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [*] Set the number per row (up to 10), number of rows (up to 10), and spacing between objects (up to 100 km).
 [/list]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/object_spawner.png[/img]
+
+[size=3][u][i]Destroy Object Tab[/i][/u][/size]
+[list]
+[*] The target object can only be set via the [b]Destroy Object[/b] right-click context menu action, which is only offered while this tab is open.
+[*] Shows the selected object's name, ID code, and sector.
+[*] A confirmation checkbox must be ticked before the [b]Destroy[/b] button becomes active.
+[*] The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
+[*] The object is removed instantly, without an explosion.
+[/list]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/object_destroy.png[/img]
+
+[size=3][u][i]Promote Crew Tab[/i][/u][/size]
+[list]
+[*] The target ship can only be set via the [b]Promote Crew[/b] right-click context menu action (player-owned ships only), which is only offered while this tab is open.
+[*] Set the Pilot/Captain, Marines, and Service Crew skill levels independently via 1-5 star sliders; each label shows the category's current average.
+[*] By default, only the skill(s) relevant to the role are set exactly to the chosen level, while the remaining skills are scaled proportionally to their current values.
+[*] An optional checkbox sets [b]every[/b] skill (not just the role-relevant ones) to the chosen level instead.
+[*] [b]Cancel[/b] clears the selected ship and any pending changes; [b]Reset[/b] reverts pending slider changes without deselecting the ship; [b]Apply[/b] commits the changes.
+[/list]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/promote_crew.png[/img]
 
 [size=3][u][i]Right-click Context Menu on Map[/i][/u][/size]
 
@@ -154,9 +177,9 @@ Right-clicking on the map gives access to the following actions, depending on th
 [*] [b]Restock: All Faction Build Storages[/b]: Instantly restocks all stations belonging to the same faction with all required resources in their build storages. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. [i]Only available in[/i] [b]extended[/b] [i]mode, as for player as for non-player faction stations[/i].
 [*] [b]Teleport Here[/b]: Teleports the player's currently piloted ship to the clicked position.
 [*] [b]Teleport To[/b]: Teleports the player character to the clicked object or position.
+[*] [b]Destroy Object[/b]: Sets the clicked object as the target on the Destroy Object tab. Only offered while that tab is open. The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
+[*] [b]Promote Crew[/b]: Sets the clicked ship as the target on the Promote Crew tab. Only offered while that tab is open, and only for player-owned ships.
 [/list]
-[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/spawn_object_menu.png[/img]
-
 [size=3][u][i]Extension Options[/i][/u][/size]
 
 An options menu is available via [b]Options Menu > Extension options > Safe Cheat Panel[/b].
@@ -185,6 +208,14 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [/list]
 [size=3][u][b]Changelog[/b][/u][/size]
 
+[size=3][u][i][8.00.37] - 2026-07-18[/i][/u][/size]
+[list]
+[*] [b]Added[/b]
+[list]
+[*] Destroy Object tab: destroy any destructible map object.
+[*] Promote Crew tab: set a player ship's Pilot/Captain, Marines, and Service Crew skill levels via 1-5 star sliders.
+[/list]
+[/list]
 [size=3][u][i][8.00.36] - 2026-07-09[/i][/u][/size]
 [list]
 [*] [b]Fixed[/b]
