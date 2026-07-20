@@ -1,6 +1,6 @@
 # Safe Cheat Panel
 
-A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations, galaxy exploration state, and spawning capabilities - all through a clean, tab-based interface.
+A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations, galaxy exploration state, spawning capabilities, object destruction, and ship crew promotion - all through a clean, tab-based interface.
 
 **Warning**: Spawning unusual objects (such as multiple Player HQs) can corrupt saves. Use responsibly.
 
@@ -21,7 +21,9 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Factions Tab**: Edit faction relations with the player and between non-player factions.
 - **Galaxy/Sectors Tab**: Reveal sectors on the map at three levels of detail, or reveal all at once.
 - **Spawner Tab**: Spawn stations, ships (with loadout and crew options), and deployable objects.
-- **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector.
+- **Destroy Object Tab**: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
+- **Promote Crew Tab**: Set a player ship's Pilot/Captain, Marines, and Service Crew skill levels via star sliders, with an option to set every skill (not just the role-relevant ones) to the chosen level.
+- **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector, destroy object, promote crew.
 - **Two modes**: **Normal** (player-owned spawns only) and **Extended** (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
 - **Compatible with X4 8.00 and 9.00**.
 - **Can work with SWI** - please use with the [kuertee UI Extensions and HUD for SW Interworlds adoption mod](https://www.nexusmods.com/x4foundations/mods/2134).
@@ -121,6 +123,7 @@ A **Reveal All** button reveals every sector at all levels at once.
 
 - Select a construction plan (player-created plans, or pre-defined plans in extended mode).
 - Select the owning faction (player only in normal mode; any faction in extended mode).
+
 ![Station Spawner](docs/images/station_spawner.png)
 
 #### Object Spawner
@@ -129,6 +132,26 @@ A **Reveal All** button reveals every sector at all levels at once.
 - Set the number per row (up to 10), number of rows (up to 10), and spacing between objects (up to 100 km).
 
 ![Object Spawner](docs/images/object_spawner.png)
+
+### Destroy Object Tab
+
+- The target object can only be set via the **Destroy Object** right-click context menu action, which is only offered while this tab is open.
+- Shows the selected object's name, ID code, and sector.
+- A confirmation checkbox must be ticked before the **Destroy** button becomes active.
+- The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
+- The object is removed instantly, without an explosion.
+
+![Destroy Object](docs/images/object_destroy.png)
+
+### Promote Crew Tab
+
+- The target ship can only be set via the **Promote Crew** right-click context menu action (player-owned ships only), which is only offered while this tab is open.
+- Set the Pilot/Captain, Marines, and Service Crew skill levels independently via 1-5 star sliders; each label shows the category's current average.
+- By default, only the skill(s) relevant to the role are set exactly to the chosen level, while the remaining skills are scaled proportionally to their current values.
+- An optional checkbox sets **every** skill (not just the role-relevant ones) to the chosen level instead.
+- **Cancel** clears the selected ship and any pending changes; **Reset** reverts pending slider changes without deselecting the ship; **Apply** commits the changes.
+
+![Promote Crew](docs/images/promote_crew.png)
 
 ### Right-click Context Menu on Map
 
@@ -148,8 +171,8 @@ Right-clicking on the map gives access to the following actions, depending on th
 - **Restock: All Faction Build Storages**: Instantly restocks all stations belonging to the same faction with all required resources in their build storages. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
 - **Teleport Here**: Teleports the player's currently piloted ship to the clicked position.
 - **Teleport To**: Teleports the player character to the clicked object or position.
-
-![Spawn Object Menu](docs/images/spawn_object_menu.png)
+- **Destroy Object**: Sets the clicked object as the target on the Destroy Object tab. Only offered while that tab is open. The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
+- **Promote Crew**: Sets the clicked ship as the target on the Promote Crew tab. Only offered while that tab is open, and only for player-owned ships.
 
 ### Extension Options
 
@@ -177,6 +200,12 @@ Debug logging can be enabled to write detailed information about the mod's opera
 - [SirNukes](https://next.nexusmods.com/profile/sirnukes?gameId=2659) - for the `Mod Support APIs` that power the UI hooks and options menu.
 
 ## Changelog
+
+### [8.00.37] - 2026-07-18
+
+- **Added**
+  - Destroy Object tab: destroy any destructible map object.
+  - Promote Crew tab: set a player ship's Pilot/Captain, Marines, and Service Crew skill levels via 1-5 star sliders.
 
 ### [8.00.36] - 2026-07-09
 
