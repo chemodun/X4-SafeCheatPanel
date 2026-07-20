@@ -162,7 +162,6 @@ Right-clicking on the map gives access to the following actions, depending on th
 - **Reveal Stations in Sector**: Reveals all stations in the sector of the clicked position on the map, including their names and positions.
 - **Spawn Ships**: Spawns ships at the clicked position using the current Spawner tab settings.
 - **Spawn Objects**: Spawns deployable objects at the clicked position using the current Spawner tab settings.
-  ![Spawn Objects Context Menu](docs/images/spawn_objects_context_menu.png)
 - **Force Build Completion: Current Station**: Instantly completes the construction of a station that is currently building, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *In* **extended** *mode available for non-player faction stations*.
 - **Force Build Completion: All Faction Stations**: Instantly completes the construction of all stations belonging to the same faction, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
 - **Restock: Current Station**: Instantly restocks the current station with all required resources. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *In* **extended** *mode available for non-player faction stations*.
