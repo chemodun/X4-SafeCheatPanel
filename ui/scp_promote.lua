@@ -88,6 +88,14 @@ function scpPromote.startPromote()
   menu.refreshInfoFrame()
 end
 
+function scpPromote.cancel()
+  scpPromote.scp.debug("Promote: cancelled")
+  scpPromote.state.object = nil
+  scpPromote.state.targets = {}
+  scpPromote.state.allSkills = false
+  menu.refreshInfoFrame()
+end
+
 function scpPromote.reset()
   scpPromote.scp.debug("Promote: reset pressed")
   scpPromote.state.targets = {}
@@ -226,10 +234,18 @@ local function addCategorySliderRow(frameTable, numDisplayed, category, labelTex
 end
 
 function scpPromote.createSection(frameTable, numDisplayed, scp)
+  local isV9 = scp.isV9
+
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(PAGE_ID, 10000),
     fixed = true,
   })
+
+  local rowGroupMain = isV9 and frameTable:addRowGroup({}) or frameTable
+
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
 
   local object = scpPromote.state.object
   if object ~= nil and (not IsValidComponent(object) or GetComponentData(object, "isplayerowned") ~= true) then
@@ -239,7 +255,7 @@ function scpPromote.createSection(frameTable, numDisplayed, scp)
   end
 
   if object == nil then
-    local row = frameTable:addRow(nil, { bgColor = Color["row_background_unselectable"] })
+    local row = rowGroupMain:addRow(nil, { bgColor = Color["row_background_unselectable"] })
     row[1]:setColSpan(12):createText(ReadText(PAGE_ID, 10010), { halign = "center", color = Color["text_inactive"] })
     return numDisplayed + 1
   end
@@ -248,20 +264,26 @@ function scpPromote.createSection(frameTable, numDisplayed, scp)
   local factionColor = owner and Helper.convertColorToText(GetFactionData(owner, "color")) or ""
   local displayIcon = (icon ~= nil and icon ~= "") and icon or "menu_info"
 
-  numDisplayed = scp.menuHelper.createIconWithTextRow(frameTable, "promote_ship_info", numDisplayed, {
+  numDisplayed = scp.menuHelper.createIconWithTextRow(rowGroupMain, "promote_ship_info", numDisplayed, {
     icon      = displayIcon,
     textLeft  = string.format("%s%s (%s)", factionColor, name, idcode),
     textRight = sector or "",
     fixed     = true,
   })
 
+  local rowGroupCrew = isV9 and rowGroupMain:addRowGroup({}) or frameTable
+
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
+
   local data = scpPromote.collectData()
   local row
 
   if data.pilot.exists then
-    numDisplayed = addCategorySliderRow(frameTable, numDisplayed, "pilot", string.format("%s: %s", data.pilot.title, data.pilot.name), data.pilot.avg15, scp)
+    numDisplayed = addCategorySliderRow(rowGroupCrew, numDisplayed, "pilot", string.format("%s: %s", data.pilot.title, data.pilot.name), data.pilot.avg15, scp)
   else
-    row = frameTable:addRow(nil, { bgColor = Color["row_background_unselectable"] })
+    row = rowGroupCrew:addRow(nil, { bgColor = Color["row_background_unselectable"] })
     row[1]:setColSpan(12):createText(string.format("%s: %s", data.pilot.title, ReadText(PAGE_ID, 10011)), { color = Color["text_inactive"] })
     numDisplayed = numDisplayed + 1
   end
@@ -270,15 +292,19 @@ function scpPromote.createSection(frameTable, numDisplayed, scp)
     local categoryData = data[category]
     local labelText = string.format("%s (%d)", categoryData.name, categoryData.count)
     if categoryData.count > 0 then
-      numDisplayed = addCategorySliderRow(frameTable, numDisplayed, category, labelText, categoryData.avg15, scp)
+      numDisplayed = addCategorySliderRow(rowGroupCrew, numDisplayed, category, labelText, categoryData.avg15, scp)
     else
-      row = frameTable:addRow(nil, { bgColor = Color["row_background_unselectable"] })
+      row = rowGroupCrew:addRow(nil, { bgColor = Color["row_background_unselectable"] })
       row[1]:setColSpan(12):createText(labelText, { color = Color["text_inactive"] })
       numDisplayed = numDisplayed + 1
     end
   end
 
-  numDisplayed = scp.menuHelper.createCheckBoxOnLeft(frameTable, "promote_all_skills", numDisplayed, {
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
+
+  numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroupMain, "promote_all_skills", numDisplayed, {
     active      = true,
     checked     = scpPromote.state.allSkills,
     text        = ReadText(PAGE_ID, 10040),
@@ -292,11 +318,17 @@ function scpPromote.createSection(frameTable, numDisplayed, scp)
     end,
   })
 
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
+
   row = frameTable:addRow("promote_buttons", { fixed = true, bgColor = Color["row_background_unselectable"] })
-  row[1]:setColSpan(6):createButton({ active = function() return scpPromote.hasChanges() end }):setText(ReadText(1001, 3318), { halign = "center" }) -- Reset
-  row[1].handlers.onClick = scpPromote.reset
-  row[7]:setColSpan(6):createButton({ active = function() return scpPromote.hasChanges() end }):setText(ReadText(PAGE_ID, 10031), { halign = "center", color = Color["text_positive"] })
-  row[7].handlers.onClick = scpPromote.apply
+  row[1]:setColSpan(4):createButton({ active = true }):setText(ReadText(1001, 64), { halign = "center" }) -- Reset
+  row[1].handlers.onClick = scpPromote.cancel
+  row[5]:setColSpan(4):createButton({ active = function() return scpPromote.hasChanges() end }):setText(ReadText(1001, 3318), { halign = "center" }) -- Reset
+  row[5].handlers.onClick = scpPromote.reset
+  row[9]:setColSpan(4):createButton({ active = function() return scpPromote.hasChanges() end }):setText(ReadText(PAGE_ID, 10031), { halign = "center", color = Color["text_positive"] })
+  row[9].handlers.onClick = scpPromote.apply
   numDisplayed = numDisplayed + 1
 
   return numDisplayed

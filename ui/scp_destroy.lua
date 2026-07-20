@@ -80,10 +80,18 @@ function scpDestroy.executeDestroy()
 end
 
 function scpDestroy.createSection(frameTable, numDisplayed, scp)
+  local isV9 = scp.isV9
+
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(PAGE_ID, 9000),
     fixed = true,
   })
+
+  local rowGroupMain = isV9 and frameTable:addRowGroup({}) or frameTable
+
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
 
   local object = scpDestroy.state.object
   if object ~= nil and not IsValidComponent(object) then
@@ -93,7 +101,7 @@ function scpDestroy.createSection(frameTable, numDisplayed, scp)
   end
 
   if object == nil then
-    local row = frameTable:addRow(nil, { bgColor = Color["row_background_unselectable"] })
+    local row = rowGroupMain:addRow(nil, { bgColor = Color["row_background_unselectable"] })
     row[1]:setColSpan(12):createText(ReadText(PAGE_ID, 9010), { halign = "center", color = Color["text_inactive"] })
     return numDisplayed + 1
   end
@@ -102,14 +110,16 @@ function scpDestroy.createSection(frameTable, numDisplayed, scp)
   local factionColor = owner and Helper.convertColorToText(GetFactionData(owner, "color")) or ""
   local displayIcon = (icon ~= nil and icon ~= "") and icon or "menu_info"
 
-  numDisplayed = scp.menuHelper.createIconWithTextRow(frameTable, "destroy_object_info", numDisplayed, {
+  numDisplayed = scp.menuHelper.createIconWithTextRow(rowGroupMain, "destroy_object_info", numDisplayed, {
     icon      = displayIcon,
     textLeft  = string.format("%s%s (%s)", factionColor, name, idcode),
     textRight = sector or "",
     fixed     = true,
   })
 
-  numDisplayed = scp.menuHelper.createCheckBoxOnLeft(frameTable, "destroy_confirm", numDisplayed, {
+  local rowGroupCheckbox = isV9 and rowGroupMain:addRowGroup({}) or frameTable
+
+  numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroupCheckbox, "destroy_confirm", numDisplayed, {
     active      = true,
     checked     = scpDestroy.state.confirmed,
     text        = ReadText(PAGE_ID, 9020),
@@ -122,6 +132,10 @@ function scpDestroy.createSection(frameTable, numDisplayed, scp)
       menu.refreshInfoFrame()
     end,
   })
+
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
 
   local row = frameTable:addRow("destroy_buttons", { fixed = true, bgColor = Color["row_background_unselectable"] })
   row[1]:setColSpan(6):createButton({ active = true }):setText(ReadText(1001, 64), { halign = "center" })
