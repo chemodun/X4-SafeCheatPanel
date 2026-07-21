@@ -240,7 +240,7 @@
                   </do_if>
                   <do_if value="$spawnData.$preset gt 0">
                     <do_all exact="100" counter="$i">
-                      <generate_loadout result="$loadouts" macro="macro.{$spawnData.$ship}" level="$spawnData.$preset" faction="faction.{$spawnOwner}" />
+                      <generate_loadout result="$loadouts" macro="macro.{$spawnData.$ship}" level="$spawnData.$preset" faction="faction.{$spawnOwner}" variation="0" />
                       <debug_text text="'SafeCheatPanel: for ship %s found %s loadouts'. [$ship.debugname, $loadouts.count]" chance="$debugChance" />
                       <do_for_each name="$loadout" in="$loadouts">
                         <apply_loadout object="$ship" loadout="$loadout" />
@@ -312,8 +312,7 @@
                 <set_value name="$numPerRow" exact="$numPerRow + 1" />
               </do_while>
 
-              <debug_text text="'SafeCheatPanel: The spawned ship has the primary race of: ' + $ship.trueowner.primaryrace.description" chance="$debugChance" />
-              <debug_text text="'SafeCheatPanel: The result of race.argon is: ' + race.argon.description" chance="$debugChance" />
+              <debug_text text="'SafeCheatPanel: The spawned ship has the primary race of: ' + $ship.trueowner.primaryrace.name" chance="$debugChance" />
 
               <set_value name="$spawnData.$position.$z" exact="$spawnData.$position.$z - $ship.length * 2" />
               <set_value name="$spawnData.$position.$x" exact="$startX" />
