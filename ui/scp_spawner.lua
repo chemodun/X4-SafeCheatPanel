@@ -232,12 +232,19 @@ end
 
 local function getShipDefaultFaction(macro)
   if not macro then return nil end
-  local wareId = macro:gsub("_macro$", "")
+  local wareId = GetMacroData(macro, "ware")
   local owners = GetWareData(wareId, "blueprintsowners")
+  local owner
   if owners and #owners > 0 then
-    return owners[1]
+    owner = owners[1]
   end
-  return nil
+  if owner == nil or owner == "ownerless" then
+    owners = GetMacroData(macro, "makerraceid")
+    if owners and #owners > 0 then
+      owner = owners[1]
+    end
+  end
+  return owner
 end
 
 local function getShipLoadouts(macro)
@@ -280,7 +287,7 @@ local function getShipLoadouts(macro)
   end
   table.sort(loadouts, sortText)
   table.insert(loadouts, 1, { id = "scpDefaultLow",    text = ReadText(1001, 7910), icon = "", displayremoveoption = false, preset = 0.1, active = true })
-  table.insert(loadouts, 2, { id = "scpDefaultLow", text = ReadText(1001, 7911), icon = "", displayremoveoption = false, preset = 0.5, active = true })
+  table.insert(loadouts, 2, { id = "scpDefaultMedium", text = ReadText(1001, 7911), icon = "", displayremoveoption = false, preset = 0.5, active = true })
   table.insert(loadouts, 3, { id = "scpDefaultHigh",   text = ReadText(1001, 7912), icon = "", displayremoveoption = false, preset = 1.0, active = true })
   if #loadouts > 3 then
     table.insert(loadouts, 4, { id = "none", text = ReadText(1972092427, 7219), icon = "", displayremoveoption = false, active = false })
@@ -322,7 +329,7 @@ function scpSpawner.PresetAndCrewForSpawnShip(macro, loadoutId)
   local preset = -1
   if loadoutId == "scpDefaultLow" then
     preset = 0.1
-  elseif loadoutId == "scpDefaultLow" then
+  elseif loadoutId == "scpDefaultMedium" then
     preset = 0.5
   elseif loadoutId == "scpDefaultHigh" then
     preset = 1
@@ -471,7 +478,7 @@ end
 -- *** Data mutation callbacks ***
 
 local function isPresetLoadout(loadoutId)
-  return loadoutId == "scpDefaultLow" or loadoutId == "scpDefaultLow" or loadoutId == "scpDefaultHigh"
+  return loadoutId == "scpDefaultLow" or loadoutId == "scpDefaultMedium" or loadoutId == "scpDefaultHigh"
 end
 
 function scpSpawner.setStationSpawnData(id, dataType)
