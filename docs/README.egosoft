@@ -208,6 +208,10 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 [size=125][u][8.00.38] - 2026-08-03[/u][/size]
 [list]
+[*] [b]Added[/b]
+[list]
+[*] Station Spawner: player-developed construction plans can now be spawned for any faction, not just for the player.
+[/list]
 [*] [b]Fixed[/b]
 [list]
 [*] Ships spawned with a Low/Medium/High loadout were missing equipment they should have had: empty gun slots or engine, most shield slots on large ships. I.e. Sapporo spawn is fixed now!
