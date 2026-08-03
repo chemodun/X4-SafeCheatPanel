@@ -20,7 +20,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 [*] [b]Blueprints Tab[/b]: Unlock blueprints individually, by subcategory, or all at once.
 [*] [b]Factions Tab[/b]: Edit faction relations with the player and between non-player factions.
 [*] [b]Galaxy/Sectors Tab[/b]: Reveal sectors on the map at three levels of detail, or reveal all at once.
-[*] [b]Spawner Tab[/b]: Spawn stations, ships (with loadout and crew options), and deployable objects.
+[*] [b]Spawner Tab[/b]: Spawn stations, ships (with loadout, crew, and job-assignment options), and deployable objects.
 [*] [b]Destroy Object Tab[/b]: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
 [*] [b]Promote Crew Tab[/b]: Set a player ship's Pilot/Captain, Marines, and Service Crew skill levels via star sliders, with an option to set every skill (not just the role-relevant ones) to the chosen level.
 [*] [b]Right-click context menu[/b]: Spawn station, fix station, spawn ships, spawn objects, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector, destroy object, promote crew.
@@ -122,16 +122,18 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [*] Select a loadout (game defaults: Low/Medium/High, or player-defined loadouts).
 [*] Select the owning faction (player only in normal mode; any faction in extended mode).
 [*] Select the crew race (all races available; Kha'ak, Xenon and Drones are not recommended).
+[*] For non-player-owned ships, optionally assign a basic job (Trade, Mine, Salvage, Build, or Fight); only jobs that fit the selected ship are offered, with the best match pre-selected.
 [*] Set the number of ships per row (up to 10) and the number of rows (up to 10).
 [/list]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/loadout_selection.png[/img]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/loadout_result.png[/img][img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/loadout_result_part_2.png[/img]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/crew_race_selection.png[/img]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/crew_result.png[/img]
+[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/job_selection.png[/img]
 
 [h3][b]Station Spawner[/b][/h3]
 [list]
-[*] Select a construction plan (player-created plans, or pre-defined plans in extended mode).
+[*] Select a construction plan (player-created plans, and pre-defined plans in extended mode).
 [*] Select the owning faction (player only in normal mode; any faction in extended mode).
 [/list]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/station_spawner.png[/img]
@@ -216,6 +218,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [*] [b]Added[/b]
 [list]
 [*] Station Spawner: player-developed construction plans can now be spawned for any faction, not just for the player.
+[*] Ship Spawner: optional job assignment (Trade, Mine, Salvage, Build, Fight) for non-player-owned spawns, limited to jobs that fit the selected ship and pre-selected to the best match.
 [/list]
 [*] [b]Changed[/b]
 [list]
