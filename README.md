@@ -204,15 +204,15 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
-### [8.00.38] - 2026-08-03
+### [8.00.38] - 2026-08-04
 
+- **Fixed**
+  - Ships spawned with a Low/Medium/High loadout were missing equipment they should have had: empty gun slots or engine, most shield slots on large ships. I.e. Sapporo spawn is fixed now!
 - **Added**
   - Station Spawner: player-developed construction plans can now be spawned for any faction, not just for the player.
   - Ship Spawner: optional job assignment (Trade, Mine, Salvage, Build, Fight) for non-player-owned spawns, limited to jobs that fit the selected ship and pre-selected to the best match.
 - **Changed**
   - Now requires the `Print Extension List` mod for debugging purposes.
-- **Fixed**
-  - Ships spawned with a Low/Medium/High loadout were missing equipment they should have had: empty gun slots or engine, most shield slots on large ships. I.e. Sapporo spawn is fixed now!
 
 ### [8.00.37] - 2026-07-18
 

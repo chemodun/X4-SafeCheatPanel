@@ -5,11 +5,11 @@
   description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations, galaxy exploration state, spawning capabilities, object destruction, and ship crew promotion - all through a clean, tab-based interface."
   author="Chem O`Dun"
   version="80038"
-  date="2026-08-03"
+  date="2026-08-04"
   save="false"
   enabled="true"
   sync="false"
-  lastupdate="1785758400">
+  lastupdate="1785799796">
   <dependency id="kuerteeUIExtensionsAndHUD" optional="false" name="kuertee UI Extensions and HUD" />
   <dependency id="ws_2042901274" optional="false" name="SirNukes Mod Support APIs" version="195"></dependency>
   <dependency id="ws_3715253556" optional="false" name="Options Helper" version="100"></dependency>
