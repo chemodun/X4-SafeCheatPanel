@@ -200,6 +200,11 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
+### [8.00.38] - 2026-08-03
+
+- **Fixed**
+  - Ships spawned with a Low/Medium/High loadout were missing equipment they should have had: empty gun slots or engine, most shield slots on large ships. I.e. Sapporo spawn is fixed now!
+
 ### [8.00.37] - 2026-07-18
 
 - **Added**
