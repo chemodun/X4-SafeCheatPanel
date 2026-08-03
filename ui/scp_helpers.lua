@@ -36,7 +36,6 @@ function scp.init(playerId, configId)
   if cfg and cfg.debugMode then
     debugLevel = cfg.debugMode
     scp.debug("Initialized debug level from config: " .. debugLevel)
-    scp.printGameEnvironmentStats()
   end
 end
 
@@ -266,48 +265,9 @@ function scp.setDebug()
   local cfg = GetNPCBlackboard(_playerId, _configId)
   scp.trace("Fetched value from blackboard: " .. (cfg and tostring(cfg.debugMode) or "nil"))
   if cfg ~= nil and cfg.debugMode then
-    local oldDebugLevel = debugLevel
     debugLevel = cfg.debugMode or "none"
     scp.debug("Updated debug level to: " .. debugLevel)
-    if oldDebugLevel == "none" and debugLevel ~= "none" then
-      scp.printGameEnvironmentStats()
-    end
   end
-end
-
-function scp.printGameEnvironmentStats()
-  if debugLevel == "none" then
-    return
-  end
-  local lines = {}
-  lines[#lines + 1] = "=== Game Environment ==="
-  lines[#lines + 1] = "Version: " .. GetVersionString() .. "  Build: " .. ffi.string(C.GetBuildVersionSuffix())
-
-  local extensions = GetExtensionList()
-  local dlcList = {}
-  local modList = {}
-  for _, ext in ipairs(extensions) do
-    if ext.enabled then
-      if ext.egosoftextension and ext.enabledbydefault then
-        dlcList[#dlcList + 1] = ext
-      else
-        modList[#modList + 1] = ext
-      end
-    end
-  end
-
-  lines[#lines + 1] = "--- Enabled DLCs (" .. #dlcList .. ") ---"
-  for _, dlc in ipairs(dlcList) do
-    lines[#lines + 1] = string.format("  id:%-30s  name:%-40s  v%-10s  date:%s", dlc.id, dlc.name, dlc.version, dlc.date)
-  end
-
-  lines[#lines + 1] = "--- Enabled Extensions (" .. #modList .. ") ---"
-  for _, mod in ipairs(modList) do
-    local source = mod.egosoftextension and "ego" or (mod.isworkshop and "workshop" or (mod.personal and "personal" or "local"))
-    lines[#lines + 1] = string.format("  id:%-30s  name:%-40s  author:%-25s  [%s]  v%-10s  date:%s", mod.id, mod.name, mod.author or "", source, mod.version, mod.date)
-  end
-
-  scp.debug(table.concat(lines, "\n"))
 end
 
 Register_Require_Response("extensions.safe_cheat_panel.ui.scp_helpers", scp)

@@ -37,6 +37,8 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
   - Available on Nexus Mods: [Mod Support APIs](https://www.nexusmods.com/x4foundations/mods/503)
 - **Options Helper**: Version 1.00 or higher by [Chem O`Dun](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659):
   - Available on Nexus Mods: [Options Helper](https://www.nexusmods.com/x4foundations/mods/2089)
+- **Print Extension List** by [Chem O`Dun](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659), version **1.01** or higher. Writes the game version and enabled extensions to the debug log at startup, so any log sent with a bug report identifies the setup:
+  - Available on Nexus Mods: [Print Extension List](https://www.nexusmods.com/x4foundations/mods/2191)
 
 ## Installation
 
@@ -204,6 +206,8 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 - **Added**
   - Station Spawner: player-developed construction plans can now be spawned for any faction, not just for the player.
+- **Changed**
+  - Now requires the `Print Extension List` mod for debugging purposes.
 - **Fixed**
   - Ships spawned with a Low/Medium/High loadout were missing equipment they should have had: empty gun slots or engine, most shield slots on large ships. I.e. Sapporo spawn is fixed now!
 
