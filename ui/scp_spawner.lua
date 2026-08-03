@@ -395,6 +395,8 @@ function scpSpawner.reset(blacklisted)
   state.playerPlans = {}
   state.station.plan = nil
   state.station.name = nil
+  -- Cleared so a mode switch cannot leave an owner the rebuilt faction list no longer offers.
+  state.station.ownerId = nil
   state.ships = {}
   state.races = {}
   scpSpawner.initStations()
@@ -407,21 +409,15 @@ function scpSpawner.initStations()
     state.constructionPlans, state.playerPlans = getAllConstructionPlans()
   end
   if state.station.plan == nil then
-    if state.station.planType == "player" then
-      state.station.ownerId = "player"
-      if #state.playerPlans > 0 then
-        state.station.plan = state.playerPlans[1].id
-        state.station.name             = state.playerPlans[1].text
-      end
-    else
-      if #state.constructionPlans > 0 then
-        state.station.plan = state.constructionPlans[1].id
-        state.station.name             = state.constructionPlans[1].text
-      end
-      if #state.factions > 0 then
-        state.station.ownerId = state.factions[1].id
-      end
+    local planList = (state.station.planType == "player") and state.playerPlans or state.constructionPlans
+    if #planList > 0 then
+      state.station.plan = planList[1].id
+      state.station.name = planList[1].text
     end
+  end
+  -- Owner applies to both plan types; getSpawnerFactions puts the player first.
+  if state.station.ownerId == nil and #state.factions > 0 then
+    state.station.ownerId = state.factions[1].id
   end
 end
 
@@ -460,9 +456,6 @@ function scpSpawner.showSpawnOption(mode, tableMode, devtools)
   if menu.infoTableMode ~= "safeCheatPanel" then return false end
   if tableMode ~= "scpObjectSpawn" or state.mode.id ~= mode then return false end
   if mode == "spawnModeStation" then
-    if state.station.planType == "player" then
-      return state.station.plan ~= nil
-    end
     return state.station.plan ~= nil and state.station.ownerId ~= nil
   elseif mode == "spawnModeShip" then
     return state.ships_sel.id ~= nil and state.ships_sel.ownerId ~= nil
@@ -498,23 +491,14 @@ function scpSpawner.setStationSpawnData(id, dataType)
     end
   elseif dataType == "planType" then
     state.station.planType = id
-    if id == "player" then
-      state.station.ownerId = "player"
-      if #state.playerPlans > 0 then
-        state.station.plan = state.playerPlans[1].id
-        state.station.name             = state.playerPlans[1].text
-      else
-        state.station.plan = nil
-        state.station.name             = nil
-      end
+    -- The two plan lists are disjoint, so the selected plan never survives a type switch.
+    local planList = (id == "player") and state.playerPlans or state.constructionPlans
+    if #planList > 0 then
+      state.station.plan = planList[1].id
+      state.station.name = planList[1].text
     else
-      if #state.constructionPlans > 0 then
-        state.station.plan = state.constructionPlans[1].id
-        state.station.name             = state.constructionPlans[1].text
-      end
-      if #state.factions > 0 then
-        state.station.ownerId = state.factions[1].id
-      end
+      state.station.plan = nil
+      state.station.name = nil
     end
   else
     state.station.ownerId = id
@@ -685,27 +669,28 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
       fixed            = nil,
       isHeader         = nil,
     })
-
-    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
-      text  = ReadText(1972092427, 7005),
-      fixed = nil,
-    })
-    rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-    numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
-      active           = #state.factions > 1,
-      dropDownData     = state.factions,
-      startOption      = state.station.ownerId,
-      text             = nil,
-      textOverride     = "",
-      onConfirmed      = function(_, id) scpSpawner.setStationSpawnData(id, "faction") end,
-      textColIndex     = 1,
-      dropDownColIndex = 1,
-      dropDownSpan     = 12,
-      textColor        = nil,
-      fixed            = nil,
-      isHeader         = nil,
-    })
   end
+
+  -- Owner applies to either plan type; outside Extended mode the list holds the player alone.
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1972092427, 7005),
+    fixed = nil,
+  })
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
+    active           = #state.factions > 1,
+    dropDownData     = state.factions,
+    startOption      = state.station.ownerId,
+    text             = nil,
+    textOverride     = "",
+    onConfirmed      = function(_, id) scpSpawner.setStationSpawnData(id, "faction") end,
+    textColIndex     = 1,
+    dropDownColIndex = 1,
+    dropDownSpan     = 12,
+    textColor        = nil,
+    fixed            = nil,
+    isHeader         = nil,
+  })
 
   return numDisplayed
 end
