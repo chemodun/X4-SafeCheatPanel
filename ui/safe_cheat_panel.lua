@@ -158,7 +158,9 @@ local config = {
           s.ships_sel.ownerId, s.ships_sel.ownerRace,
           s.ships_sel.rows,
           s.ships_sel.numPerRow,
-          s.ships_sel.loadoutFaction)
+          s.ships_sel.loadoutFaction,
+          s.ships_sel.assignPurpose,
+          s.ships_sel.purpose)
       end
     },
     {

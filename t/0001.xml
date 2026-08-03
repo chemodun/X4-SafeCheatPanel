@@ -119,6 +119,10 @@
         <t id="7207">Where you clicked is the top left of where ships spawn from</t>
         <t id="7208">Checked:</t>
         <t id="7209">Where you clicked is the center of where ships spawn from</t>
+        <t id="7210">Assign Job</t>
+        <t id="7211">When enabled, the spawned ship(s) are given a default AI order matching the selected job. Only available for non-player-owned ships.</t>
+        <t id="7212">Job</t>
+        <t id="7213">Choose a Job</t>
         <t id="7219">--- Player Defined ---</t>
         <!-- Object Spawner Mode -->
         <t id="7300">Choose an object</t>

@@ -189,6 +189,7 @@
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_ship'" />
           </conditions>
           <actions>
+            <create_group groupname="$ships" />
             <set_value name="$spawnData" exact="event.param3" />
             <set_value name="$rows" exact="0" />
             <set_value name="$numPerRow" exact="0" />
@@ -321,6 +322,10 @@
                       </do_if>
                     </do_for_each>
                   </do_if>
+                  <do_if value="@$spawnData.$purposeOrderId != null">
+                    <add_to_group groupname="$ships" object="$ship" />
+                    <debug_text text="'SafeCheatPanel: Ship %s has a purpose order %s, adding to group for processing.'. [$ship.debugname, $spawnData.$purposeOrderId]" chance="$debugChance" />
+                  </do_if>
                 </do_if>
                 <set_value name="$spawnData.$position.$x" exact="$spawnData.$position.$x + $ship.width * 2" />
                 <set_value name="$numPerRow" exact="$numPerRow + 1" />
@@ -333,6 +338,79 @@
               <set_value name="$rows" exact="$rows + 1" />
               <set_value name="$numPerRow" exact="0" />
             </do_while>
+          </actions>
+          <delay min="400ms" max="600ms" />
+          <actions>
+            <debug_text text="'SafeCheatPanel: Processing %s ships for default orders and/or activate_job_ship_orders.'. [$ships.count]" chance="$debugChance" />
+            <do_if value="@$ships.count gt 0">
+              <do_for_each name="$ship" in="$ships">
+                <do_if value="@$ship != null">
+                  <debug_text text="'SafeCheatPanel: Processing ship %s with pilot %s, owner %s'. [$ship.debugname, @$ship.pilot.name, $ship.owner.name]" chance="$debugChance" />
+                  <do_if value="@$spawnData.$purposeOrderId != null">
+                    <!-- Patrol has no self-computed default for $space (required, "Mandatory for UI"),
+                         unlike the other job orders; anchor it on the spawn sector. -->
+                    <do_if value="$spawnData.$purposeOrderId == 'Patrol'">
+                      <create_order object="$ship" id="'Patrol'" default="true">
+                        <param name="space" value="$spawnData.$offsetComponent" />
+                      </create_order>
+                    </do_if>
+                    <!-- Trade and mining default their warebasket to the ship's job basket, which a
+                         jobless spawn has none of - the order then runs but never finds anything to
+                         move. Baskets and min/max gate distances mirror vanilla's trader/miner jobs. -->
+                    <do_elseif value="$spawnData.$purposeOrderId == 'TradeRoutine'">
+                      <!-- Container only: solid and liquid holds belong to miners, which are not
+                           offered trade in the first place. -->
+                      <create_list name="$basketWares" />
+                      <append_list_elements name="$basketWares" other="warebasket.all_container.list" />
+                      <include_actions ref="Scp_Build_Order_Basket" />
+                      <create_order object="$ship" id="'TradeRoutine'" default="true">
+                        <param name="warebasket" value="$orderBasket" />
+                        <param name="minbuy" value="0" />
+                        <param name="maxbuy" value="5" />
+                        <param name="minsell" value="0" />
+                        <param name="maxsell" value="5" />
+                        <!-- <param name="debugchance" value="$debugChance" /> -->
+                      </create_order>
+                    </do_elseif>
+                    <do_elseif value="$spawnData.$purposeOrderId == 'MiningRoutine'">
+                      <!-- Basket follows the hold: minerals for solid, gases for liquid, both for a
+                           universal hold. Same split as vanilla's stationminer_*_solid/_liquid jobs. -->
+                      <create_list name="$basketWares" />
+                      <do_if value="$ship.cargo.capacity.solid gt 0 or $ship.cargo.capacity.universal gt 0">
+                        <append_list_elements name="$basketWares" other="warebasket.minerals.list" />
+                      </do_if>
+                      <do_if value="$ship.cargo.capacity.liquid gt 0 or $ship.cargo.capacity.universal gt 0">
+                        <append_list_elements name="$basketWares" other="warebasket.gases.list" />
+                      </do_if>
+                      <include_actions ref="Scp_Build_Order_Basket" />
+                      <create_order object="$ship" id="'MiningRoutine'" default="true">
+                        <param name="warebasket" value="$orderBasket" />
+                        <param name="minbuy" value="0" />
+                        <param name="maxbuy" value="5" />
+                        <param name="minsell" value="0" />
+                        <param name="maxsell" value="5" />
+                        <!-- <param name="debugchance" value="$debugChance" /> -->
+                      </create_order>
+                    </do_elseif>
+                    <!-- Salvage brings its own warebasket fallback, but its $range defaults to 0,
+                         which pins the ship to the spawn sector. -->
+                    <do_elseif value="$spawnData.$purposeOrderId == 'SalvageRoutine'">
+                      <create_order object="$ship" id="'SalvageRoutine'" default="true">
+                        <param name="range" value="5" />
+                        <!-- <param name="debugchance" value="$debugChance" /> -->
+                      </create_order>
+                    </do_elseif>
+                    <do_else>
+                      <create_order object="$ship" id="$spawnData.$purposeOrderId" default="true">
+                        <!-- <param name="debugchance" value="$debugChance" /> -->
+                      </create_order>
+                    </do_else>
+                    <debug_text text="'SafeCheatPanel: Assigned default order %s to ship %s, warebasket %s'. [$spawnData.$purposeOrderId, $ship.debugname, @$orderBasket]" chance="$debugChance" />
+                  </do_if>
+                </do_if>
+              </do_for_each>
+            </do_if>
+            <remove_value name="$ships" />
           </actions>
         </cue>
 
@@ -681,6 +759,23 @@
             <do_for_each name="$fitName" in="$fitBucket">
               <append_to_list name="$fitPool" exact="macro.{$fitName}" />
             </do_for_each>
+          </actions>
+        </library>
+
+        <!-- Narrows $basketWares to what $ship's holds actually take, the same cargo.{ware}.max
+             gate trade.find.free applies (wares outside it are logged as errors there).
+             Input: $ship, $basketWares. Output: $orderBasket. -->
+        <library name="Scp_Build_Order_Basket" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$orderBasket" exact="[]" />
+            <do_for_each name="$basketWare" in="$basketWares">
+              <do_if value="$ship.cargo.{$basketWare}.max gt 0">
+                <append_to_list name="$orderBasket" exact="$basketWare" />
+              </do_if>
+            </do_for_each>
+            <do_if value="$orderBasket.count == 0">
+              <debug_text text="'SafeCheatPanel: %s has no hold for any of the %s offered wares - order gets an empty warebasket'. [$ship.debugname, $basketWares.count]" chance="$debugChance" />
+            </do_if>
           </actions>
         </library>
 

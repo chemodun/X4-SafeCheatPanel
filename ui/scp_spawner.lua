@@ -164,6 +164,8 @@ local state = {
     ownerId        = nil,
     ownerRace      = nil,
     loadoutFaction = nil,
+    assignPurpose  = false,
+    purpose        = nil,
   },
   station = {
     first            = true,
@@ -195,6 +197,19 @@ local spawnModes = {
 local stationPlanTypes = {
   { id = "inGame", text = ReadText(1972092427, 7102), active = true, icon = "", displayremoveoption = false },
   { id = "player", text = ReadText(1972092427, 7103), active = true, icon = "", displayremoveoption = false },
+}
+
+-- Job (default AI order) offered per ship. "fight" is gated the same way vanilla jobs.xml
+-- allocates it (combat-purpose slots only), not by Patrol's own <requires> (which only excludes
+-- lasertowers/spacesuits); the rest mirror each order's own <requires> in aiscripts
+-- (order.trade.routine / order.mining.routine / order.salvage.routine / order.build.find.task).
+-- Text reused from the vanilla Orders page (1041) so labels match the in-game order names.
+local shipPurposeOrders = {
+  { id = "trade",   orderId = "TradeRoutine",   nameRef = { 1041, 161 } },
+  { id = "mine",    orderId = "MiningRoutine",  nameRef = { 1041, 341 } },
+  { id = "salvage", orderId = "SalvageRoutine", nameRef = { 1041, 821 } },
+  { id = "build",   orderId = "FindBuildTasks", nameRef = { 1041, 491 } },
+  { id = "fight",   orderId = "Patrol",         nameRef = { 1041, 391 } },
 }
 
 -- *** Data helpers ***
@@ -249,6 +264,55 @@ local function getShipDefaultFaction(macro)
     end
   end
   return owner
+end
+
+-- Jobs applicable to this ship. Auxiliary ships (resupply/service) get none: their real default,
+-- SupplyFleet, needs a pre-existing commander/fleet a freshly spawned standalone ship never has,
+-- so offering it would just be a no-op. Otherwise: mine/build need the ship's own primarypurpose,
+-- salvage needs a tug/compactor shiptype, trade is open to everything else EXCEPT miners (a
+-- dedicated miner should not be defaulted to trading). Returns the filtered dropdown list plus
+-- the ship's primarypurpose, so the caller can preselect the best match.
+local function getShipPurposeOptions(macro)
+  if macro == nil then return {}, nil end
+  local primaryPurpose, shipType = GetMacroData(macro, "primarypurpose", "shiptype")
+  local options = {}
+  if primaryPurpose == "auxiliary" then
+    return options, primaryPurpose
+  end
+  for _, entry in ipairs(shipPurposeOrders) do
+    local applicable
+    if entry.id == "trade" then
+      applicable = shipType ~= "lasertower" and primaryPurpose ~= "mine"
+    elseif entry.id == "mine" then
+      applicable = primaryPurpose == "mine"
+    elseif entry.id == "salvage" then
+      applicable = shipType == "tug" or shipType == "compactor"
+    elseif entry.id == "build" then
+      applicable = primaryPurpose == "build"
+    elseif entry.id == "fight" then
+      applicable = primaryPurpose == "fight"
+    end
+    if applicable then
+      options[#options + 1] = { id = entry.id, text = ReadText(entry.nameRef[1], entry.nameRef[2]), active = true, icon = "", displayremoveoption = false }
+    end
+  end
+  return options, primaryPurpose
+end
+
+-- Preselects the option matching the ship's own primarypurpose; falls back to the first
+-- (always-applicable) entry, which is "trade" for any normal ship.
+local function pickDefaultShipPurpose(options, primaryPurpose)
+  for _, option in ipairs(options) do
+    if option.id == primaryPurpose then return option.id end
+  end
+  return options[1] and options[1].id or nil
+end
+
+local function getShipPurposeOrderId(purposeId)
+  for _, entry in ipairs(shipPurposeOrders) do
+    if entry.id == purposeId then return entry.orderId end
+  end
+  return nil
 end
 
 -- The macro's named loadouts, with the three generated presets pushed in front of them.
@@ -431,6 +495,8 @@ function scpSpawner.initShips()
       state.ships_sel.ownerId       = #state.factions > 0 and state.factions[1].id or "player"
       state.ships_sel.ownerRace     = #state.factions > 0 and state.factions[1].ownerrace or nil
       state.ships_sel.loadoutFaction = getShipDefaultFaction(state.ships_sel.id)
+      local purposeOptions, primaryPurpose = getShipPurposeOptions(state.ships_sel.id)
+      state.ships_sel.purpose = pickDefaultShipPurpose(purposeOptions, primaryPurpose)
     end
   end
   if #state.races == 0 then
@@ -521,6 +587,10 @@ function scpSpawner.setShipSpawnData(id, dataType)
     end
   elseif dataType == "race" then
     state.ships_sel.ownerRace = id
+  elseif dataType == "assignPurpose" then
+    state.ships_sel.assignPurpose = id
+  elseif dataType == "purpose" then
+    state.ships_sel.purpose = id
   end
   -- Only a generated preset needs a loadout faction; a named loadout brings its own equipment.
   if dataType == "ship" or dataType == "loadout" then
@@ -528,6 +598,16 @@ function scpSpawner.setShipSpawnData(id, dataType)
       state.ships_sel.loadoutFaction = getShipDefaultFaction(state.ships_sel.id)
     else
       state.ships_sel.loadoutFaction = nil
+    end
+  end
+  -- The applicable job list depends on the ship macro, so the selection may no longer fit.
+  -- A ship with no applicable job (e.g. auxiliary) forces the checkbox off, not just greyed out,
+  -- so a stale assignPurpose=true from a previous ship can never carry a job into spawnShip.
+  if dataType == "ship" then
+    local purposeOptions, primaryPurpose = getShipPurposeOptions(state.ships_sel.id)
+    state.ships_sel.purpose = pickDefaultShipPurpose(purposeOptions, primaryPurpose)
+    if #purposeOptions == 0 then
+      state.ships_sel.assignPurpose = false
     end
   end
   menu.refreshInfoFrame()
@@ -780,6 +860,47 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
     isHeader         = nil,
   })
 
+  -- Auto-assigning a job order only makes sense for NPC-owned spawns; the player flies their
+  -- own ships directly. The title+checkbox always show for a non-player owner so the panel
+  -- doesn't jump around; a ship with no applicable job (e.g. auxiliary) just shows them disabled.
+  if state.ships_sel.ownerId ~= "player" then
+    local purposeOptions, _ = getShipPurposeOptions(state.ships_sel.id)
+    local hasPurposeOptions = #purposeOptions > 0
+
+    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+      text  = ReadText(1972092427, 7213),
+      fixed = nil,
+    })
+    rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+    numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroup, true, numDisplayed, {
+      checked       = hasPurposeOptions and state.ships_sel.assignPurpose,
+      active        = hasPurposeOptions,
+      text          = ReadText(1972092427, 7210),
+      mouseOverText = ReadText(1972092427, 7211),
+      textColIndex  = 2,
+      checkBoxColIndex = nil,
+      textColor     = nil,
+      fixed         = nil,
+      onClick       = function(_, checked) scpSpawner.setShipSpawnData(checked, "assignPurpose") end,
+    })
+    if hasPurposeOptions then
+      numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
+        active           = state.ships_sel.assignPurpose,
+        dropDownData     = purposeOptions,
+        startOption      = state.ships_sel.purpose,
+        text             = ReadText(1972092427, 7212),
+        textOverride     = "",
+        onConfirmed      = function(_, id) scpSpawner.setShipSpawnData(id, "purpose") end,
+        textColIndex     = nil,
+        dropDownColIndex = nil,
+        dropDownSpan     = nil,
+        textColor        = nil,
+        fixed            = nil,
+        isHeader         = nil,
+      })
+    end
+  end
+
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7007),
     fixed = nil,
@@ -947,10 +1068,12 @@ scpSpawner.state = state
 
 -- *** Spawn action functions (called from safe_cheat_panel luaActions) ***
 
-function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow, loadoutFaction)
+function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow, loadoutFaction, assignPurpose, purpose)
   local preset, crew = scpSpawner.PresetAndCrewForSpawnShip(ship, loadout)
   -- Must match the faction MD creates the ship under, so both sides judge equipment alike.
   local spawnFaction = (preset > 0 and loadoutFaction) or ownerId
+  -- Player-owned ships stay under direct player control; never auto-assign them a job.
+  local purposeOrderId = (ownerId ~= "player" and assignPurpose) and getShipPurposeOrderId(purpose) or nil
   local data = {
     ship = ship,
     loadout = loadout,
@@ -962,6 +1085,7 @@ function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow
     ownerId = ownerId,
     ownerRace = ownerRace,
     loadoutFaction = loadoutFaction,
+    purposeOrderId = purposeOrderId,
     position = {
       x = interactMenu.offset.x,
       y = interactMenu.offset.y,

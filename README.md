@@ -20,7 +20,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Blueprints Tab**: Unlock blueprints individually, by subcategory, or all at once.
 - **Factions Tab**: Edit faction relations with the player and between non-player factions.
 - **Galaxy/Sectors Tab**: Reveal sectors on the map at three levels of detail, or reveal all at once.
-- **Spawner Tab**: Spawn stations, ships (with loadout and crew options), and deployable objects.
+- **Spawner Tab**: Spawn stations, ships (with loadout, crew, and job-assignment options), and deployable objects.
 - **Destroy Object Tab**: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
 - **Promote Crew Tab**: Set a player ship's Pilot/Captain, Marines, and Service Crew skill levels via star sliders, with an option to set every skill (not just the role-relevant ones) to the chosen level.
 - **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector, destroy object, promote crew.
@@ -114,16 +114,18 @@ A **Reveal All** button reveals every sector at all levels at once.
 - Select a loadout (game defaults: Low/Medium/High, or player-defined loadouts).
 - Select the owning faction (player only in normal mode; any faction in extended mode).
 - Select the crew race (all races available; Kha'ak, Xenon and Drones are not recommended).
+- For non-player-owned ships, optionally assign a basic job (Trade, Mine, Salvage, Build, or Fight); only jobs that fit the selected ship are offered, with the best match pre-selected.
 - Set the number of ships per row (up to 10) and the number of rows (up to 10).
 
 ![Loadout Selection](docs/images/loadout_selection.png)
 ![Loadout Result](docs/images/loadout_result.png)![Loadout Result. Part 2](docs/images/loadout_result_part_2.png)
 ![Crew Race Selection](docs/images/crew_race_selection.png)
 ![Crew Result](docs/images/crew_result.png)
+![Job Selection](docs/images/job_selection.png)
 
 #### Station Spawner
 
-- Select a construction plan (player-created plans, or pre-defined plans in extended mode).
+- Select a construction plan (player-created plans, and pre-defined plans in extended mode).
 - Select the owning faction (player only in normal mode; any faction in extended mode).
 
 ![Station Spawner](docs/images/station_spawner.png)
@@ -206,6 +208,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 - **Added**
   - Station Spawner: player-developed construction plans can now be spawned for any faction, not just for the player.
+  - Ship Spawner: optional job assignment (Trade, Mine, Salvage, Build, Fight) for non-player-owned spawns, limited to jobs that fit the selected ship and pre-selected to the best match.
 - **Changed**
   - Now requires the `Print Extension List` mod for debugging purposes.
 - **Fixed**
