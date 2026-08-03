@@ -43,6 +43,10 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 [list]
 [*] Available on Nexus Mods: [url=https://www.nexusmods.com/x4foundations/mods/2089]Options Helper[/url]
 [/list]
+[*] [b]Print Extension List[/b] by [url=https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659]Chem O`Dun[/url], version [b]1.01[/b] or higher. Writes the game version and enabled extensions to the debug log at startup, so any log sent with a bug report identifies the setup:
+[list]
+[*] Available on Nexus Mods: [url=https://www.nexusmods.com/x4foundations/mods/2191]Print Extension List[/url]
+[/list]
 [/list]
 [h2][b]Installation[/b][/h2]
 [list]
@@ -212,6 +216,10 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [*] [b]Added[/b]
 [list]
 [*] Station Spawner: player-developed construction plans can now be spawned for any faction, not just for the player.
+[/list]
+[*] [b]Changed[/b]
+[list]
+[*] Now requires the [b]Print Extension List[/b] mod for debugging purposes.
 [/list]
 [*] [b]Fixed[/b]
 [list]
