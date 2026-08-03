@@ -19,11 +19,10 @@ local scpMap = {
 local cache = {}
 
 function scpMap.createSection(frameTable, numDisplayed, scp)
-  -- Collect all sectors via faction list + ownerless
-  -- In DevMode: all factions (including unknown); otherwise: known factions only (GetLibrary)
+  -- scpMap.sectors and .superHighways come from MD through the blackboard, see requestSectors.
   local sectors = {}
 
-  -- Helper: check if a known sector has at least one active gate whose destination is not known
+  -- True when the sector still has an active gate or highway the player has not discovered.
   local function hasUnknownGates(sectorLuaId)
     local gates = GetGates(sectorLuaId)
     for _, gateId in ipairs(gates) do
@@ -111,7 +110,6 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
   end
   table.sort(sectors, Helper.sortName)
 
-  -- Header
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1001, 9181),
     fixed = true,
@@ -179,7 +177,7 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
     })
   end
 
-  -- Helper: check if a known sector has at least one active gate whose destination is also known
+  -- True when the sector connects to somewhere already known, or has no connections at all.
   local function hasKnownPath(sectorLuaId)
     local gates = GetGates(sectorLuaId)
     for _, gateId in ipairs(gates) do
@@ -208,10 +206,8 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
     return (not gates or #gates == 0) and (highways == nil or #highways == 0)
   end
 
-  -- BFS: find shortest gate-hop path from startSectorId to any known sector.
-  -- Returns a flat list of 64-bit component IDs to reveal (gates, dest components,
-  -- intermediate sectors) — only includes components not already known.
-  -- nil if no path found.
+  -- Shortest gate-hop path from startSectorId to targetSectorId, or to any known sector when
+  -- no target is given. Returns the components to reveal along it, nil when there is no path.
   local function findRevealPath(startSectorId, targetSectorId)
     local MAX_DEPTH = 100
     -- queue entries: { sectorId, path (flat list of LuaIDs to reveal), depth, incomingGate }
@@ -237,27 +233,24 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
                   if not visited[destSectorKey] then
                     local newPath = {}
                     for i = 1, #current.path do newPath[i] = current.path[i] end
+                    -- With a target, keep walking past known sectors instead of stopping at one.
                     local forceNext = targetSectorId and current.sectorId ~= targetSectorId
 
-                    -- outgoing gate (if not already known)
                     if not GetComponentData(gate64, "isknown") or forceNext then
                       newPath[#newPath + 1] = gate64
                     end
 
-                    -- destination component/gate on the other side (if not already known)
                     local dest64 = ConvertStringTo64Bit(tostring(destination))
                     if dest64 and dest64 ~= 0 and (not GetComponentData(dest64, "isknown") or forceNext) then
                       newPath[#newPath + 1] = dest64
                     end
 
-                    -- destination sector
                     local destSector64 = ConvertStringTo64Bit(destSectorKey)
                     local destKnown = GetComponentData(destSector64, "isknown")
                     if destKnown and not forceNext or destSector64 == targetSectorId then
-                      return newPath  -- BFS: this is the shortest path
+                      return newPath
                     end
 
-                    -- intermediate sector (not known) — add and continue BFS
                     newPath[#newPath + 1] = destSector64
                     visited[destSectorKey] = true
                     queue[#queue + 1] = { sectorId = destSector64, path = newPath, depth = current.depth + 1, incomingGate = dest64 }
@@ -281,24 +274,20 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
                 newPath[#newPath + 1] = highway.highway
               end
 
-              -- entry gate (if not already known)
               if not GetComponentData(highway.entryGate, "isknown") or forceNext then
                 newPath[#newPath + 1] = highway.entryGate
               end
 
-              -- exit gate (if not already known)
               if not GetComponentData(highway.exitGate, "isknown") or forceNext then
                 newPath[#newPath + 1] = highway.exitGate
               end
 
-              -- destination sector
               local destSector64 = ConvertStringTo64Bit(destSectorKey)
               local destKnown = GetComponentData(destSector64, "isknown")
               if destKnown and not forceNext or destSector64 == targetSectorId then
-                return newPath  -- BFS: this is the shortest path
+                return newPath
               end
 
-              -- intermediate sector (not known) — add and continue BFS
               newPath[#newPath + 1] = destSector64
               visited[destSectorKey] = true
               queue[#queue + 1] = { sectorId = destSector64, path = newPath, depth = current.depth + 1, incomingGate = nil }
@@ -359,7 +348,7 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
           onClick         = function()
             local path = findRevealPath(sector.id, ConvertStringTo64Bit(tostring(C.GetContextByClass(C.GetPlayerID(), "sector", false))))
             if not path or #path == 0 then
-              -- fallback: reveal sector to nearest known sector
+              -- No route to the player's own sector, so settle for the nearest known one.
               path = findRevealPath(sector.id)
             end
             if path and #path > 0 then
@@ -433,6 +422,8 @@ function scpMap.requestSuperHighways()
   end
 end
 
+-- The sector and highway lists are not reachable from Lua: MD fills the blackboard and
+-- signals back, so both requests clear it first and the section renders empty until then.
 function scpMap.requestSectors()
   if #scpMap.sectors == 0 then
     SetNPCBlackboard(scpMap.scp.playerId, scpMap.scpConfig.variableId, {})

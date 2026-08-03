@@ -19,6 +19,7 @@ local PAGE_ID    = 1972092427
 local SLIDER_MIN = -30
 local SLIDER_MAX = 30
 
+-- Slider step (1-30) to the game's own relation value, mirroring X4_DataStructures.lua.
 local relations_t = {
   [1] = 0.00064, [2] = 0.00128, [3] = 0.00192, [4] = 0.00256, [5] = 0.00320,
   [6] = 0.00402, [7] = 0.00505, [8] = 0.00634, [9] = 0.00797, [10] = 0.01000,
@@ -59,6 +60,8 @@ function scpFactions.init(playerId, variableId, blacklistedFactions)
   _blacklisted = blacklistedFactions
 end
 
+-- Only relations to the player are readable from Lua; for any other faction MD answers by
+-- writing the whole set to the blackboard, so the section stays frozen until it arrives.
 function scpFactions.requestFactionRelations(factionId)
   factionId = factionId or "player"
   if state.factionFor ~= factionId then
@@ -86,6 +89,7 @@ function scpFactions.onRelationsData()
   end
 end
 
+-- Same split on the way back: the FFI setter only covers relations to the player.
 function scpFactions.setRelation(factionId, newValue, isNegative)
   local newRelation = calculateRelationValue(newValue, isNegative)
   if state.factionFor == "player" then
@@ -207,6 +211,7 @@ function scpFactions.createSection(frameTable, numDisplayed, scp)
     end
   end
 
+  -- Blackboard data is a snapshot, so re-request it while a non-player faction is shown.
   if state.factionFor ~= "player" then
     if getElapsedTime() - state.refreshed > 10 then
       local currentFaction = state.factionFor

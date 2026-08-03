@@ -40,6 +40,8 @@
           </actions>
         </cue>
 
+        <!-- Sectors and super-highways cannot be enumerated from Lua, so both collect cues
+             answer through player.entity.$safeCheatPanelDataExchange. -->
         <cue name="Scp_Collect_Sectors" instantiate="true">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_collect_sectors'" />
@@ -100,8 +102,7 @@
           </actions>
         </cue>
 
-        <!-- Promote Crew: sets role-relevant skills to the target value (stars * 3) and scales
-             the remaining skills by the same relative change, capped at 15. -->
+        <!-- Sets role-relevant skills to stars * 3 and scales the rest by the same change, max 15. -->
         <cue name="Scp_Promote_Crew" instantiate="true">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_promote_crew'" />
@@ -133,9 +134,8 @@
             </do_if>
             <do_if value="$promoteData.$marine? or $promoteData.$service?">
               <debug_text text="'SafeCheatPanel: crew loop starting, people.list.count = %s'. [$ship.people.list.count]" chance="$debugChance" />
-              <!-- $ship.people.{$template} is a pseudo/live accessor (npctemplateentry), never
-                   stored via set_value and reused; every property access below re-chains
-                   $ship.people.{$template}.xxx directly, matching vanilla usage everywhere. -->
+              <!-- $ship.people.{$template} is a live accessor: it cannot be stored in a variable
+                   and reused, so every access below re-chains it in full. -->
               <do_for_each name="$template" in="$ship.people.list" counter="$i">
                 <debug_text text="'SafeCheatPanel: crew[%s] template=%s name=%s role=%s'. [$i, $template, $ship.people.{$template}.name, $ship.people.{$template}.role]" chance="$debugChance" />
                 <do_if value="$promoteData.$marine? and $ship.people.{$template}.role == entityrole.marine">
@@ -193,8 +193,8 @@
             <set_value name="$rows" exact="0" />
             <set_value name="$numPerRow" exact="0" />
             <set_value name="$startX" exact="$spawnData.$position.$x" />
-            <!-- For scpDefault preset loadouts with a known native faction, create the ship under
-             that faction so generate_loadout picks faction-specific equipment correctly, then transfer ownership. -->
+            <!-- Preset loadouts are built under the ship's own faction so faction-specific
+                 equipment is picked; ownership is transferred once it is fitted. -->
             <set_value name="$spawnOwner" exact="$spawnData.$ownerId" />
             <do_if value="$spawnData.$preset gt 0 and @$spawnData.$loadoutFaction != null">
               <set_value name="$spawnOwner" exact="$spawnData.$loadoutFaction" />
@@ -277,7 +277,7 @@
                     </do_else>
                     <include_actions ref="Scp_Fit_Equipment_From_Pools" />
                   </do_if>
-                  <!-- Transfer ownership to the intended faction after loadout is applied -->
+                  <!-- Hand over to the intended owner now that the equipment is on. -->
                   <do_if value="$spawnOwner != $spawnData.$ownerId">
                     <set_owner object="$ship" faction="faction.{$spawnData.$ownerId}" overridenpc="true" />
                   </do_if>
@@ -348,11 +348,13 @@
             </create_station>
             <do_if value="$station">
               <do_if value="$station.owner != faction.player">
-                <!-- NPC-owned: the 'init station' signal triggers InitStationActions which creates trade manager, defence/engineer NPCs and AI unit -->
+                <!-- NPC-owned: 'init station' runs InitStationActions, which adds the manager,
+                     the defence and engineer NPCs and the AI unit. -->
                 <signal_objects object="player.galaxy" param="'init station'" param2="$station" param3="true" />
               </do_if>
               <do_else>
-                <!-- Player-owned: mirror PlayerStationBuilt using shared libraries from InitUniverse; $controllable is required by the libraries -->
+                <!-- Player-owned: mirrors PlayerStationBuilt; the InitUniverse libraries below
+                     read the station from $controllable. -->
                 <set_value name="$controllable" exact="$station" />
                 <include_actions ref="md.InitUniverse.CreateDefenceControlEntity" />
                 <include_actions ref="md.InitUniverse.CreateEngineerEntity" />

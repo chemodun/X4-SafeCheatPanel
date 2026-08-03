@@ -38,6 +38,8 @@ local PAGE_ID = 1972092427
 local scpStation = {
 }
 
+-- Runs an action over every station of the picked station's owner. Only the last one gets
+-- the finishAction flag, so the whole batch reaches MD as a single event.
 function scpStation.processForAllStations(functionToProcess)
   local station = interactMenu.componentSlot.component
   if station == nil then return end
@@ -99,6 +101,8 @@ function scpStation.forceBuildCompletionForAllFaction()
 end
 
 
+-- What the build storage still lacks: the holomap's build sequence, planned modules included,
+-- minus what is already stored.
 function scpStation.getBuildStorageGap(station, buildStorage)
   local neededResources = {}
   local numTotalResources = C.PrepareBuildSequenceResources2(menu.holomap, station, true)
@@ -132,6 +136,8 @@ function scpStation.getBuildStorageGap(station, buildStorage)
   return neededResources
 end
 
+-- What the station is buying: GetTradeList needs a counterpart, so any ship of the same
+-- owner stands in as one.
 function scpStation.getStationGap(station, owner)
   local stationObject = ConvertStringToLuaID(tostring(station))
   local ships = GetContainedShipsByOwner(owner)
@@ -161,6 +167,7 @@ function scpStation.getStationGap(station, owner)
 end
 
 
+-- Reservations are stock already on its way in, so they count against the gap.
 function scpStation.applyReservations(container, neededResources, count)
   local container64 = ConvertStringTo64Bit(tostring(container))
   local n = C.GetNumContainerWareReservations2(container64, true, true, true)

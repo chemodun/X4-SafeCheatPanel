@@ -28,8 +28,8 @@ ffi.cdef [[
 --endregion
 
 --region Config
-local menu = {}                  -- NOTE: menu is map menu as its the main menu we access
-local shipConfigurationMenu = {} -- NOTE: this is the menu for ship configuration, used in the spawn ship section of the cheat menu
+local menu = {}                  -- the map menu, which hosts the panel
+local shipConfigurationMenu = {} -- source of the loadout presets used by the spawn section
 local interactMenu = {}
 
 local scp = {
@@ -78,8 +78,7 @@ scp.destroy.join(scp)
 scp.promote    = require("extensions.safe_cheat_panel.ui.scp_promote")
 scp.promote.join(scp)
 
--- Canonical isExtendedMode lives in scp_helpers; alias it onto scp for use in
--- display functions and scp.reset().
+-- Aliases so display functions and scp.reset() can call these off scp directly.
 scp.isExtendedMode = scp.helpers.isExtendedMode
 scp.isDeveloperMode = scp.helpers.isDeveloperMode
 
@@ -288,7 +287,6 @@ local config = {
   },
 
 
-  -- Faction relation slider values are based on the values used in the game, see GetFactionRelationStatus2 in X4_DataStructures.lua for reference
   mapRowHeight = Helper.standardTextHeight,
   mapFontSize = Helper.standardFontSize,
 
@@ -494,7 +492,6 @@ end
 
 --region Menu Functions
 function scp.createCheatMenu(frame, _)
-  -- local infoTableMode = menu.infoTableMode[instance]
   local mainTable = frame:addTable(12, { tabOrder = 2, reserveScrollBar = false })
   scp.table = mainTable
   mainTable:setDefaultCellProperties("text", { minRowHeight = config.mapRowHeight, fontsize = config.mapFontSize })
@@ -502,6 +499,7 @@ function scp.createCheatMenu(frame, _)
   mainTable:setDefaultCellProperties("dropdown", { height = config.mapRowHeight })
   mainTable:setDefaultComplexCellProperties("button", "text", { fontsize = config.mapFontSize })
 
+  -- One tab column per sidebar-width slot, capped at the engine's column limit.
   local maxNumCategoryColumns = math.floor(menu.infoTableWidth / (menu.sideBarWidth + Helper.borderSize))
   if maxNumCategoryColumns > Helper.maxTableCols then
     maxNumCategoryColumns = Helper.maxTableCols
@@ -541,7 +539,7 @@ function scp.createCheatMenu(frame, _)
     end
     local diff = menu.infoTableWidth - maxNumCategoryColumns * (menu.sideBarWidth + Helper.borderSize)
     tabTable:setColWidth(maxNumCategoryColumns, menu.sideBarWidth + diff, false)
-    -- object list categories row
+    -- Tab strip, one cell per visible category.
     local row = tabTable:addRow("cheat_tabs", { fixed = true })
     local rowCount = 1
 

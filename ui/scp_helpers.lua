@@ -40,21 +40,17 @@ function scp.init(playerId, configId)
   end
 end
 
---- Returns true when the player has chosen "extended" mode in the mod config.
 function scp.isExtendedMode()
   if _playerId == nil then return false end
   local cfg = GetNPCBlackboard(_playerId, _configId)
   return cfg ~= nil and cfg.mode == "extended"
 end
 
---- Returns true when the player has chosen "developer" mode in the mod config.
 function scp.isDeveloperMode()
   if _playerId == nil then return false end
   local cfg = GetNPCBlackboard(_playerId, _configId)
   return cfg ~= nil and cfg.mode == "developer"
 end
-
---- Logs a debug message when debug level is "debug" or "trace".
 
 function scp.info(msg)
   DebugError("SafeCheatPanel [info]: " .. msg)
@@ -66,7 +62,6 @@ function scp.debug(msg)
   end
 end
 
---- Logs a trace message when debug level is "trace" only.
 function scp.trace(msg)
   if debugLevel == "trace" then
     DebugError("SafeCheatPanel [trace]: " .. msg)
@@ -197,13 +192,12 @@ function scp.sortText(a, b)
 end
 
 function scp.topologicalSortResearch(items)
-  -- Build a lookup table for items by ID
   local itemById = {}
   for i = 1, #items do
     itemById[items[i].id] = items[i]
   end
 
-  -- Calculate depth for each item (max depth of its precursors + 1)
+  -- Depth = deepest precursor + 1, so the tree indents by prerequisite chain.
   local function getDepth(item, visited)
     if item.depth then
       return item.depth
@@ -235,27 +229,25 @@ function scp.topologicalSortResearch(items)
     return item.depth
   end
 
-  -- Calculate depth for all items
   for i = 1, #items do
     getDepth(items[i])
   end
 end
 
+-- sortOrder keeps a category together, depth orders it by prerequisite, name settles ties.
 function scp.sortResearch(a, b)
-  -- Sort by sortOrder first (keeps categories/groups together)
   if a.sortOrder ~= b.sortOrder then
     return a.sortOrder < b.sortOrder
   end
 
-  -- Within same sortOrder group, use topologically-assigned depth
   if a.depth ~= b.depth then
     return a.depth < b.depth
   end
 
-  -- Finally by name
   return a.name < b.name
 end
 
+-- Closes the interact menu, or tears its frame down by hand when it is already gone.
 function scp.interactMenuFinishAction()
   if interactMenu.shown then
     interactMenu.onCloseElement("close")

@@ -203,6 +203,7 @@ local function sortText(a, b)
   return a.text < b.text
 end
 
+-- Extended mode lists every ship ware, not only the ones the player could ever build.
 local function getAllShips()
   local ships = {}
   local excludeTags = "noplayerblueprint noblueprint noplayerbuild deprecated missiononly"
@@ -231,6 +232,8 @@ local function getAllShips()
   return ships
 end
 
+-- Faction whose equipment suits the ship: its blueprint owner, or the maker race when the
+-- ware belongs to nobody.
 local function getShipDefaultFaction(macro)
   if not macro then return nil end
   local wareId = GetMacroData(macro, "ware")
@@ -248,6 +251,7 @@ local function getShipDefaultFaction(macro)
   return owner
 end
 
+-- The macro's named loadouts, with the three generated presets pushed in front of them.
 local function getShipLoadouts(macro)
   local loadouts = {}
   if macro == nil then return loadouts end
@@ -291,6 +295,7 @@ local function getShipLoadouts(macro)
   table.insert(loadouts, 2, { id = "scpDefaultMedium", text = ReadText(1001, 7911), icon = "", displayremoveoption = false, preset = 0.5, active = true })
   table.insert(loadouts, 3, { id = "scpDefaultHigh",   text = ReadText(1001, 7912), icon = "", displayremoveoption = false, preset = 1.0, active = true })
   if #loadouts > 3 then
+    -- Inactive separator between the presets and the named loadouts.
     table.insert(loadouts, 4, { id = "none", text = ReadText(1972092427, 7219), icon = "", displayremoveoption = false, active = false })
   end
   return loadouts
@@ -322,10 +327,11 @@ end
 
 local scpSpawner = {}
 
--- Called once from safe_cheat_panel init() so the spawner can hold a reference
--- to the shipConfigurationMenu needed by PresetAndCrewForSpawnShip.
+-- Set once from safe_cheat_panel init().
 scpSpawner.shipConfigurationMenu = {}
 
+-- Preset crew comes from the ShipConfigurationMenu, the only place a macro's crew capacity
+-- is reachable; its object and macro fields are borrowed and put back.
 function scpSpawner.PresetAndCrewForSpawnShip(macro, loadoutId)
   local preset = -1
   if loadoutId == "scpDefaultLow" then
@@ -364,13 +370,11 @@ function scpSpawner.PresetAndCrewForSpawnShip(macro, loadoutId)
   return preset, crew
 end
 
--- Expose getShipDefaultFaction for SpawnShip
 function scpSpawner.getShipDefaultFaction(macro)
   return getShipDefaultFaction(macro)
 end
 
--- Returns the current spawner state (read-only reference used by safe_cheat_panel
--- to read scp.spawner.* fields for context actions / showSpawnOption).
+-- Live reference, not a copy: safe_cheat_panel reads the spawner's selection through it.
 function scpSpawner.getState()
   return state
 end
@@ -534,6 +538,7 @@ function scpSpawner.setShipSpawnData(id, dataType)
   elseif dataType == "race" then
     state.ships_sel.ownerRace = id
   end
+  -- Only a generated preset needs a loadout faction; a named loadout brings its own equipment.
   if dataType == "ship" or dataType == "loadout" then
     if isPresetLoadout(state.ships_sel.loadout) then
       state.ships_sel.loadoutFaction = getShipDefaultFaction(state.ships_sel.id)
@@ -573,7 +578,7 @@ end
 function scpSpawner.createSection(frameTable, numDisplayed, consumableTypes, scp)
   local isV9 = scp.isV9
   if #state.factions == 0 then
-    -- factions not yet loaded (first open before reset was called)
+    -- First open, before reset() has run.
     state.factions = getSpawnerFactions({})
   end
 
@@ -953,7 +958,6 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, 
   return numDisplayed
 end
 
--- Expose internal state
 scpSpawner.state = state
 
 -- *** Spawn action functions (called from safe_cheat_panel luaActions) ***

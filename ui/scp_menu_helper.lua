@@ -3,6 +3,8 @@ local scp = {
   subHeaderRowCenteredProperties = { }
 }
 
+-- Shared layout for every builder below: label from the first column, widget from the second
+-- to the end of the row, each overridable per call through options.
 local config = {
   mapRowHeight = Helper.standardTextHeight,
   mapFontSize = Helper.standardFontSize,

@@ -14,6 +14,7 @@ local PAGE_ID = 1972092427
 
 local scpPlayer = {}
 
+-- AddPlayerMoney is relative and counts cents, so the balance is zeroed before the new one.
 function scpPlayer.SetPlayerMoney(newBalance)
   if not newBalance then
     menu.refreshInfoFrame()
@@ -49,14 +50,14 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
   table.sort(spacesuitUpgrades, Helper.sortName)
   table.sort(spacesuitAmmo, Helper.sortName)
 
-  -- Header: Player
+  -- Player
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(20203, 101),
     fixed = nil,
   })
 
   local rowGroup = scp.isV9 and frameTable:addRowGroup({}) or frameTable
-  -- Player Money
+  -- Player money
   numDisplayed = scp.menuHelper.createEditBox(rowGroup, "player_money", numDisplayed, {
     active               = true,
     text                 = ReadText(PAGE_ID, 1100),
@@ -70,7 +71,7 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
     isHeader             = nil,
   })
 
-  -- Title: Spacesuit Upgrades
+  -- Spacesuit upgrades
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(PAGE_ID, 1200),
     fixed = nil,
@@ -108,7 +109,7 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
     end
   end
 
-  -- Title: Spacesuit Ammo
+  -- Spacesuit ammo
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(PAGE_ID, 1300),
     fixed = nil,

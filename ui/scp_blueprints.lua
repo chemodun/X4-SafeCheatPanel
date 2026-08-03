@@ -85,8 +85,7 @@ local function getOwnedBlueprints()
   return owned
 end
 
--- Loads module or ship wares, grouped by infolibrary (modules) or class (ships).
--- Returns a table keyed by group key, each value being a sorted list of { ware, name }.
+-- Module or ship wares grouped by infolibrary (modules) or macro class (ships).
 local function loadGroupedWares(tag)
   local num = tonumber(C.GetNumWares(tag, false, "", "deprecated noplayerblueprint"))
   if num == 0 then return {} end
@@ -123,8 +122,8 @@ local function loadGroupedWares(tag)
   return groups
 end
 
--- Loads equipment wares for one equipment sub-tag.
--- Returns a sorted flat list of { ware, name }.
+-- Equipment wares of one tag; "consumables" expands into its sub-tags, and macros with an
+-- info alias are dropped as duplicates of the one they alias.
 local function loadEquipmentWares(equipmentTag)
   local concatTag = equipmentTag
   if equipmentTag == "consumables" then
@@ -149,7 +148,6 @@ end
 
 local scpBlueprints = {}
 
--- Loads all blueprint data: owned map + all module/ship/equipment groups.
 function scpBlueprints.loadData()
   local data = {
     owned           = getOwnedBlueprints(),
@@ -258,15 +256,9 @@ end
 
 -- *** UI rendering helpers ***
 
--- Column layout (12 total):
---   Col buttonCol  : expand/collapse button (+/-)
---   Cols buttonCol+1 .. 7  : section label (or full width when no unlock button)
---   Cols 6 .. 12 (span 5) : "Unlock All" button or "All Unlocked" text (optional)
--- For entry rows:
---   Cols textStartCol .. 7  : item name
---   Cols 8 .. 12 (span 5)  : "Owned" text or "Unlock" button
+-- Column layout, 12 wide: +/- button up to buttonCol, label to col 7, cols 8-12 the
+-- unlock button or owned marker. Entry rows indent by starting their text at textStartCol.
 
--- Returns true if every entry in the list is already owned.
 local function isAllOwnedInList(owned, entries)
   for _, e in ipairs(entries) do
     if not owned[e.ware] then return false end
@@ -274,7 +266,6 @@ local function isAllOwnedInList(owned, entries)
   return true
 end
 
--- Calls LearnBlueprint for every unowned entry in the list.
 local function learnGroup(owned, entries)
   if not entries then return end
   for _, e in ipairs(entries) do
@@ -282,8 +273,7 @@ local function learnGroup(owned, entries)
   end
 end
 
--- Renders a collapsible section header row.
--- allOwned and onUnlock are optional; when provided, an unlock button (cols 8-12) is added.
+-- Collapsible section header; passing onUnlock adds the unlock button in cols 8-12.
 local function addExpandRow(frameTable, key, label, buttonCol, isExpanded, onToggle, allOwned, onUnlock)
   local row = frameTable:addRow("expand_" .. key, { bgColor = Color["row_background_unselectable"] })
   local buttonX = 0
@@ -340,8 +330,7 @@ local function addBlueprintEntryRow(frameTable, entry, data, blueprint, textStar
   end
 end
 
--- Renders all module sub-category sections.
--- expandButtonCol : column index used for the +/- buttons at this level
+-- expandButtonCol is the +/- column for this nesting level; entries indent one past it.
 local function renderModuleSection(frameTable, data, blueprint, expandButtonCol)
   local entryTextStartCol = expandButtonCol + 1
   for _, orderEntry in ipairs(blueprintOrder.module) do
@@ -359,7 +348,6 @@ local function renderModuleSection(frameTable, data, blueprint, expandButtonCol)
     if hasEntries then
       local sectionKey = "modsec_" .. orderEntry.key
       local isExpanded = blueprint.expanded[sectionKey]
-      -- Collect all entries in this section for allOwned check and unlock callback
       local sectionEntries = {}
       if group then
         for _, e in ipairs(group) do table.insert(sectionEntries, e) end
@@ -408,7 +396,6 @@ local function renderModuleSection(frameTable, data, blueprint, expandButtonCol)
   end
 end
 
--- Renders all ship size-class sections.
 local function renderShipSection(frameTable, data, blueprint, expandButtonCol)
   local entryTextStartCol = expandButtonCol + 1
   for _, orderEntry in ipairs(blueprintOrder.ship) do
@@ -440,7 +427,6 @@ local function renderShipSection(frameTable, data, blueprint, expandButtonCol)
   end
 end
 
--- Renders the given equipment sub-tags as collapsible sections.
 local function renderEquipmentSection(frameTable, data, blueprint, tagsToRender, tagNamesToRender, expandButtonCol)
   local entryTextStartCol = expandButtonCol + 1
   for i, tag in ipairs(tagsToRender) do
@@ -524,8 +510,7 @@ local function getSecondaryName(blueprint)
   return st
 end
 
--- Returns a human-readable label for the current filter selection.
--- Examples: "All", "Ships: All", "Ships: Large"
+-- Label for the current filter, e.g. "All", "Ships: All", "Ships: Large".
 local function getFilterLabel(blueprint)
   local pt = blueprint.primaryTag
   if pt == "all" then
@@ -544,27 +529,25 @@ end
 -- *** Main section render ***
 
 function scpBlueprints.createSection(frameTable, numDisplayed, scp)
-  -- Match the expand/collapse button column width to the vanilla infotable (e.g. propertyowned).
-  -- col 1 = top-level +/- button; col 2 = sub-section +/- button.
+  -- Cols 1 and 2 hold the top-level and sub-section +/- buttons, sized like the vanilla infotable.
   local expandColWidth = Helper.scaleY(Helper.standardTextHeight) + Helper.standardContainerOffset
   frameTable:setColWidth(1, expandColWidth, false)
   frameTable:setColWidth(2, expandColWidth, false)
   local blueprint = scp.blueprint
   local isV9 = scp.isV9
 
-  -- Load blueprint data if not yet cached (or invalidated after learning)
+  -- Cached until a blueprint is learned, which clears blueprint.data.
   if blueprint.data == nil then
     blueprint.data = scpBlueprints.loadData()
   end
   local data = blueprint.data
 
-  -- Title (fixed - does not scroll)
+  -- fixed = true keeps the title and the filters out of the scrolling area.
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(PAGE_ID, 4000),
     fixed = true,
   })
 
-  -- Filter dropdowns (fixed - does not scroll)
   local primaryOptions = {
     { id = "all",       text = ReadText(PAGE_ID, 4011), icon = "", displayremoveoption = false },
     { id = "module",    text = primaryTagNames[1],      icon = "", displayremoveoption = false },
@@ -594,7 +577,7 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
     isHeader         = true,
   })
 
-  -- Secondary dropdown: shown for module, ship, and equipment
+  -- Secondary dropdown, empty and hidden while the primary filter is "all".
   local secondaryOptions = nil
   if blueprint.primaryTag == "module" then
     secondaryOptions = {
@@ -654,7 +637,7 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
     })
   end
 
-  -- Expand/collapse + unlock all combined row (fixed - does not scroll)
+  -- Combined expand-all + unlock-all row; a fully narrowed filter has nothing left to expand.
   local isFlat = (blueprint.primaryTag ~= "all") and (blueprint.secondaryTag ~= "all")
   local allOwned = scpBlueprints.isAllOwnedForScope(data, blueprint.primaryTag, blueprint.secondaryTag)
   local ctrlRow = frameTable:addRow("blueprint_controls", { bgColor = Color["row_background_unselectable"], fixed = true })
@@ -676,11 +659,10 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
   end
   numDisplayed = numDisplayed + 1
 
-  -- Blueprint list
   local listGroup = isV9 and frameTable:addRowGroup({}) or frameTable
 
   if blueprint.primaryTag == "all" then
-    -- Three top-level expand sections: Modules, Ships, Equipment
+    -- Unfiltered: Modules, Ships and Equipment each get their own top-level section.
     local modKey      = "primary_module"
     local modExpanded = blueprint.expanded[modKey]
     local modAllOwned = scpBlueprints.isAllOwnedForScope(data, "module", "all")
@@ -752,7 +734,6 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
     if blueprint.secondaryTag == "all" then
       renderModuleSection(listGroup, data, blueprint, 1)
     else
-      -- Specific module type selected — show entries flat
       local group = data.moduleGroups[blueprint.secondaryTag]
       if group then
         for _, entry in ipairs(group) do
@@ -764,7 +745,6 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
     if blueprint.secondaryTag == "all" then
       renderShipSection(listGroup, data, blueprint, 1)
     else
-      -- Specific ship size class selected — show entries flat
       local group = data.shipGroups[blueprint.secondaryTag]
       if group then
         for _, entry in ipairs(group) do
@@ -776,7 +756,6 @@ function scpBlueprints.createSection(frameTable, numDisplayed, scp)
     if blueprint.secondaryTag == "all" then
       renderEquipmentSection(listGroup, data, blueprint, equipmentTags, equipmentTagNames, 1)
     else
-      -- Specific secondary tag selected — show entries directly with no section header
       local group = data.equipmentGroups[blueprint.secondaryTag]
       if group then
         for _, entry in ipairs(group) do

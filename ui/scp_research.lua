@@ -11,8 +11,10 @@ local PAGE_ID = 1972092427
 
 local scpResearch = {}
 
+-- researchIndex 0 = the "unlock all" button, otherwise the index of the clicked item.
 function scpResearch.processResearch(researchItems, researchIndex)
   local researchToUnlock = {}
+  -- Unlocking an item pulls in its whole precursor chain.
   local function addResearchAndPrecursors(id)
     for i = 1, #researchItems do
       local research = researchItems[i]
@@ -29,6 +31,7 @@ function scpResearch.processResearch(researchItems, researchIndex)
   end
 
   local researchSuccessors = {}
+  -- Revoking one takes every completed item that depends on it, transitively.
   local function collectResearchedSuccessors(id)
     for i = 1, #researchItems do
       local research = researchItems[i]
@@ -57,6 +60,7 @@ function scpResearch.processResearch(researchItems, researchIndex)
     local researchItem = researchItems[researchIndex]
     if researchItem == nil then return end
     if researchItem.completed then
+      -- No FFI counterpart to AddResearch, so revoking goes through MD.
       researchSuccessors[#researchSuccessors + 1] = researchItem.id
       collectResearchedSuccessors(researchItem.id)
       AddUITriggeredEvent("scp_main", "scp_remove_research", researchSuccessors)

@@ -37,6 +37,8 @@ local state = {
 local scpInventory = {}
 scpInventory.state = state
 
+-- Seminars and mission items are excluded from the main query and fetched separately, so
+-- they land in their own categories instead of the generic ones.
 function scpInventory.prepareData()
   local numItems = C.GetNumWares("inventory", false, "", "clothingmod personalupgrade deprecated seminar missiononly")
   local inventoryItems = ffi.new("const char*[?]", numItems)
@@ -123,6 +125,7 @@ function scpInventory.SetWare(wareId, oldAmount, newAmount)
   end
   local maxAmount = 10000
   newAmount = math.max(0, math.min(newAmount, maxAmount))
+  -- nil object = the player's own inventory; there is no set, only remove then add.
   RemoveInventory(nil, wareId, oldAmount)
   AddInventory(nil, wareId, newAmount, true)
   PlaySound("ui_crafting_success")
@@ -174,6 +177,7 @@ function scpInventory.createSection(frameTable, numDisplayed, scp)
     local wareRowGroup = scp.isV9 and frameTable:addRowGroup({}) or frameTable
     for j = 1, #category.data do
       local wareId = category.data[j]
+      -- Venture rewards fall into "useful" but are account items, not inventory ones.
       if category.id ~= "useful" or not onlineItems[wareId] then
         local ware = wareId and state.wares[wareId] or nil
         if ware ~= nil then
@@ -181,6 +185,7 @@ function scpInventory.createSection(frameTable, numDisplayed, scp)
           local isIllegal = policeFaction and IsWareIllegalTo(wareId, "player", policeFaction)
           local textColor = amount == 0 and Color["text_inactive"] or isIllegal and Color["text_illegal"] or nil
           if state.selected == wareId then
+            -- menu.noupdate holds off the frame refresh that would reset the slider mid-drag.
             numDisplayed = scp.menuHelper.createSliderRow(wareRowGroup, true, numDisplayed, {
               text                = ware.name,
               mouseOverText       = ReadText(PAGE_ID, 2003),
