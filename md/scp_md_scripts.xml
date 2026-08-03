@@ -200,15 +200,36 @@
               <set_value name="$spawnOwner" exact="$spawnData.$loadoutFaction" />
             </do_if>
             <debug_text text="'SafeCheatPanel: Spawning ship with macro %s for faction %s at position %s'. [$spawnData.$ship, $spawnOwner, $spawnData.$position]" chance="$debugChance" />
+            <!-- Loadout is settled before the first ship exists, so none is born with the
+                 engine's random default fit. Macro-based, so one build serves the batch. -->
+            <do_if value="$spawnData.$preset gt 0">
+              <include_actions ref="Scp_Build_Equipment_Loadout" />
+            </do_if>
+            <do_else>
+              <get_loadout result="$scpLoadout" macro="macro.{$spawnData.$ship}" loadout="$spawnData.$loadout" />
+            </do_else>
             <do_while value="$rows lt $spawnData.$rows">
               <do_while value="$numPerRow lt $spawnData.$numPerRow">
-                <create_ship name="$ship" macro="$spawnData.$ship" sector="$spawnData.$offsetComponent">
-                  <owner exact="faction.{$spawnOwner}" overridenpc="true" />
-                  <pilot>
-                    <select race="race.{$spawnData.$ownerRace}" tags="tag.aipilot" />
-                  </pilot>
-                  <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
-                </create_ship>
+                <!-- Two shapes: <loadout> is static, it cannot be conditional inside one create_ship. -->
+                <do_if value="@$scpLoadout != null">
+                  <create_ship name="$ship" macro="$spawnData.$ship" sector="$spawnData.$offsetComponent">
+                    <owner exact="faction.{$spawnOwner}" overridenpc="true" />
+                    <pilot>
+                      <select race="race.{$spawnData.$ownerRace}" tags="tag.aipilot" />
+                    </pilot>
+                    <loadout loadout="$scpLoadout" />
+                    <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
+                  </create_ship>
+                </do_if>
+                <do_else>
+                  <create_ship name="$ship" macro="$spawnData.$ship" sector="$spawnData.$offsetComponent">
+                    <owner exact="faction.{$spawnOwner}" overridenpc="true" />
+                    <pilot>
+                      <select race="race.{$spawnData.$ownerRace}" tags="tag.aipilot" />
+                    </pilot>
+                    <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
+                  </create_ship>
+                </do_else>
                 <do_if value="@$ship != null">
                   <do_if value="@$ship.aipilot != null">
                     <do_for_each name="$skill" in="lookup.skilltype.list">
@@ -239,30 +260,23 @@
                     </do_for_each>
                   </do_if>
                   <do_if value="$spawnData.$preset gt 0">
-                    <do_all exact="100" counter="$i">
-                      <generate_loadout result="$loadouts" macro="macro.{$spawnData.$ship}" level="$spawnData.$preset" faction="faction.{$spawnOwner}" variation="0" />
-                      <debug_text text="'SafeCheatPanel: for ship %s found %s loadouts'. [$ship.debugname, $loadouts.count]" chance="$debugChance" />
-                      <do_for_each name="$loadout" in="$loadouts">
-                        <apply_loadout object="$ship" loadout="$loadout" />
-                        <find_object_component name="$engine" object="$ship" class="class.engine" />
-                        <debug_text text="'SafeCheatPanel: on ship %s loadout %s applied, Engine is: %s'. [$ship.debugname, $loadout, @$engine.name]" chance="$debugChance" />
-                        <do_if value="@$engine != null">
-                          <debug_text text="'SafeCheatPanel: on ship %s loadout applied successfully'. [$ship.debugname]" chance="$debugChance" />
-                          <break />
-                        </do_if>
-                      </do_for_each>
-                      <do_if value="@$engine != null">
-                        <break />
-                      </do_if>
-                      <do_if value="$i ge 99">
-                        <debug_text text="'SafeCheatPanel: for ship %s are no loadouts with engines found'. [$ship.debugname]" chance="$debugChance" />
-                      </do_if>
-                    </do_all>
+                    <debug_text text="'SafeCheatPanel: %s straight after create_ship - weapons %s/%s, turrets %s/%s, shields %s/%s, engines %s/%s'. [
+                      $ship.debugname,
+                      $ship.weapons.all.count - $ship.turrets.all.count, $ship.weapons.numslots,
+                      $ship.turrets.all.count, $ship.turrets.numslots,
+                      $ship.shields.all.count, $ship.shields.numslots,
+                      $ship.engines.all.count, $ship.engines.numslots]" chance="$traceChance" />
+                    <!-- Only the categories Lua does not model - the four slot ones are already
+                         fitted from the Lua pools, being out of this faction pool's reach. -->
+                    <generate_loadout result="$loadouts" macro="macro.{$spawnData.$ship}" level="$spawnData.$preset" faction="faction.{$spawnOwner}" variation="0" />
+                    <do_if value="@$loadouts.count gt 0">
+                      <apply_loadout object="$ship" loadout="$loadouts.{1}" flags="add thrusters ammo units software drones crew" />
+                    </do_if>
+                    <do_else>
+                      <debug_text text="'SafeCheatPanel: no base loadout generated for ship %s'. [$ship.debugname]" chance="$debugChance" />
+                    </do_else>
+                    <include_actions ref="Scp_Fit_Equipment_From_Pools" />
                   </do_if>
-                  <do_else>
-                    <get_loadout result="$loadout" macro="macro.{$spawnData.$ship}" loadout="$spawnData.$loadout" />
-                    <apply_loadout object="$ship" loadout="$loadout" />
-                  </do_else>
                   <!-- Transfer ownership to the intended faction after loadout is applied -->
                   <do_if value="$spawnOwner != $spawnData.$ownerId">
                     <set_owner object="$ship" faction="faction.{$spawnData.$ownerId}" overridenpc="true" />
@@ -495,6 +509,179 @@
           </actions>
         </library>
 
+        <!--
+      Builds the engine/shield/weapon/turret loadout create_ship is handed, from the Lua
+      candidate pools. All four generated at once: shield groups are only emitted alongside
+      the turret or engine group they hang off.
+      Expects $spawnData and $debugChance; sets $scpLoadout, null when there is nothing to fit.
+    -->
+        <library name="Scp_Build_Equipment_Loadout" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$fitPool" exact="[]" />
+            <do_if value="@$spawnData.$equipment != null">
+              <set_value name="$fitCategories" exact="[]" />
+              <do_if value="$spawnData.$equipment.$engines?">
+                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$engines" />
+              </do_if>
+              <do_if value="$spawnData.$equipment.$weapons?">
+                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$weapons" />
+              </do_if>
+              <do_if value="$spawnData.$equipment.$turrets?">
+                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$turrets" />
+              </do_if>
+              <do_if value="$spawnData.$equipment.$shields?">
+                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$shields" />
+              </do_if>
+              <do_for_each name="$fitCategory" in="$fitCategories">
+                <do_for_each name="$fitBucket" in="$fitCategory">
+                  <do_for_each name="$fitName" in="$fitBucket">
+                    <append_to_list name="$fitPool" exact="macro.{$fitName}" />
+                  </do_for_each>
+                </do_for_each>
+              </do_for_each>
+              <remove_value name="$fitCategories" />
+              <remove_value name="$fitCategory" />
+              <remove_value name="$fitBucket" />
+              <remove_value name="$fitName" />
+            </do_if>
+            <do_if value="$fitPool.count gt 0">
+              <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" flags="engines weapons turrets turretgroups shields shieldgroups">
+                <quantity level="$spawnData.$preset" variation="0" />
+                <quality level="$spawnData.$preset" variation="0" />
+              </generate_loadout>
+              <do_if value="@$fitLoadouts.count gt 0">
+                <set_value name="$scpLoadout" exact="$fitLoadouts.{1}" />
+              </do_if>
+              <debug_text text="'SafeCheatPanel: pre-spawn loadout for %s at preset %s - %s macro(s) offered, used %s'. [
+                $spawnData.$ship, $spawnData.$preset, $fitPool.count, @$fitUsed]" chance="$debugChance" />
+              <remove_value name="$fitUsed" />
+              <remove_value name="$fitLoadouts" />
+            </do_if>
+            <remove_value name="$fitPool" />
+          </actions>
+        </library>
+
+        <!--
+      Post-spawn repairs on a ship created with the loadout above: the floor guard for a
+      category that still came out empty, and the ammo pass. A category with no candidates is
+      absent from the plan and stays empty by design - Lua logs what came up dry.
+      Expects $ship, $spawnData, $debugChance and $traceChance in scope.
+    -->
+        <library name="Scp_Fit_Equipment_From_Pools" purpose="include_actions" version="5">
+          <actions>
+            <do_if value="@$spawnData.$equipment != null">
+              <debug_text text="'SafeCheatPanel: %s before fitting - weapons %s/%s, turrets %s/%s, shields %s/%s, engines %s/%s, missiles %s/%s; plan %s'. [
+                $ship.debugname,
+                $ship.weapons.all.count - $ship.turrets.all.count, $ship.weapons.numslots,
+                $ship.turrets.all.count, $ship.turrets.numslots,
+                $ship.shields.all.count, $ship.shields.numslots,
+                $ship.engines.all.count, $ship.engines.numslots,
+                $ship.ammostorage.missile.count, $ship.ammostorage.missile.capacity,
+                $spawnData.$equipment]" chance="$traceChance" />
+              <!-- Floor guard: no category may come out empty, however low the preset, so
+                   quantity is forced to full instead of the pass being re-rolled.
+                   Shields last again - their groups only exist once turrets and engines are in. -->
+              <do_if value="$ship.engines.numslots gt 0 and $ship.engines.all.count == 0 and $spawnData.$equipment.$engines?">
+                <set_value name="$fitCategory" exact="$spawnData.$equipment.$engines" />
+                <include_actions ref="Scp_Fit_Category_Pool_Build" />
+                <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" flags="engines">
+                  <quantity level="1" variation="0" />
+                  <quality level="$spawnData.$preset" variation="0" />
+                </generate_loadout>
+                <do_if value="@$fitLoadouts.count gt 0">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add engines" />
+                </do_if>
+                <debug_text text="'SafeCheatPanel: engine floor guard on %s - %s/%s, used %s'. [
+                  $ship.debugname, $ship.engines.all.count, $ship.engines.numslots, @$fitUsed]" chance="$debugChance" />
+              </do_if>
+              <!-- weapons.all.count counts turrets too, so main battery guns are the difference. -->
+              <do_if value="$ship.weapons.numslots gt 0 and $ship.weapons.all.count - $ship.turrets.all.count == 0 and $spawnData.$equipment.$weapons?">
+                <set_value name="$fitCategory" exact="$spawnData.$equipment.$weapons" />
+                <include_actions ref="Scp_Fit_Category_Pool_Build" />
+                <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" flags="weapons">
+                  <quantity level="1" variation="0" />
+                  <quality level="$spawnData.$preset" variation="0" />
+                </generate_loadout>
+                <do_if value="@$fitLoadouts.count gt 0">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add weapons" />
+                </do_if>
+                <debug_text text="'SafeCheatPanel: weapon floor guard on %s - %s/%s, used %s'. [
+                  $ship.debugname, $ship.weapons.all.count - $ship.turrets.all.count, $ship.weapons.numslots, @$fitUsed]" chance="$debugChance" />
+              </do_if>
+              <do_if value="$ship.turrets.numslots gt 0 and $ship.turrets.all.count == 0 and $spawnData.$equipment.$turrets?">
+                <set_value name="$fitCategory" exact="$spawnData.$equipment.$turrets" />
+                <include_actions ref="Scp_Fit_Category_Pool_Build" />
+                <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" flags="turrets turretgroups">
+                  <quantity level="1" variation="0" />
+                  <quality level="$spawnData.$preset" variation="0" />
+                </generate_loadout>
+                <do_if value="@$fitLoadouts.count gt 0">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add turrets turretgroups" />
+                </do_if>
+                <debug_text text="'SafeCheatPanel: turret floor guard on %s - %s/%s, used %s'. [
+                  $ship.debugname, $ship.turrets.all.count, $ship.turrets.numslots, @$fitUsed]" chance="$debugChance" />
+              </do_if>
+              <do_if value="$ship.shields.numslots gt 0 and $ship.shields.all.count == 0 and $spawnData.$equipment.$shields?">
+                <set_value name="$fitCategory" exact="$spawnData.$equipment.$shields" />
+                <include_actions ref="Scp_Fit_Category_Pool_Build" />
+                <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" flags="shields shieldgroups">
+                  <quantity level="1" variation="0" />
+                  <quality level="$spawnData.$preset" variation="0" />
+                </generate_loadout>
+                <do_if value="@$fitLoadouts.count gt 0">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add shields shieldgroups" />
+                </do_if>
+                <debug_text text="'SafeCheatPanel: shield floor guard on %s - %s/%s, used %s'. [
+                  $ship.debugname, $ship.shields.all.count, $ship.shields.numslots, @$fitUsed]" chance="$debugChance" />
+              </do_if>
+              <remove_value name="$fitCategory" />
+              <!-- Ammo last: a loadout only carries ammo for the launchers it contains, so the
+                   ammo bucket holds those launchers too, even though only the ammo is applied. -->
+              <do_if value="$spawnData.$equipment.$ammo?">
+                <do_for_each name="$fitBucket" in="$spawnData.$equipment.$ammo">
+                  <include_actions ref="Scp_Fit_Pool_Build" />
+                  <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" repeat="false" flags="weapons turrets ammo">
+                    <quantity level="$spawnData.$preset" variation="0" />
+                    <quality level="$spawnData.$preset" variation="0" />
+                  </generate_loadout>
+                  <do_if value="@$fitLoadouts.count gt 0">
+                    <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add ammo" />
+                  </do_if>
+                  <debug_text text="'SafeCheatPanel: fitted ammo on %s - %s/%s missiles, pool %s, used %s'. [
+                    $ship.debugname, $ship.ammostorage.missile.count, $ship.ammostorage.missile.capacity, $fitPool, @$fitUsed]" chance="$debugChance" />
+                </do_for_each>
+              </do_if>
+              <remove_value name="$fitUsed" />
+              <remove_value name="$fitBucket" />
+              <remove_value name="$fitName" />
+              <remove_value name="$fitPool" />
+              <remove_value name="$fitLoadouts" />
+            </do_if>
+          </actions>
+        </library>
+
+        <!-- The generate_loadout macro list ($fitPool) for a whole category ($fitCategory, a list of buckets). -->
+        <library name="Scp_Fit_Category_Pool_Build" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$fitPool" exact="[]" />
+            <do_for_each name="$fitBucket" in="$fitCategory">
+              <do_for_each name="$fitName" in="$fitBucket">
+                <append_to_list name="$fitPool" exact="macro.{$fitName}" />
+              </do_for_each>
+            </do_for_each>
+          </actions>
+        </library>
+
+        <!-- The same for one bucket ($fitBucket) of macro-name strings. -->
+        <library name="Scp_Fit_Pool_Build" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$fitPool" exact="[]" />
+            <do_for_each name="$fitName" in="$fitBucket">
+              <append_to_list name="$fitPool" exact="macro.{$fitName}" />
+            </do_for_each>
+          </actions>
+        </library>
+
         <!-- *** Config / Options Menu *** -->
 
         <!--
@@ -502,7 +689,7 @@
       Leaves a local $config reference; caller must remove_value $config when done.
       Forward-compat: fills any keys added in later versions.
     -->
-        <library name="Scp_DefaultConfig" purpose="include_actions" version="1">
+        <library name="Scp_DefaultConfig" purpose="include_actions" version="2">
           <actions>
             <do_if value="@player.entity.$safeCheatPanelConfig == null">
               <set_value name="player.entity.$safeCheatPanelConfig" exact="table[
@@ -518,6 +705,7 @@
               <set_value name="$config.$debugMode" exact="'none'" />
             </do_if>
             <set_value name="$debugChance" exact="if $config.$debugMode != 'none' then 100 else 0" />
+            <set_value name="$traceChance" exact="if $config.$debugMode == 'trace' then 100 else 0" />
           </actions>
         </library>
 

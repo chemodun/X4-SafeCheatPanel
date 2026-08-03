@@ -3,6 +3,7 @@
   <environment type="menus">
     <file name="ui/scp_helpers.lua" />
     <file name="ui/scp_menu_helper.lua" />
+    <file name="ui/scp_equipment.lua" />
     <file name="ui/scp_blueprints.lua" />
     <file name="ui/scp_spawner.lua" />
     <file name="ui/scp_station.lua" />

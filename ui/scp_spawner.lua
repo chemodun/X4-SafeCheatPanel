@@ -138,6 +138,7 @@ ffi.cdef [[
 ]]
 
 local scpHelpers    = require("extensions.safe_cheat_panel.ui.scp_helpers")
+local scpEquipment  = require("extensions.safe_cheat_panel.ui.scp_equipment")
 
 local menu         = Helper.getMenu("MapMenu")
 local interactMenu = Helper.getMenu("InteractMenu")
@@ -959,11 +960,15 @@ scpSpawner.state = state
 
 function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow, loadoutFaction)
   local preset, crew = scpSpawner.PresetAndCrewForSpawnShip(ship, loadout)
+  -- Must match the faction MD creates the ship under, so both sides judge equipment alike.
+  local spawnFaction = (preset > 0 and loadoutFaction) or ownerId
   local data = {
     ship = ship,
     loadout = loadout,
     crew = crew,
     preset = preset,
+    -- Candidates for slots the faction item pool cannot reach; nil for named loadouts.
+    equipment = scpEquipment.buildLoadoutPlan(ship, preset, spawnFaction),
     offsetComponent = ConvertStringToLuaID(tostring(interactMenu.offsetcomponent)),
     ownerId = ownerId,
     ownerRace = ownerRace,

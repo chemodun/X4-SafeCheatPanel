@@ -62,6 +62,8 @@ local scp = {
 
 scp.helpers    = require("extensions.safe_cheat_panel.ui.scp_helpers")
 scp.menuHelper = require("extensions.safe_cheat_panel.ui.scp_menu_helper")
+scp.equipment  = require("extensions.safe_cheat_panel.ui.scp_equipment")
+scp.equipment.init(scp.isV9)
 scp.blueprints = require("extensions.safe_cheat_panel.ui.scp_blueprints")
 scp.spawner    = require("extensions.safe_cheat_panel.ui.scp_spawner")
 scp.player     = require("extensions.safe_cheat_panel.ui.scp_player")
