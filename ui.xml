@@ -4,6 +4,9 @@
     <file name="ui/scp_helpers.lua" />
     <file name="ui/scp_menu_helper.lua" />
     <file name="ui/scp_equipment.lua" />
+    <file name="ui/scp_crew.lua" />
+    <file name="ui/scp_workforce.lua" />
+    <file name="ui/scp_identify.lua" />
     <file name="ui/scp_blueprints.lua" />
     <file name="ui/scp_spawner.lua" />
     <file name="ui/scp_station.lua" />
@@ -13,7 +16,6 @@
     <file name="ui/scp_factions.lua" />
     <file name="ui/scp_map.lua" />
     <file name="ui/scp_destroy.lua" />
-    <file name="ui/scp_promote.lua" />
     <file name="ui/safe_cheat_panel.lua" />
     <dependency name="sn_mod_support_apis" />
     <dependency name="ego_detailmonitor" />

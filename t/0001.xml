@@ -22,7 +22,8 @@
         <t id="113">Restock: Current Build Storage</t>
         <t id="114">Restock: All Faction Build Storages</t>
         <t id="115">Destroy Object</t>
-        <t id="116">Promote Crew</t>
+        <t id="117">Edit Ship</t>
+        <t id="118">Edit Station</t>
 
         <!-- Tab 1: Player -->
         <t id="1000">Player</t>
@@ -132,6 +133,32 @@
         <t id="7304">Number of rows to spawn</t>
         <t id="7305">Spacing in meters</t>
         <t id="7306">Distance between objects in meters</t>
+        <!-- Edit Mode (existing object loaded into the tab) -->
+        <t id="7400">Objects Editor</t>
+        <t id="7401">Edit Mode</t>
+        <t id="7402">Custom</t>
+        <t id="7403">Mixed</t>
+        <t id="7404">Not assigned</t>
+        <t id="7405">Unknown</t>
+        <!-- Crew skills (spawn and edit) -->
+        <t id="7410">Crew Skills</t>
+        <t id="7411">Set crew skills explicitly</t>
+        <t id="7412">When enabled, the crew gets exactly the skill levels set below instead of the loadout preset's randomised range.</t>
+        <t id="7413">Set all skills to the selected level (not just the ones relevant to the current role)</t>
+        <!-- Station control entities -->
+        <t id="7420">Station Crew</t>
+        <t id="7421">Assign a manager</t>
+        <t id="7422">A station without a manager neither trades nor produces. Vanilla leaves player stations without one until you hire somebody.</t>
+        <t id="7423">Add a ship trader</t>
+        <t id="7424">Only stations with a dock module that can equip ships have a place for a ship trader.</t>
+        <t id="7426">Defence Officer</t>
+        <!-- Edit actions -->
+        <t id="7430">Apply</t>
+        <!-- Station workforce. The section title and the slider label come from vanilla page 1001
+             (2456 "Station Workforce", 9415 "Workforce" - the latter is vanilla's own workforce header). -->
+        <t id="7440">Set workforce explicitly</t>
+        <t id="7441">When enabled, the station's workforce is set to the share of its habitation capacity selected below, filled proportionally across every race the station has habitats for.</t>
+        <t id="7442">Share of the station's total workforce capacity. Applying a lower value sends workers away.</t>
 
         <!-- Tab 8: Dev Mode -->
         <t id="8000">Dev Tools</t>
@@ -143,14 +170,6 @@
         <t id="9010">No object selected. Keep this tab open and use the right-click menu on a map object.</t>
         <t id="9020">Confirm destruction of the selected object</t>
         <t id="9030">Destroy</t>
-
-        <!-- Tab 10: Promote Crew -->
-        <t id="10000">Promote Crew</t>
-        <t id="10001">Promote the crew of a player ship</t>
-        <t id="10010">No ship selected. Keep this tab open and use the right-click menu on a player ship.</t>
-        <t id="10011">Not assigned</t>
-        <t id="10031">Apply</t>
-        <t id="10040">Set all skills to the selected level (not just the ones relevant to the current role)</t>
 
         <!-- Settings (Options Menu) -->
         <t id="90000">Settings</t>

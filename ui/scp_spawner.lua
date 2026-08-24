@@ -139,6 +139,9 @@ ffi.cdef [[
 
 local scpHelpers    = require("extensions.safe_cheat_panel.ui.scp_helpers")
 local scpEquipment  = require("extensions.safe_cheat_panel.ui.scp_equipment")
+local scpCrew       = require("extensions.safe_cheat_panel.ui.scp_crew")
+local scpIdentify   = require("extensions.safe_cheat_panel.ui.scp_identify")
+local scpWorkforce  = require("extensions.safe_cheat_panel.ui.scp_workforce")
 
 local menu         = Helper.getMenu("MapMenu")
 local interactMenu = Helper.getMenu("InteractMenu")
@@ -174,6 +177,8 @@ local state = {
     planType         = "inGame",
     owner            = nil,
     ownerId          = nil,
+    addManager       = false,
+    addTrader        = false,
   },
   object = {
     consumableType = "civilian",
@@ -184,6 +189,22 @@ local state = {
     numPerRow      = 1,
     spacing        = 500,
   },
+  -- Existing object pulled in through the "Edit Ship"/"Edit Station" interact action. While
+  -- `object` is set the tab renders in edit mode and every spawn action is withheld.
+  target = {
+    object     = nil,
+    isStation  = false,
+    macro      = nil,
+    loadout    = nil, -- identified loadout id, nil when nothing matched
+    newLoadout = nil, -- dropdown selection; re-equips only while it differs from `loadout`
+    plan       = nil,
+    planType   = nil,
+    race       = nil, -- crew race id from MD, "scpMixed", or nil until the answer arrives
+    addManager = false,
+    addTrader  = false,
+  },
+  crew = scpCrew.newState(),
+  workforce = scpWorkforce.newState(),
 }
 
 -- *** Config (static tables referenced in UI) ***
@@ -197,6 +218,11 @@ local spawnModes = {
 local stationPlanTypes = {
   { id = "inGame", text = ReadText(1972092427, 7102), active = true, icon = "", displayremoveoption = false },
   { id = "player", text = ReadText(1972092427, 7103), active = true, icon = "", displayremoveoption = false },
+}
+
+-- Stands in for spawnModes while a target is loaded: one inactive entry naming the mode.
+local editModes = {
+  { id = "editMode", text = ReadText(1972092427, 7401), active = false, icon = "", displayremoveoption = false },
 }
 
 -- Job (default AI order) offered per ship. "fight" is gated the same way vanilla jobs.xml
@@ -463,6 +489,11 @@ function scpSpawner.reset(blacklisted)
   state.station.ownerId = nil
   state.ships = {}
   state.races = {}
+  -- A mode switch rebuilds the plan lists, so the identification cache and any loaded target go.
+  scpIdentify.reset()
+  state.target = { object = nil, isStation = false, addManager = false, addTrader = false }
+  scpCrew.resetState(state.crew)
+  scpWorkforce.resetState(state.workforce)
   scpSpawner.initStations()
   scpSpawner.initShips()
   state.object.ownerId = "player"
@@ -516,11 +547,179 @@ function scpSpawner.initShips()
   state.ships_sel.ownerRace = state.races[1].id
 end
 
+-- *** Edit mode: an existing object loaded into the tab ***
+
+function scpSpawner.join(scp)
+  scpSpawner.scp = scp
+end
+
+function scpSpawner.init()
+  RegisterEvent("scp_main.objectInspected", scpSpawner.onObjectInspected)
+  RegisterEvent("scp_main.objectEdited", scpSpawner.onObjectEdited)
+end
+
+local function dropTarget()
+  state.target = { object = nil, isStation = false, addManager = false, addTrader = false }
+  scpCrew.resetState(state.crew)
+  scpWorkforce.resetState(state.workforce)
+end
+
+---Drops a target that was destroyed or changed hands while the tab was open. Runs during frame
+---setup, so it must never refresh the frame - see the onRowChanged re-entrancy rule.
+local function validateTarget()
+  local object = state.target.object
+  if object == nil then return nil end
+  if not IsValidComponent(object) or GetComponentData(object, "isplayerowned") ~= true then
+    dropTarget()
+    return nil
+  end
+  return object
+end
+
+---Shared validity for both edit actions: a player-owned ship or station, while the tab is shown.
+---Stays available with a target already loaded, so another object can be picked up directly.
+local function isValidEditTarget(className)
+  if menu.infoTableMode ~= "safeCheatPanel" or scpSpawner.scp.tableMode ~= "scpObjectSpawn" then
+    return false
+  end
+  local component = interactMenu.componentSlot and interactMenu.componentSlot.component
+  if component == nil or component == 0 then
+    return false
+  end
+  if not C.IsComponentClass(component, className) then
+    return false
+  end
+  local converted = ConvertStringTo64Bit(tostring(component))
+  if not IsValidComponent(converted) then
+    return false
+  end
+  return GetComponentData(converted, "isplayerowned") == true
+end
+
+function scpSpawner.isValidEditShip()
+  return isValidEditTarget("ship")
+end
+
+function scpSpawner.isValidEditStation()
+  return isValidEditTarget("station")
+end
+
+---Pulls the right-clicked object's configuration into the tab. Everything Lua can read is
+---resolved here; the crew race comes back later through scp_main.objectInspected.
+function scpSpawner.startEdit(isStation)
+  local object = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
+  scpCrew.resetState(state.crew)
+  scpWorkforce.resetState(state.workforce)
+  state.crew.enabled = true
+  state.target = {
+    object     = object,
+    isStation  = isStation,
+    macro      = GetComponentData(object, "macro"),
+    addManager = false,
+    addTrader  = false,
+  }
+  -- Crew baselines are seeded on every render, not here, so they stay right after an apply.
+  if isStation then
+    scpSpawner.initStations()
+    state.target.plan, state.target.planType = scpIdentify.stationPlan(object, state.constructionPlans, state.playerPlans)
+  else
+    state.target.loadout = scpIdentify.shipLoadout(object, state.target.macro, getShipLoadouts(state.target.macro))
+    state.target.newLoadout = state.target.loadout
+  end
+  -- Crew race is not reachable from Lua at all - no GetPersonRace in the FFI export set.
+  AddUITriggeredEvent("scp_main", "scp_inspect_object", { object = ConvertStringToLuaID(tostring(object)) })
+  scpSpawner.scp.debug("Edit: target set to " .. tostring(object) .. (isStation and " (station)" or " (ship)"))
+  scpHelpers.interactMenuFinishAction()
+  menu.refreshInfoFrame()
+end
+
+function scpSpawner.clearTarget()
+  dropTarget()
+  menu.refreshInfoFrame()
+end
+
+function scpSpawner.cancelEdit()
+  scpSpawner.scp.debug("Edit: cancelled")
+  scpSpawner.clearTarget()
+end
+
+---Reset drops the pending changes but keeps the object loaded; cancel drops the object too.
+function scpSpawner.resetEdit()
+  scpSpawner.scp.debug("Edit: reset pressed")
+  state.crew.targets = {}
+  state.crew.allSkills = false
+  scpWorkforce.resetState(state.workforce)
+  state.target.newLoadout = state.target.loadout
+  state.target.addManager = false
+  state.target.addTrader = false
+  menu.refreshInfoFrame()
+end
+
+function scpSpawner.hasEditChanges()
+  if scpCrew.hasChanges(state.crew) then return true end
+  if state.target.isStation then
+    return state.target.addManager or state.target.addTrader or scpWorkforce.hasChanges(state.workforce)
+  end
+  return state.target.newLoadout ~= state.target.loadout
+end
+
+function scpSpawner.onObjectInspected(_, param)
+  if type(param) ~= "table" or state.target.object == nil then return end
+  state.target.race = param.race
+  scpSpawner.scp.debug("Edit: crew race reported as " .. tostring(param.race))
+  menu.refreshInfoFrame()
+end
+
+function scpSpawner.onObjectEdited()
+  scpSpawner.scp.debug("Edit: MD confirmed the changes, refreshing")
+  state.crew.targets = {}
+  state.crew.allSkills = false
+  scpWorkforce.resetState(state.workforce)
+  state.target.addManager = false
+  state.target.addTrader = false
+  if state.target.object ~= nil and not state.target.isStation then
+    state.target.loadout = state.target.newLoadout
+  end
+  menu.refreshInfoFrame()
+end
+
+function scpSpawner.applyEdit()
+  local object = validateTarget()
+  if object == nil then return end
+  -- Components crossing AddUITriggeredEvent must be LuaIDs, not the 64-bit ids used locally.
+  local data = {
+    object    = ConvertStringToLuaID(tostring(object)),
+    isStation = state.target.isStation,
+    allSkills = state.crew.allSkills,
+    skills    = scpCrew.getChanges(state.crew),
+  }
+  if state.target.isStation then
+    data.addManager = state.target.addManager
+    data.addTrader  = state.target.addTrader
+    data.workforce  = scpWorkforce.getChange(state.workforce)
+  elseif state.target.newLoadout ~= state.target.loadout then
+    -- Only a moved loadout dropdown re-equips; leaving it alone never touches the equipment.
+    local preset = scpSpawner.PresetAndCrewForSpawnShip(state.target.macro, state.target.newLoadout)
+    local loadoutFaction = getShipDefaultFaction(state.target.macro)
+    -- The equipment libraries read the macro off $spawnData.$ship, so it travels under that name.
+    data.ship           = state.target.macro
+    data.loadout        = state.target.newLoadout
+    data.preset         = preset
+    data.loadoutFaction = loadoutFaction
+    data.equipment      = scpEquipment.buildLoadoutPlan(state.target.macro, preset, (preset > 0 and loadoutFaction) or "player")
+  end
+  scpSpawner.scp.debug("Edit: apply pressed, allSkills=" .. tostring(data.allSkills) .. ", loadout=" .. tostring(data.loadout)
+    .. ", workforce=" .. tostring(data.workforce))
+  AddUITriggeredEvent("scp_main", "scp_edit_object", data)
+end
+
 -- *** Action condition helpers ***
 
 function scpSpawner.showSpawnOption(mode, tableMode, devtools)
   if menu.infoTableMode ~= "safeCheatPanel" then return false end
   if tableMode ~= "scpObjectSpawn" or state.mode.id ~= mode then return false end
+  -- Spawning is withheld while an object is loaded for editing; the two share the same rows.
+  if state.target.object ~= nil then return false end
   if mode == "spawnModeStation" then
     return state.station.plan ~= nil and state.station.ownerId ~= nil
   elseif mode == "spawnModeShip" then
@@ -545,6 +744,21 @@ local function isPresetLoadout(loadoutId)
   return loadoutId == "scpDefaultLow" or loadoutId == "scpDefaultMedium" or loadoutId == "scpDefaultHigh"
 end
 
+---Switching to a plan that builds no pier or build module must drop a pending trader request.
+local function clearTraderIfPlanCannotEquip()
+  if state.station.addTrader and not scpIdentify.planCanEquipShips(state.station.plan) then
+    state.station.addTrader = false
+    state.crew.targets.trader = nil
+  end
+end
+
+---Same for the workforce: a plan without a habitation module builds nowhere to put workers.
+local function clearWorkforceIfPlanHasNoHabitation()
+  if state.workforce.enabled and not scpIdentify.planHasHabitation(state.station.plan) then
+    scpWorkforce.resetState(state.workforce)
+  end
+end
+
 function scpSpawner.setStationSpawnData(id, dataType)
   if dataType == "station" then
     state.station.plan = id
@@ -566,8 +780,18 @@ function scpSpawner.setStationSpawnData(id, dataType)
       state.station.plan = nil
       state.station.name = nil
     end
+  elseif dataType == "addManager" then
+    state.station.addManager = id
+    if not id then state.crew.targets.manager = nil end
+  elseif dataType == "addTrader" then
+    state.station.addTrader = id
+    if not id then state.crew.targets.trader = nil end
   else
     state.station.ownerId = id
+  end
+  if dataType == "station" or dataType == "planType" then
+    clearTraderIfPlanCannotEquip()
+    clearWorkforceIfPlanHasNoHabitation()
   end
   menu.refreshInfoFrame()
 end
@@ -646,16 +870,18 @@ function scpSpawner.createSection(frameTable, numDisplayed, consumableTypes, scp
     state.factions = getSpawnerFactions({})
   end
 
+  local editing = validateTarget() ~= nil
+
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
-    text  = ReadText(1972092427, 7000),
+    text  = ReadText(1972092427, editing and 7400 or 7000),
     fixed = nil,
   })
 
   local rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
   numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
-    active           = true,
-    dropDownData     = spawnModes,
-    startOption      = state.mode.id,
+    active           = not editing,
+    dropDownData     = editing and editModes or spawnModes,
+    startOption      = editing and "editMode" or state.mode.id,
     text             = ReadText(1972092427, 7008),
     textOverride     = "",
     onConfirmed      = function(_, id) scpSpawner.setMode(id) end,
@@ -667,7 +893,13 @@ function scpSpawner.createSection(frameTable, numDisplayed, consumableTypes, scp
     isHeader         = nil,
   })
 
-  if state.mode.id == "spawnModeStation" then
+  if editing then
+    if state.target.isStation then
+      numDisplayed = scpSpawner.createStationEditMenu(frameTable, numDisplayed, scp)
+    else
+      numDisplayed = scpSpawner.createShipEditMenu(frameTable, numDisplayed, scp)
+    end
+  elseif state.mode.id == "spawnModeStation" then
     numDisplayed = scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
   elseif state.mode.id == "spawnModeShip" then
     numDisplayed = scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
@@ -772,7 +1004,62 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
     isHeader         = nil,
   })
 
+  -- Vanilla only withholds the manager and trader from player-owned stations.
+  if state.station.ownerId == "player" then
+    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+      text  = ReadText(1972092427, 7420),
+      fixed = nil,
+    })
+    rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+    numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroup, "spawn_add_manager", numDisplayed, {
+      active        = true,
+      checked       = state.station.addManager,
+      text          = ReadText(1972092427, 7421),
+      mouseOverText = ReadText(1972092427, 7422),
+      textColIndex  = 2,
+      onClick       = function(_, checked) scpSpawner.setStationSpawnData(checked, "addManager") end,
+    })
+    -- A trader has nowhere to stand unless the plan builds a pier or a build module.
+    if scpIdentify.planCanEquipShips(state.station.plan) then
+      numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroup, "spawn_add_trader", numDisplayed, {
+        active        = true,
+        checked       = state.station.addTrader,
+        text          = ReadText(1972092427, 7423),
+        mouseOverText = ReadText(1972092427, 7424),
+        textColIndex  = 2,
+        onClick       = function(_, checked) scpSpawner.setStationSpawnData(checked, "addTrader") end,
+      })
+    end
+
+    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+      text  = ReadText(1972092427, 7410),
+      fixed = nil,
+    })
+    rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+    numDisplayed = scpCrew.addEnableRow(rowGroup, numDisplayed, scp, state.crew)
+    if state.crew.enabled then
+      numDisplayed = scpCrew.addSpawnRows(rowGroup, numDisplayed, scp, state.crew, scpSpawner.getStationSpawnCategories())
+      numDisplayed = scpCrew.addAllSkillsRow(rowGroup, numDisplayed, scp, state.crew, true)
+    end
+
+    -- A plan with no habitation module builds a station with no workforce capacity.
+    if scpIdentify.planHasHabitation(state.station.plan) then
+      rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+      numDisplayed = scpWorkforce.addRows(rowGroup, numDisplayed, scp, state.workforce, nil)
+    end
+  end
+
   return numDisplayed
+end
+
+---Posts a spawned player station will have: defence and engineer always, manager and trader on request.
+function scpSpawner.getStationSpawnCategories()
+  local categories = {}
+  if state.station.addManager then categories[#categories + 1] = "manager" end
+  if state.station.addTrader then categories[#categories + 1] = "trader" end
+  categories[#categories + 1] = "defence"
+  categories[#categories + 1] = "engineer"
+  return categories
 end
 
 function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
@@ -901,6 +1188,18 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
     end
   end
 
+  -- Unchecked, the spawned crew keeps the loadout preset's randomised skill ranges.
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1972092427, 7410),
+    fixed = nil,
+  })
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = scpCrew.addEnableRow(rowGroup, numDisplayed, scp, state.crew)
+  if state.crew.enabled then
+    numDisplayed = scpCrew.addSpawnRows(rowGroup, numDisplayed, scp, state.crew, scpCrew.shipCategories)
+    numDisplayed = scpCrew.addAllSkillsRow(rowGroup, numDisplayed, scp, state.crew, true)
+  end
+
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7007),
     fixed = nil,
@@ -940,6 +1239,276 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
   })
 
   return numDisplayed
+end
+
+-- *** Edit mode sections ***
+
+local function addTargetInfoRow(rowGroup, numDisplayed, scp, object)
+  local name, idcode, icon, sector, owner = GetComponentData(object, "name", "idcode", "icon", "sector", "owner")
+  local factionColor = owner and Helper.convertColorToText(GetFactionData(owner, "color")) or ""
+  return scp.menuHelper.createIconWithTextRow(rowGroup, "edit_object_info", numDisplayed, {
+    icon      = (icon ~= nil and icon ~= "") and icon or "menu_info",
+    textLeft  = string.format("%s%s (%s)", factionColor, name, idcode),
+    textRight = sector or "",
+    fixed     = true,
+  })
+end
+
+---One-entry dropdown standing in for a control that is display-only in edit mode.
+local function fixedOption(id, text)
+  return { { id = id, text = text, active = false, icon = "", displayremoveoption = false } }
+end
+
+local function addEditButtons(frameTable, numDisplayed)
+  local row = frameTable:addRow("edit_buttons", { fixed = true, bgColor = Color["row_background_unselectable"] })
+  row[1]:setColSpan(4):createButton({ active = true }):setText(ReadText(1001, 64), { halign = "center" }) -- Cancel
+  row[1].handlers.onClick = scpSpawner.cancelEdit
+  row[5]:setColSpan(4):createButton({ active = function() return scpSpawner.hasEditChanges() end }):setText(ReadText(1001, 3318), { halign = "center" }) -- Reset
+  row[5].handlers.onClick = scpSpawner.resetEdit
+  row[9]:setColSpan(4):createButton({ active = function() return scpSpawner.hasEditChanges() end }):setText(ReadText(1972092427, 7430), { halign = "center", color = Color["text_positive"] })
+  row[9].handlers.onClick = scpSpawner.applyEdit
+  return numDisplayed + 1
+end
+
+---The crew race the ship carries, display-only: changing it is not offered, so one inactive entry.
+local function addRaceRow(rowGroup, numDisplayed, scp)
+  local raceId, raceText = state.target.race, nil
+  if raceId == nil then
+    raceText = ReadText(1972092427, 7405) -- Unknown, until MD answers
+  elseif raceId == "scpMixed" then
+    raceText = ReadText(1972092427, 7403) -- Mixed
+  else
+    for _, race in ipairs(state.races) do
+      if race.id == raceId then
+        raceText = race.text
+        break
+      end
+    end
+    raceText = raceText or raceId
+  end
+  return scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
+    active           = false,
+    dropDownData     = fixedOption(raceId or "scpUnknown", raceText),
+    startOption      = raceId or "scpUnknown",
+    text             = nil,
+    textOverride     = "",
+    onConfirmed      = nil,
+    textColIndex     = 1,
+    dropDownColIndex = 1,
+    dropDownSpan     = 12,
+    textColor        = nil,
+    fixed            = nil,
+    isHeader         = nil,
+  })
+end
+
+function scpSpawner.createShipEditMenu(frameTable, numDisplayed, scp)
+  local isV9 = scp.isV9
+  local object = state.target.object
+  local macro = state.target.macro or ""
+  scpSpawner.initShips()
+
+  local rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = addTargetInfoRow(rowGroup, numDisplayed, scp, object)
+
+  -- The ship itself is fixed: a target's macro may not even be in the spawnable ware list.
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1972092427, 7200),
+    fixed = nil,
+  })
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
+    active           = false,
+    dropDownData     = fixedOption(macro, GetMacroData(macro, "name")),
+    startOption      = macro,
+    text             = nil,
+    textOverride     = "",
+    onConfirmed      = nil,
+    textColIndex     = 1,
+    dropDownColIndex = 1,
+    dropDownSpan     = 12,
+    textColor        = nil,
+    fixed            = nil,
+    isHeader         = nil,
+  })
+
+  -- Loadout is the one identified control that stays editable: picking another re-equips.
+  local loadoutOptions = getShipLoadouts(macro)
+  if state.target.loadout == nil then
+    table.insert(loadoutOptions, 1, { id = "scpCustom", text = ReadText(1972092427, 7402), icon = "", displayremoveoption = false, active = false })
+  end
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1001, 7905),
+    fixed = nil,
+  })
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
+    active           = true,
+    dropDownData     = loadoutOptions,
+    startOption      = state.target.newLoadout or "scpCustom",
+    text             = nil,
+    textOverride     = "",
+    onConfirmed      = function(_, id) scpSpawner.setEditData(id, "loadout") end,
+    textColIndex     = 1,
+    dropDownColIndex = 1,
+    dropDownSpan     = 12,
+    textColor        = nil,
+    fixed            = nil,
+    isHeader         = nil,
+  })
+
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1972092427, 7006),
+    fixed = nil,
+  })
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = addRaceRow(rowGroup, numDisplayed, scp)
+
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1972092427, 7410),
+    fixed = nil,
+  })
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
+  local crewData = scpCrew.collectShip(object)
+  scpCrew.seedInitial(state.crew, crewData, scpCrew.shipCategories)
+  numDisplayed = scpCrew.addShipRows(rowGroup, numDisplayed, scp, state.crew, crewData, true)
+  numDisplayed = scpCrew.addAllSkillsRow(rowGroup, numDisplayed, scp, state.crew, true)
+
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
+  return addEditButtons(frameTable, numDisplayed)
+end
+
+function scpSpawner.createStationEditMenu(frameTable, numDisplayed, scp)
+  local isV9 = scp.isV9
+  local object = state.target.object
+  scpSpawner.initStations()
+
+  local rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = addTargetInfoRow(rowGroup, numDisplayed, scp, object)
+
+  -- Modules cannot be rearranged from here, so both plan controls are display-only.
+  local planText, planId = ReadText(1972092427, 7405), "scpUnknown"
+  if state.target.plan then
+    local planList = (state.target.planType == "player") and state.playerPlans or state.constructionPlans
+    for _, plan in ipairs(planList) do
+      if plan.id == state.target.plan then
+        planText, planId = plan.text, plan.id
+        break
+      end
+    end
+  end
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1972092427, 7101),
+    fixed = nil,
+  })
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
+    active           = false,
+    dropDownData     = fixedOption(state.target.planType or "scpUnknown",
+      state.target.planType and ReadText(1972092427, state.target.planType == "player" and 7103 or 7102) or ReadText(1972092427, 7405)),
+    startOption      = state.target.planType or "scpUnknown",
+    text             = nil,
+    textOverride     = "",
+    onConfirmed      = nil,
+    textColIndex     = 1,
+    dropDownColIndex = 1,
+    dropDownSpan     = 12,
+    textColor        = nil,
+    fixed            = nil,
+    isHeader         = nil,
+  })
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1972092427, 7100),
+    fixed = nil,
+  })
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
+    active           = false,
+    dropDownData     = fixedOption(planId, planText),
+    startOption      = planId,
+    text             = nil,
+    textOverride     = "",
+    onConfirmed      = nil,
+    textColIndex     = 1,
+    dropDownColIndex = 1,
+    dropDownSpan     = 12,
+    textColor        = nil,
+    fixed            = nil,
+    isHeader         = nil,
+  })
+
+  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+    text  = ReadText(1972092427, 7420),
+    fixed = nil,
+  })
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
+  local crewData = scpCrew.collectStation(object)
+  scpCrew.seedInitial(state.crew, crewData, scpCrew.stationCategories)
+  numDisplayed = scpSpawner.addStationPostRows(rowGroup, numDisplayed, scp, object, crewData)
+  numDisplayed = scpCrew.addStationRows(rowGroup, numDisplayed, scp, state.crew, crewData, true,
+    { manager = state.target.addManager, trader = state.target.addTrader })
+  numDisplayed = scpCrew.addAllSkillsRow(rowGroup, numDisplayed, scp, state.crew, true)
+
+  rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+  numDisplayed = scpWorkforce.addRows(rowGroup, numDisplayed, scp, state.workforce, object)
+
+  if not isV9 then
+    frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+  end
+  return addEditButtons(frameTable, numDisplayed)
+end
+
+---The two "create this post" checkboxes. Each disappears once its post is filled; the trader's
+---greys out on the live canequipships, the same gate vanilla's CreateShipDealerEntity applies.
+function scpSpawner.addStationPostRows(rowGroup, numDisplayed, scp, object, crewData)
+  if not crewData.manager.exists then
+    numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroup, "edit_add_manager", numDisplayed, {
+      active        = true,
+      checked       = state.target.addManager,
+      text          = ReadText(1972092427, 7421),
+      mouseOverText = ReadText(1972092427, 7422),
+      textColIndex  = 2,
+      fixed         = true,
+      onClick       = function(_, checked) scpSpawner.setEditData(checked, "addManager") end,
+    })
+  end
+  local trader = GetComponentData(object, "shiptrader")
+  if trader == nil or trader == 0 then
+    local canEquip = GetComponentData(object, "canequipships") == true
+    numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroup, "edit_add_trader", numDisplayed, {
+      active        = canEquip,
+      checked       = canEquip and state.target.addTrader,
+      text          = ReadText(1972092427, 7423),
+      mouseOverText = ReadText(1972092427, 7424),
+      textColIndex  = 2,
+      textColor     = canEquip and Color["text_normal"] or Color["text_inactive"],
+      fixed         = true,
+      onClick       = function(_, checked) scpSpawner.setEditData(checked, "addTrader") end,
+    })
+  end
+  return numDisplayed
+end
+
+function scpSpawner.setEditData(id, dataType)
+  if dataType == "loadout" then
+    state.target.newLoadout = id
+  elseif dataType == "addManager" then
+    state.target.addManager = id
+    -- The slider only writes on change, so a ticked box seeds a value itself.
+    state.crew.targets.manager = id and (state.crew.targets.manager or 3) or nil
+  elseif dataType == "addTrader" then
+    state.target.addTrader = id
+    state.crew.targets.trader = id and (state.crew.targets.trader or 3) or nil
+  end
+  menu.refreshInfoFrame()
 end
 
 function scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, scp)
@@ -1086,6 +1655,9 @@ function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow
     ownerRace = ownerRace,
     loadoutFaction = loadoutFaction,
     purposeOrderId = purposeOrderId,
+    -- Absent unless the checkbox is on, so an untouched spawn keeps the preset's ranges.
+    crewSkills = state.crew.enabled and scpCrew.pickCategories(state.crew, scpCrew.shipCategories) or nil,
+    allSkills = state.crew.enabled and state.crew.allSkills or false,
     position = {
       x = interactMenu.offset.x,
       y = interactMenu.offset.y,
@@ -1104,6 +1676,12 @@ function scpSpawner.spawnStation(stationName, constructionPlan, ownerId)
     offsetComponent = ConvertStringToLuaID(tostring(interactMenu.offsetcomponent)),
     constructionPlan = constructionPlan,
     ownerId = ownerId,
+    -- Vanilla withholds both posts from player-owned stations; these two put them back.
+    addManager = ownerId == "player" and state.station.addManager or false,
+    addTrader = ownerId == "player" and state.station.addTrader or false,
+    crewSkills = (ownerId == "player" and state.crew.enabled) and scpCrew.pickCategories(state.crew, scpSpawner.getStationSpawnCategories()) or nil,
+    allSkills = (ownerId == "player" and state.crew.enabled) and state.crew.allSkills or false,
+    workforce = ownerId == "player" and scpWorkforce.getChange(state.workforce) or nil,
     position = {
       x = interactMenu.offset.x,
       y = interactMenu.offset.y,

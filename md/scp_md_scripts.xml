@@ -102,87 +102,217 @@
           </actions>
         </cue>
 
-        <!-- Sets role-relevant skills to stars * 3 and scales the rest by the same change, max 15. -->
-        <cue name="Scp_Promote_Crew" instantiate="true">
+        <cue name="Scp_Inspect_Object" instantiate="true">
           <conditions>
-            <event_ui_triggered screen="'scp_main'" control="'scp_promote_crew'" />
+            <event_ui_triggered screen="'scp_main'" control="'scp_inspect_object'" />
           </conditions>
           <actions>
-            <set_value name="$promoteData" exact="event.param3" />
-            <set_value name="$ship" exact="$promoteData.$ship" />
-            <debug_text text="'SafeCheatPanel: Promoting crew on %s (pilot: %s, marines: %s, service: %s, allSkills: %s)'. [@$ship.knownname, @$promoteData.$pilot, @$promoteData.$marine, @$promoteData.$service, @$promoteData.$allSkills]" chance="$debugChance" />
-            <do_if value="$promoteData.$pilot? and @$ship.pilot.exists">
-              <set_value name="$pilot" exact="$ship.pilot" />
-              <set_value name="$target15" exact="$promoteData.$pilot * 3" />
-              <do_if value="@$promoteData.$allSkills == true">
-                <set_skill entity="$pilot" type="skilltype.management" exact="$target15" />
-                <set_skill entity="$pilot" type="skilltype.engineering" exact="$target15" />
-                <set_skill entity="$pilot" type="skilltype.boarding" exact="$target15" />
+            <set_value name="$object" exact="event.param3.$object" />
+            <!-- Crew race has no Lua path, so the editor asks here. people.{$template} is a live
+                 accessor - re-chain it, never store it. -->
+            <set_value name="$crewRace" exact="null" />
+            <set_value name="$crewMixed" exact="false" />
+            <do_if value="@$object.pilot.exists">
+              <set_value name="$crewRace" exact="$object.pilot.race" />
+            </do_if>
+            <do_elseif value="@$object.controlentity.{controlpost.manager}.exists">
+              <set_value name="$crewRace" exact="$object.controlentity.{controlpost.manager}.race" />
+            </do_elseif>
+            <do_for_each name="$template" in="$object.people.list">
+              <do_if value="@$crewRace == null">
+                <set_value name="$crewRace" exact="$object.people.{$template}.race" />
               </do_if>
-              <do_else>
-                <set_value name="$current" exact="$pilot.combinedskill" />
-                <do_if value="$current gt 0">
-                  <set_value name="$ratio" exact="($promoteData.$pilot * 20.0) / $current" />
-                  <set_skill entity="$pilot" type="skilltype.management" exact="[15, (($pilot.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
-                  <set_skill entity="$pilot" type="skilltype.engineering" exact="[15, (($pilot.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
-                  <set_skill entity="$pilot" type="skilltype.boarding" exact="[15, (($pilot.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
-                </do_if>
-              </do_else>
-              <set_skill entity="$pilot" type="skilltype.piloting" exact="$target15" />
-              <set_skill entity="$pilot" type="skilltype.morale" exact="$target15" />
-              <debug_text text="'SafeCheatPanel: Pilot %s promoted to skill %s'. [@$pilot.knownname, $target15]" chance="$debugChance" />
+              <do_elseif value="$object.people.{$template}.race != $crewRace">
+                <set_value name="$crewMixed" exact="true" />
+              </do_elseif>
+            </do_for_each>
+            <debug_text text="'SafeCheatPanel: Inspected %s - crew race %s, mixed %s'. [$object.debugname, @$crewRace, $crewMixed]" chance="$debugChance" />
+            <do_if value="$crewMixed">
+              <raise_lua_event name="'scp_main.objectInspected'" param="table[$race = 'scpMixed']" />
             </do_if>
-            <do_if value="$promoteData.$marine? or $promoteData.$service?">
-              <debug_text text="'SafeCheatPanel: crew loop starting, people.list.count = %s'. [$ship.people.list.count]" chance="$debugChance" />
-              <!-- $ship.people.{$template} is a live accessor: it cannot be stored in a variable
-                   and reused, so every access below re-chains it in full. -->
-              <do_for_each name="$template" in="$ship.people.list" counter="$i">
-                <debug_text text="'SafeCheatPanel: crew[%s] template=%s name=%s role=%s'. [$i, $template, $ship.people.{$template}.name, $ship.people.{$template}.role]" chance="$debugChance" />
-                <do_if value="$promoteData.$marine? and $ship.people.{$template}.role == entityrole.marine">
-                  <set_value name="$target15" exact="$promoteData.$marine * 3" />
-                  <do_if value="@$promoteData.$allSkills">
-                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="$target15" />
-                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="$target15" />
-                    <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="$target15" />
-                  </do_if>
-                  <do_else>
-                    <set_value name="$current" exact="$ship.people.{$template}.combinedskill" />
-                    <do_if value="$current gt 0">
-                      <set_value name="$ratio" exact="($promoteData.$marine * 20.0) / $current" />
-                      <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($ship.people.{$template}.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
-                      <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($ship.people.{$template}.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
-                      <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="[15, (($ship.people.{$template}.skill.{skilltype.engineering} * $ratio) + 0.5)i].min" />
-                    </do_if>
-                  </do_else>
-                  <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="$target15" />
-                  <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
-                  <debug_text text="'SafeCheatPanel: Marine %s promoted to skill %s'. [@$ship.people.{$template}.name, $target15]" chance="$debugChance" />
-                </do_if>
-                <do_elseif value="$promoteData.$service? and $ship.people.{$template}.role == entityrole.service">
-                  <set_value name="$target15" exact="$promoteData.$service * 3" />
-                  <do_if value="@$promoteData.$allSkills">
-                    <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="$target15" />
-                    <set_skill object="$ship" template="$template" type="skilltype.management" exact="$target15" />
-                    <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="$target15" />
-                  </do_if>
-                  <do_else>
-                    <set_value name="$current" exact="$ship.people.{$template}.combinedskill" />
-                    <do_if value="$current gt 0">
-                      <set_value name="$ratio" exact="($promoteData.$service * 20.0) / $current" />
-                      <set_skill object="$ship" template="$template" type="skilltype.piloting" exact="[15, (($ship.people.{$template}.skill.{skilltype.piloting} * $ratio) + 0.5)i].min" />
-                      <set_skill object="$ship" template="$template" type="skilltype.management" exact="[15, (($ship.people.{$template}.skill.{skilltype.management} * $ratio) + 0.5)i].min" />
-                      <set_skill object="$ship" template="$template" type="skilltype.boarding" exact="[15, (($ship.people.{$template}.skill.{skilltype.boarding} * $ratio) + 0.5)i].min" />
-                    </do_if>
-                  </do_else>
-                  <set_skill object="$ship" template="$template" type="skilltype.engineering" exact="$target15" />
-                  <set_skill object="$ship" template="$template" type="skilltype.morale" exact="$target15" />
-                  <debug_text text="'SafeCheatPanel: Service crew %s promoted to skill %s'. [@$ship.people.{$template}.name, $target15]" chance="$debugChance" />
-                </do_elseif>
-              </do_for_each>
-            </do_if>
-            <raise_lua_event name="'scp_main.crewPromoted'" />
+            <do_elseif value="@$crewRace != null">
+              <raise_lua_event name="'scp_main.objectInspected'" param="table[$race = $crewRace.id]" />
+            </do_elseif>
+            <do_else>
+              <raise_lua_event name="'scp_main.objectInspected'" param="table[$race = null]" />
+            </do_else>
           </actions>
         </cue>
+
+        <cue name="Scp_Edit_Object" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_edit_object'" />
+          </conditions>
+          <actions>
+            <set_value name="$editData" exact="event.param3" />
+            <set_value name="$object" exact="$editData.$object" />
+            <set_value name="$scpAllSkills" exact="@$editData.$allSkills == true" />
+            <debug_text text="'SafeCheatPanel: Editing %s (station: %s, loadout: %s, skills: %s, allSkills: %s)'. [
+              $object.debugname, @$editData.$isStation, @$editData.$loadout, @$editData.$skills, $scpAllSkills]" chance="$debugChance" />
+            <do_if value="@$editData.$isStation == true">
+              <!-- Vanilla withholds both posts from player-owned stations (inituniverse.xml). -->
+              <set_value name="$controllable" exact="$object" />
+              <do_if value="@$editData.$addManager == true">
+                <include_actions ref="md.InitUniverse.CreateTradeManagerEntity" />
+              </do_if>
+              <do_if value="@$editData.$addTrader == true">
+                <include_actions ref="md.InitUniverse.CreateShipDealerEntity" />
+              </do_if>
+              <remove_value name="$controllable" />
+            </do_if>
+            <do_elseif value="@$editData.$loadout != null">
+              <!-- As a preset spawn, minus create_ship: pool loadout as a set, then the
+                   faction pass tops up what Lua does not model. -->
+              <set_value name="$spawnData" exact="$editData" />
+              <set_value name="$ship" exact="$object" />
+              <do_if value="$editData.$preset gt 0">
+                <include_actions ref="Scp_Build_Equipment_Loadout" />
+                <do_if value="@$scpLoadout != null">
+                  <apply_loadout object="$ship" loadout="$scpLoadout" flags="engines weapons turrets turretgroups shields shieldgroups" />
+                </do_if>
+                <!-- Skipped when the macro has no owner or maker race to draw a pool from. -->
+                <do_if value="@$editData.$loadoutFaction != null">
+                  <generate_loadout result="$loadouts" macro="macro.{$editData.$ship}" level="$editData.$preset" faction="faction.{$editData.$loadoutFaction}" variation="0" />
+                  <do_if value="@$loadouts.count gt 0">
+                    <apply_loadout object="$ship" loadout="$loadouts.{1}" flags="add thrusters ammo units software drones" />
+                  </do_if>
+                </do_if>
+                <include_actions ref="Scp_Fit_Equipment_From_Pools" />
+              </do_if>
+              <do_else>
+                <get_loadout result="$scpLoadout" macro="macro.{$editData.$ship}" loadout="$editData.$loadout" />
+                <do_if value="@$scpLoadout != null">
+                  <apply_loadout object="$ship" loadout="$scpLoadout" />
+                </do_if>
+              </do_else>
+              <remove_value name="$spawnData" />
+              <remove_value name="$scpLoadout" />
+            </do_elseif>
+          </actions>
+          <!-- A just-created control entity cannot take a skill write in the same block. -->
+          <delay min="400ms" max="600ms" />
+          <actions>
+            <do_if value="@$editData.$skills != null">
+              <do_if value="@$editData.$isStation == true">
+                <do_for_each name="$scpPost" in="[
+                  ['manager', controlpost.manager, skilltype.management],
+                  ['trader', controlpost.shiptrader, skilltype.management],
+                  ['defence', controlpost.defence, skilltype.piloting],
+                  ['engineer', controlpost.engineer, skilltype.engineering]]">
+                  <do_if value="$editData.$skills.{'$' + $scpPost.{1}}? and @$object.controlentity.{$scpPost.{2}}.exists">
+                    <set_value name="$scpEntity" exact="$object.controlentity.{$scpPost.{2}}" />
+                    <set_value name="$scpStars" exact="$editData.$skills.{'$' + $scpPost.{1}}" />
+                    <set_value name="$scpPrimarySkill" exact="$scpPost.{3}" />
+                    <include_actions ref="Scp_Set_Entity_Skills" />
+                  </do_if>
+                </do_for_each>
+              </do_if>
+              <do_else>
+                <do_if value="$editData.$skills.$pilot? and @$object.pilot.exists">
+                  <set_value name="$scpEntity" exact="$object.pilot" />
+                  <set_value name="$scpStars" exact="$editData.$skills.$pilot" />
+                  <set_value name="$scpPrimarySkill" exact="skilltype.piloting" />
+                  <include_actions ref="Scp_Set_Entity_Skills" />
+                </do_if>
+                <do_if value="$editData.$skills.$marine? or $editData.$skills.$service?">
+                  <set_value name="$scpObject" exact="$object" />
+                  <do_for_each name="$scpTemplate" in="$object.people.list">
+                    <do_if value="$editData.$skills.$marine? and $object.people.{$scpTemplate}.role == entityrole.marine">
+                      <set_value name="$scpStars" exact="$editData.$skills.$marine" />
+                      <set_value name="$scpPrimarySkill" exact="skilltype.boarding" />
+                      <include_actions ref="Scp_Set_Template_Skills" />
+                    </do_if>
+                    <do_elseif value="$editData.$skills.$service? and $object.people.{$scpTemplate}.role == entityrole.service">
+                      <set_value name="$scpStars" exact="$editData.$skills.$service" />
+                      <set_value name="$scpPrimarySkill" exact="skilltype.engineering" />
+                      <include_actions ref="Scp_Set_Template_Skills" />
+                    </do_elseif>
+                  </do_for_each>
+                </do_if>
+              </do_else>
+            </do_if>
+            <do_if value="@$editData.$workforce != null">
+              <set_value name="$scpObject" exact="$object" />
+              <set_value name="$scpWorkforcePercent" exact="$editData.$workforce" />
+              <include_actions ref="Scp_Set_Workforce" />
+              <remove_value name="$scpObject" />
+              <remove_value name="$scpWorkforcePercent" />
+            </do_if>
+            <raise_lua_event name="'scp_main.objectEdited'" />
+          </actions>
+        </cue>
+
+        <!-- Primary skill and morale land on stars*3, the rest scale by the same ratio unless
+             $scpAllSkills sets them outright. Expects $scpEntity, $scpStars, $scpPrimarySkill, $scpAllSkills. -->
+        <library name="Scp_Set_Entity_Skills" purpose="include_actions" version="2">
+          <actions>
+            <set_value name="$scpTarget15" exact="$scpStars * 3" />
+            <set_value name="$scpCurrent" exact="$scpEntity.combinedskill" />
+            <set_value name="$scpRatio" exact="if $scpCurrent gt 0 then ($scpStars * 20.0) / $scpCurrent else 0.0" />
+            <do_for_each name="$scpSkill" in="lookup.skilltype.list">
+              <do_if value="$scpAllSkills or $scpSkill == $scpPrimarySkill or $scpSkill == skilltype.morale">
+                <set_skill entity="$scpEntity" type="$scpSkill" exact="$scpTarget15" />
+              </do_if>
+              <do_elseif value="$scpCurrent gt 0">
+                <set_skill entity="$scpEntity" type="$scpSkill" exact="[15, (($scpEntity.skill.{$scpSkill} * $scpRatio) + 0.5)i].min" />
+              </do_elseif>
+            </do_for_each>
+            <debug_text text="'SafeCheatPanel: %s set to %s stars (primary %s, all %s)'. [$scpEntity.debugname, $scpStars, $scpPrimarySkill, $scpAllSkills]" chance="$debugChance" />
+            <remove_value name="$scpTarget15" />
+            <remove_value name="$scpCurrent" />
+            <remove_value name="$scpRatio" />
+            <remove_value name="$scpSkill" />
+          </actions>
+        </library>
+
+        <!-- Scp_Set_Entity_Skills for a crew member keyed by NPC template - a live accessor, re-chained
+             at every use. Expects $scpObject, $scpTemplate, $scpStars, $scpPrimarySkill, $scpAllSkills. -->
+        <library name="Scp_Set_Template_Skills" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$scpTarget15" exact="$scpStars * 3" />
+            <set_value name="$scpCurrent" exact="$scpObject.people.{$scpTemplate}.combinedskill" />
+            <set_value name="$scpRatio" exact="if $scpCurrent gt 0 then ($scpStars * 20.0) / $scpCurrent else 0.0" />
+            <do_for_each name="$scpSkill" in="lookup.skilltype.list">
+              <do_if value="$scpSkill == $scpPrimarySkill or $scpSkill == skilltype.morale or $scpAllSkills">
+                <set_skill object="$scpObject" template="$scpTemplate" type="$scpSkill" exact="$scpTarget15" />
+              </do_if>
+              <do_elseif value="$scpCurrent gt 0">
+                <set_skill object="$scpObject" template="$scpTemplate" type="$scpSkill" exact="[15, (($scpObject.people.{$scpTemplate}.skill.{$scpSkill} * $scpRatio) + 0.5)i].min" />
+              </do_elseif>
+            </do_for_each>
+            <debug_text text="'SafeCheatPanel: crew %s set to %s stars (primary %s)'. [@$scpObject.people.{$scpTemplate}.name, $scpStars, $scpPrimarySkill]" chance="$debugChance" />
+            <remove_value name="$scpTarget15" />
+            <remove_value name="$scpCurrent" />
+            <remove_value name="$scpRatio" />
+            <remove_value name="$scpSkill" />
+          </actions>
+        </library>
+
+        <!-- Fills every race to the same share of its own habitation capacity, so the total follows
+             the plan's mix of habitats. Sets rather than tops up. Expects $scpObject, $scpWorkforcePercent (0-100). -->
+        <library name="Scp_Set_Workforce" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$scpCapacities" exact="$scpObject.workforce.capacities" />
+            <do_for_each name="$scpRace" in="$scpCapacities.keys.list">
+              <set_value name="$scpRaceCapacity" exact="$scpCapacities.{$scpRace}" />
+              <set_value name="$scpRaceTarget" exact="((($scpRaceCapacity)f * $scpWorkforcePercent / 100.0f) + 0.5f)i" />
+              <set_value name="$scpRaceCurrent" exact="if @$scpObject.workforce.{$scpRace}.amount then $scpObject.workforce.{$scpRace}.amount else 0" />
+              <do_if value="$scpRaceTarget gt $scpRaceCurrent">
+                <add_workforce object="$scpObject" race="$scpRace" exact="$scpRaceTarget - $scpRaceCurrent" />
+              </do_if>
+              <do_elseif value="$scpRaceTarget lt $scpRaceCurrent">
+                <remove_workforce object="$scpObject" race="$scpRace" exact="$scpRaceCurrent - $scpRaceTarget" />
+              </do_elseif>
+              <debug_text text="'SafeCheatPanel: %s workforce %s set to %s%% - %s of %s, was %s'. [
+                $scpObject.debugname, $scpRace, $scpWorkforcePercent, $scpRaceTarget, $scpRaceCapacity, $scpRaceCurrent]" chance="$debugChance" />
+            </do_for_each>
+            <remove_value name="$scpCapacities" />
+            <remove_value name="$scpRace" />
+            <remove_value name="$scpRaceCapacity" />
+            <remove_value name="$scpRaceTarget" />
+            <remove_value name="$scpRaceCurrent" />
+          </actions>
+        </library>
 
         <cue name="Scp_Spawn_Ship" instantiate="true">
           <conditions>
@@ -191,6 +321,9 @@
           <actions>
             <create_group groupname="$ships" />
             <set_value name="$spawnData" exact="event.param3" />
+            <!-- `@` and `?` cannot be combined, so the optional table is normalised once here. -->
+            <set_value name="$scpCrewSkills" exact="if @$spawnData.$crewSkills != null then $spawnData.$crewSkills else table[]" />
+            <set_value name="$scpAllSkills" exact="@$spawnData.$allSkills == true" />
             <set_value name="$rows" exact="0" />
             <set_value name="$numPerRow" exact="0" />
             <set_value name="$startX" exact="$spawnData.$position.$x" />
@@ -233,32 +366,35 @@
                 </do_else>
                 <do_if value="@$ship != null">
                   <do_if value="@$ship.aipilot != null">
-                    <do_for_each name="$skill" in="lookup.skilltype.list">
-                      <do_if value="$skill == skilltype.piloting">
-                        <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
-                          <set_skill entity="$ship.aipilot" type="$skill" min="10" max="14" />
+                    <!-- Fallback ranges only; exact stars are written in the delayed block. -->
+                    <do_if value="not $scpCrewSkills.$pilot?">
+                      <do_for_each name="$skill" in="lookup.skilltype.list">
+                        <do_if value="$skill == skilltype.piloting">
+                          <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                            <set_skill entity="$ship.aipilot" type="$skill" min="10" max="14" />
+                          </do_if>
+                          <do_else>
+                            <set_skill entity="$ship.aipilot" type="$skill" min="6" max="9" />
+                          </do_else>
                         </do_if>
+                        <do_elseif value="$skill == skilltype.morale">
+                          <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                            <set_skill entity="$ship.aipilot" type="$skill" min="8" max="12" />
+                          </do_if>
+                          <do_else>
+                            <set_skill entity="$ship.aipilot" type="$skill" min="4" max="7" />
+                          </do_else>
+                        </do_elseif>
                         <do_else>
-                          <set_skill entity="$ship.aipilot" type="$skill" min="6" max="9" />
+                          <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                            <set_skill entity="$ship.aipilot" type="$skill" min="6" max="9" />
+                          </do_if>
+                          <do_else>
+                            <set_skill entity="$ship.aipilot" type="$skill" min="1" max="4" />
+                          </do_else>
                         </do_else>
-                      </do_if>
-                      <do_elseif value="$skill == skilltype.morale">
-                        <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
-                          <set_skill entity="$ship.aipilot" type="$skill" min="8" max="12" />
-                        </do_if>
-                        <do_else>
-                          <set_skill entity="$ship.aipilot" type="$skill" min="4" max="7" />
-                        </do_else>
-                      </do_elseif>
-                      <do_else>
-                        <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
-                          <set_skill entity="$ship.aipilot" type="$skill" min="6" max="9" />
-                        </do_if>
-                        <do_else>
-                          <set_skill entity="$ship.aipilot" type="$skill" min="1" max="4" />
-                        </do_else>
-                      </do_else>
-                    </do_for_each>
+                      </do_for_each>
+                    </do_if>
                   </do_if>
                   <do_if value="$spawnData.$preset gt 0">
                     <debug_text text="'SafeCheatPanel: %s straight after create_ship - weapons %s/%s, turrets %s/%s, shields %s/%s, engines %s/%s'. [
@@ -290,42 +426,43 @@
                         <do_all counter="$i" exact="$role.$count">
                           <create_npc_template object="$ship" role="entityrole.{$role.$role}" name="$npcTemplate" macro="$roleMacro" />
                           <do_if value="@$npcTemplate != null">
-                            <do_for_each name="$skill" in="lookup.skilltype.list">
-                              <do_if value="$role.$role == 'service' and $skill == skilltype.engineering or
-                                $role.$role == 'marine' and $skill == skilltype.boarding">
-                                <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
-                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="10" max="14" />
+                            <!-- Same split as the pilot: fallback here, exact stars in the delayed block. -->
+                            <do_if value="not $scpCrewSkills.{'$' + $role.$role}?">
+                              <do_for_each name="$skill" in="lookup.skilltype.list">
+                                <do_if value="$role.$role == 'service' and $skill == skilltype.engineering or
+                                  $role.$role == 'marine' and $skill == skilltype.boarding">
+                                  <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="10" max="14" />
+                                  </do_if>
+                                  <do_else>
+                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="6" max="9" />
+                                  </do_else>
                                 </do_if>
+                                <do_elseif value="$skill == skilltype.morale">
+                                  <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="8" max="12" />
+                                  </do_if>
+                                  <do_else>
+                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="4" max="7" />
+                                  </do_else>
+                                </do_elseif>
                                 <do_else>
-                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="6" max="9" />
+                                  <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
+                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="6" max="9" />
+                                  </do_if>
+                                  <do_else>
+                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="1" max="4" />
+                                  </do_else>
                                 </do_else>
-                              </do_if>
-                              <do_elseif value="$skill == skilltype.morale">
-                                <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
-                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="8" max="12" />
-                                </do_if>
-                                <do_else>
-                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="4" max="7" />
-                                </do_else>
-                              </do_elseif>
-                              <do_else>
-                                <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
-                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="6" max="9" />
-                                </do_if>
-                                <do_else>
-                                  <set_skill object="$ship" template="$npcTemplate" type="$skill" min="1" max="4" />
-                                </do_else>
-                              </do_else>
-                            </do_for_each>
+                              </do_for_each>
+                            </do_if>
                           </do_if>
                         </do_all>
                       </do_if>
                     </do_for_each>
                   </do_if>
-                  <do_if value="@$spawnData.$purposeOrderId != null">
-                    <add_to_group groupname="$ships" object="$ship" />
-                    <debug_text text="'SafeCheatPanel: Ship %s has a purpose order %s, adding to group for processing.'. [$ship.debugname, $spawnData.$purposeOrderId]" chance="$debugChance" />
-                  </do_if>
+                  <!-- Every ship: the delayed block writes crew skills, not just orders. -->
+                  <add_to_group groupname="$ships" object="$ship" />
                 </do_if>
                 <set_value name="$spawnData.$position.$x" exact="$spawnData.$position.$x + $ship.width * 2" />
                 <set_value name="$numPerRow" exact="$numPerRow + 1" />
@@ -341,11 +478,35 @@
           </actions>
           <delay min="400ms" max="600ms" />
           <actions>
-            <debug_text text="'SafeCheatPanel: Processing %s ships for default orders and/or activate_job_ship_orders.'. [$ships.count]" chance="$debugChance" />
+            <debug_text text="'SafeCheatPanel: Processing %s ships for crew skills and/or default orders.'. [$ships.count]" chance="$debugChance" />
             <do_if value="@$ships.count gt 0">
               <do_for_each name="$ship" in="$ships">
                 <do_if value="@$ship != null">
                   <debug_text text="'SafeCheatPanel: Processing ship %s with pilot %s, owner %s'. [$ship.debugname, @$ship.pilot.name, $ship.owner.name]" chance="$debugChance" />
+                  <!-- The whole crew aboard, whoever created it: this cue, the loadout or the engine. -->
+                  <do_if value="$scpCrewSkills.$pilot?">
+                    <do_if value="@$ship.pilot.exists">
+                      <set_value name="$scpEntity" exact="$ship.pilot" />
+                      <set_value name="$scpStars" exact="$scpCrewSkills.$pilot" />
+                      <set_value name="$scpPrimarySkill" exact="skilltype.piloting" />
+                      <include_actions ref="Scp_Set_Entity_Skills" />
+                    </do_if>
+                  </do_if>
+                  <do_if value="$scpCrewSkills.$marine? or $scpCrewSkills.$service?">
+                    <set_value name="$scpObject" exact="$ship" />
+                    <do_for_each name="$scpTemplate" in="$ship.people.list">
+                      <do_if value="$scpCrewSkills.$marine? and $ship.people.{$scpTemplate}.role == entityrole.marine">
+                        <set_value name="$scpStars" exact="$scpCrewSkills.$marine" />
+                        <set_value name="$scpPrimarySkill" exact="skilltype.boarding" />
+                        <include_actions ref="Scp_Set_Template_Skills" />
+                      </do_if>
+                      <do_elseif value="$scpCrewSkills.$service? and $ship.people.{$scpTemplate}.role == entityrole.service">
+                        <set_value name="$scpStars" exact="$scpCrewSkills.$service" />
+                        <set_value name="$scpPrimarySkill" exact="skilltype.engineering" />
+                        <include_actions ref="Scp_Set_Template_Skills" />
+                      </do_elseif>
+                    </do_for_each>
+                  </do_if>
                   <do_if value="@$spawnData.$purposeOrderId != null">
                     <!-- Patrol has no self-computed default for $space (required, "Mandatory for UI"),
                          unlike the other job orders; anchor it on the spawn sector. -->
@@ -436,9 +597,48 @@
                 <set_value name="$controllable" exact="$station" />
                 <include_actions ref="md.InitUniverse.CreateDefenceControlEntity" />
                 <include_actions ref="md.InitUniverse.CreateEngineerEntity" />
+                <!-- Vanilla skips both for a player-owned station, leaving them to be hired. -->
+                <do_if value="@$spawnData.$addManager == true">
+                  <include_actions ref="md.InitUniverse.CreateTradeManagerEntity" />
+                </do_if>
+                <do_if value="@$spawnData.$addTrader == true">
+                  <include_actions ref="md.InitUniverse.CreateShipDealerEntity" />
+                </do_if>
                 <create_ai_unit object="$controllable" />
                 <remove_value name="$controllable" />
               </do_else>
+            </do_if>
+          </actions>
+          <!-- A just-created control entity cannot take a skill write in the same block. -->
+          <delay min="400ms" max="600ms" />
+          <actions>
+            <do_if value="@$station != null">
+              <debug_text text="'SafeCheatPanel: Spawned station %s - canequipships %s, posts manager %s / trader %s / defence %s / engineer %s'. [
+                $station.debugname, $station.canequipships, @$station.controlentity.{controlpost.manager}.exists, @$station.controlentity.{controlpost.shiptrader}.exists,
+                @$station.controlentity.{controlpost.defence}.exists, @$station.controlentity.{controlpost.engineer}.exists]" chance="$debugChance" />
+            </do_if>
+            <do_if value="@$spawnData.$crewSkills != null and @$station != null">
+              <set_value name="$scpAllSkills" exact="@$spawnData.$allSkills == true" />
+              <do_for_each name="$scpPost" in="[
+                ['manager', controlpost.manager, skilltype.management],
+                ['trader', controlpost.shiptrader, skilltype.management],
+                ['defence', controlpost.defence, skilltype.piloting],
+                ['engineer', controlpost.engineer, skilltype.engineering]]">
+                <do_if value="$spawnData.$crewSkills.{'$' + $scpPost.{1}}? and @$station.controlentity.{$scpPost.{2}}.exists">
+                  <set_value name="$scpEntity" exact="$station.controlentity.{$scpPost.{2}}" />
+                  <set_value name="$scpStars" exact="$spawnData.$crewSkills.{'$' + $scpPost.{1}}" />
+                  <set_value name="$scpPrimarySkill" exact="$scpPost.{3}" />
+                  <include_actions ref="Scp_Set_Entity_Skills" />
+                </do_if>
+              </do_for_each>
+            </do_if>
+            <!-- Vanilla leaves a player-owned station's workforce empty; the checkbox fills it. -->
+            <do_if value="@$spawnData.$workforce != null and @$station != null">
+              <set_value name="$scpObject" exact="$station" />
+              <set_value name="$scpWorkforcePercent" exact="$spawnData.$workforce" />
+              <include_actions ref="Scp_Set_Workforce" />
+              <remove_value name="$scpObject" />
+              <remove_value name="$scpWorkforcePercent" />
             </do_if>
           </actions>
         </cue>
