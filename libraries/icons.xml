@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <diff>
     <add sel="/icons">
-        <icon name="pi_blueprints" texture="extensions\safe_cheat_panel\assets\fx\gui\textures\player_info\pi_blueprints.tga" height="128" width="128" />
+        <icon name="scp_blueprints" texture="extensions\safe_cheat_panel\assets\textures\ui\safe_cheat_panel\scp_blueprints.tga" height="128" width="128" />
+        <icon name="scp_objectspawn" texture="extensions\safe_cheat_panel\assets\textures\ui\safe_cheat_panel\scp_objectspawn.tga" height="128" width="128" />
     </add>
 </diff>

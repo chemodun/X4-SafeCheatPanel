@@ -108,10 +108,10 @@ local config = {
         return C.CanResearch() or scp.isExtendedMode()
       end
     },
-    { category = "scpBlueprint",   name = ReadText(1972092427, 4000), icon = "pi_blueprints",  helpOverlayID = "help_category_cheatsblueprint", helpOverlayText = ReadText(1972092427, 4001), display = function() return true end },
+    { category = "scpBlueprint",   name = ReadText(1972092427, 4000), icon = "scp_blueprints", helpOverlayID = "help_category_cheatsblueprint", helpOverlayText = ReadText(1972092427, 4001), display = function() return true end },
     { category = "scpFactions",    name = ReadText(1972092427, 5000), icon = "pi_diplomacy",   helpOverlayID = "help_category_cheatsfactions",  helpOverlayText = ReadText(1972092427, 5001), display = function() return true end },
     { category = "scpMap",         name = ReadText(1001, 9181),    icon = "tlt_map",        helpOverlayID = "help_category_cheatsmap",       helpOverlayText = ReadText(1001, 9181), display = function() return true end },
-    { category = "scpObjectSpawn", name = ReadText(1972092427, 7000), icon = "mapst_cheats",   helpOverlayID = "help_category_cheatsspawn",     helpOverlayText = ReadText(1972092427, 7001), display = function() return true end },
+    { category = "scpObjectSpawn", name = ReadText(1972092427, 7000), icon = "scp_objectspawn", helpOverlayID = "help_category_cheatsspawn",     helpOverlayText = ReadText(1972092427, 7001), display = function() return true end },
     { category = "scpDestroy",     name = ReadText(1972092427, 9000), icon = "order_attack",   helpOverlayID = "help_category_cheatsdestroy",   helpOverlayText = ReadText(1972092427, 9001), display = function() return true end },
     {
       category = "scpDevMode",
