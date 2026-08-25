@@ -141,6 +141,7 @@ local scpHelpers    = require("extensions.safe_cheat_panel.ui.scp_helpers")
 local scpEquipment  = require("extensions.safe_cheat_panel.ui.scp_equipment")
 local scpCrew       = require("extensions.safe_cheat_panel.ui.scp_crew")
 local scpIdentify   = require("extensions.safe_cheat_panel.ui.scp_identify")
+local scpCrewSize   = require("extensions.safe_cheat_panel.ui.scp_crewsize")
 local scpWorkforce  = require("extensions.safe_cheat_panel.ui.scp_workforce")
 
 local menu         = Helper.getMenu("MapMenu")
@@ -204,6 +205,7 @@ local state = {
     addTrader  = false,
   },
   crew = scpCrew.newState(),
+  crewSize = scpCrewSize.newState(),
   workforce = scpWorkforce.newState(),
 }
 
@@ -417,11 +419,8 @@ end
 
 local scpSpawner = {}
 
--- Set once from safe_cheat_panel init().
-scpSpawner.shipConfigurationMenu = {}
-
--- Preset crew comes from the ShipConfigurationMenu, the only place a macro's crew capacity
--- is reachable; its object and macro fields are borrowed and put back.
+-- Head counts come from the crew sliders; all that is left to read is whether the crew starts out
+-- experienced - the High preset does, a named loadout declares it.
 function scpSpawner.PresetAndCrewForSpawnShip(macro, loadoutId)
   local preset = -1
   if loadoutId == "scpDefaultLow" then
@@ -431,30 +430,10 @@ function scpSpawner.PresetAndCrewForSpawnShip(macro, loadoutId)
   elseif loadoutId == "scpDefaultHigh" then
     preset = 1
   end
-  local crew = {
-    roles = {},
-    hasCrewExperience = preset == 1,
-  }
-  if preset > 0 then
-    local scMenu = scpSpawner.shipConfigurationMenu
-    scMenu.crew = { roles = {}, total = 0 }
-    scMenu.object = 0
-    scMenu.macro = macro
-    scMenu.prepareMacroCrewInfo(macro)
-    local crewInfo = scMenu.crew
-    local intendedCrew = preset * crewInfo.capacity
-    local intendedCrewPerRole = math.floor(intendedCrew / #crewInfo.roles)
-    for i, entry in ipairs(crewInfo.roles) do
-      crew.roles[#crew.roles + 1] = { role = entry.id, count = intendedCrewPerRole }
-    end
-    scMenu.object = nil
-    scMenu.macro = nil
-  else
+  local crew = { hasCrewExperience = preset == 1 }
+  if preset <= 0 then
     local loadout = Helper.getLoadoutHelper2(C.GetLoadout2, C.GetLoadoutCounts2, "UILoadout2", 0, macro, loadoutId)
     local loadoutInfo = Helper.convertLoadout(0, macro, loadout, nil, "UILoadout2")
-    for role, count in pairs(loadoutInfo.crew) do
-      crew.roles[#crew.roles + 1] = { role = role, count = count }
-    end
     crew.hasCrewExperience = loadoutInfo.hascrewexperience
   end
   return preset, crew
@@ -493,6 +472,7 @@ function scpSpawner.reset(blacklisted)
   scpIdentify.reset()
   state.target = { object = nil, isStation = false, addManager = false, addTrader = false }
   scpCrew.resetState(state.crew)
+  scpCrewSize.resetState(state.crewSize)
   scpWorkforce.resetState(state.workforce)
   scpSpawner.initStations()
   scpSpawner.initShips()
@@ -561,6 +541,7 @@ end
 local function dropTarget()
   state.target = { object = nil, isStation = false, addManager = false, addTrader = false }
   scpCrew.resetState(state.crew)
+  scpCrewSize.resetState(state.crewSize)
   scpWorkforce.resetState(state.workforce)
 end
 
@@ -609,6 +590,7 @@ end
 function scpSpawner.startEdit(isStation)
   local object = ConvertStringTo64Bit(tostring(interactMenu.componentSlot.component))
   scpCrew.resetState(state.crew)
+  scpCrewSize.resetState(state.crewSize)
   scpWorkforce.resetState(state.workforce)
   state.crew.enabled = true
   state.target = {
@@ -648,6 +630,7 @@ function scpSpawner.resetEdit()
   scpSpawner.scp.debug("Edit: reset pressed")
   state.crew.targets = {}
   state.crew.allSkills = false
+  scpCrewSize.resetState(state.crewSize)
   scpWorkforce.resetState(state.workforce)
   state.target.newLoadout = state.target.loadout
   state.target.addManager = false
@@ -660,7 +643,7 @@ function scpSpawner.hasEditChanges()
   if state.target.isStation then
     return state.target.addManager or state.target.addTrader or scpWorkforce.hasChanges(state.workforce)
   end
-  return state.target.newLoadout ~= state.target.loadout
+  return state.target.newLoadout ~= state.target.loadout or scpCrewSize.hasChanges(state.crewSize)
 end
 
 function scpSpawner.onObjectInspected(_, param)
@@ -674,6 +657,7 @@ function scpSpawner.onObjectEdited()
   scpSpawner.scp.debug("Edit: MD confirmed the changes, refreshing")
   state.crew.targets = {}
   state.crew.allSkills = false
+  scpCrewSize.resetState(state.crewSize)
   scpWorkforce.resetState(state.workforce)
   state.target.addManager = false
   state.target.addTrader = false
@@ -693,6 +677,9 @@ function scpSpawner.applyEdit()
     allSkills = state.crew.allSkills,
     skills    = scpCrew.getChanges(state.crew),
   }
+  if not state.target.isStation and scpCrewSize.hasChanges(state.crewSize) then
+    data.crewSize = scpCrewSize.getChange(state.crewSize, (scpCrewSize.collect(object)))
+  end
   if state.target.isStation then
     data.addManager = state.target.addManager
     data.addTrader  = state.target.addTrader
@@ -709,7 +696,8 @@ function scpSpawner.applyEdit()
     data.equipment      = scpEquipment.buildLoadoutPlan(state.target.macro, preset, (preset > 0 and loadoutFaction) or "player")
   end
   scpSpawner.scp.debug("Edit: apply pressed, allSkills=" .. tostring(data.allSkills) .. ", loadout=" .. tostring(data.loadout)
-    .. ", workforce=" .. tostring(data.workforce))
+    .. ", workforce=" .. tostring(data.workforce)
+    .. ", crew=" .. (data.crewSize and (data.crewSize.marines .. " marines / " .. data.crewSize.service .. " service") or "unchanged"))
   AddUITriggeredEvent("scp_main", "scp_edit_object", data)
 end
 
@@ -1188,6 +1176,13 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
     end
   end
 
+  -- Authoritative for a spawn: the ship gets exactly this crew, whatever the loadout would have set.
+  local crewCapacity = scpCrewSize.getMacroCapacity(state.ships_sel.id)
+  if crewCapacity > 0 then
+    rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+    numDisplayed = scpCrewSize.addRows(rowGroup, numDisplayed, scp, state.crewSize, crewCapacity, nil, nil)
+  end
+
   -- Unchecked, the spawned crew keeps the loadout preset's randomised skill ranges.
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7410),
@@ -1363,6 +1358,16 @@ function scpSpawner.createShipEditMenu(frameTable, numDisplayed, scp)
   })
   rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
   numDisplayed = addRaceRow(rowGroup, numDisplayed, scp)
+
+  -- Seeded on every render, like the crew-skill baselines, so it stays right after an apply.
+  local crewCapacity, crewCurrent, crewCurrentMarines = scpCrewSize.seedInitial(state.crewSize, object)
+  if crewCapacity > 0 then
+    if not isV9 then
+      frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+    end
+    rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+    numDisplayed = scpCrewSize.addRows(rowGroup, numDisplayed, scp, state.crewSize, crewCapacity, crewCurrent, crewCurrentMarines)
+  end
 
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7410),
@@ -1639,6 +1644,12 @@ scpSpawner.state = state
 
 function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow, loadoutFaction, assignPurpose, purpose)
   local preset, crew = scpSpawner.PresetAndCrewForSpawnShip(ship, loadout)
+  -- MD reconciles the ship against these counts instead of adding to what the loadout left.
+  -- A macro with no crew berths sends neither key, so MD leaves its crew alone.
+  local crewCapacity = scpCrewSize.getMacroCapacity(ship)
+  if crewCapacity > 0 then
+    crew.marines, crew.service = select(2, scpCrewSize.targets(state.crewSize, crewCapacity))
+  end
   -- Must match the faction MD creates the ship under, so both sides judge equipment alike.
   local spawnFaction = (preset > 0 and loadoutFaction) or ownerId
   -- Player-owned ships stay under direct player control; never auto-assign them a job.

@@ -147,8 +147,10 @@
             <set_value name="$editData" exact="event.param3" />
             <set_value name="$object" exact="$editData.$object" />
             <set_value name="$scpAllSkills" exact="@$editData.$allSkills == true" />
-            <debug_text text="'SafeCheatPanel: Editing %s (station: %s, loadout: %s, skills: %s, allSkills: %s)'. [
-              $object.debugname, @$editData.$isStation, @$editData.$loadout, @$editData.$skills, $scpAllSkills]" chance="$debugChance" />
+            <!-- `@` and `?` cannot be combined, so the optional table is normalised once here. -->
+            <set_value name="$scpCrewSkills" exact="if @$editData.$skills != null then $editData.$skills else table[]" />
+            <debug_text text="'SafeCheatPanel: Editing %s (station: %s, loadout: %s, skills: %s, allSkills: %s, crew: %s)'. [
+              $object.debugname, @$editData.$isStation, @$editData.$loadout, @$editData.$skills, $scpAllSkills, @$editData.$crewSize]" chance="$debugChance" />
             <do_if value="@$editData.$isStation == true">
               <!-- Vanilla withholds both posts from player-owned stations (inituniverse.xml). -->
               <set_value name="$controllable" exact="$object" />
@@ -188,6 +190,31 @@
               <remove_value name="$spawnData" />
               <remove_value name="$scpLoadout" />
             </do_elseif>
+            <!-- Independent of the loadout, and before the delay so the skill pass below covers
+                 anybody hired here. -->
+            <do_if value="@$editData.$isStation != true and @$editData.$crewSize != null">
+              <!-- Crew race is not reachable from Lua; read it off the ship, then off the owner. -->
+              <set_value name="$scpCrewRace" exact="null" />
+              <do_if value="@$object.pilot.exists">
+                <set_value name="$scpCrewRace" exact="$object.pilot.race" />
+              </do_if>
+              <do_elseif value="$object.people.count gt 0">
+                <set_value name="$scpCrewRace" exact="$object.people.{$object.people.list.{1}}.race" />
+              </do_elseif>
+              <do_else>
+                <set_value name="$scpCrewRace" exact="$object.owner.primaryrace" />
+              </do_else>
+              <set_value name="$scpObject" exact="$object" />
+              <set_value name="$scpCrewMarines" exact="$editData.$crewSize.$marines" />
+              <set_value name="$scpCrewService" exact="$editData.$crewSize.$service" />
+              <set_value name="$scpCrewExperience" exact="null" />
+              <include_actions ref="Scp_Set_Crew_Complement" />
+              <remove_value name="$scpObject" />
+              <remove_value name="$scpCrewMarines" />
+              <remove_value name="$scpCrewService" />
+              <remove_value name="$scpCrewRace" />
+              <remove_value name="$scpCrewExperience" />
+            </do_if>
           </actions>
           <!-- A just-created control entity cannot take a skill write in the same block. -->
           <delay min="400ms" max="600ms" />
@@ -285,6 +312,104 @@
             <remove_value name="$scpCurrent" />
             <remove_value name="$scpRatio" />
             <remove_value name="$scpSkill" />
+          </actions>
+        </library>
+
+        <!-- Reconciles a ship's marines and service crew to exact head counts: a role over target is
+             re-assigned into one under it before anybody is dismissed, weakest first. Expects
+             $scpObject, $scpCrewMarines, $scpCrewService, $scpCrewRace, $scpCrewSkills (roles the
+             caller writes exact stars for) and $scpCrewExperience (null: engine defaults). -->
+        <library name="Scp_Set_Crew_Complement" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$scpCrewTargets" exact="table[$marine = $scpCrewMarines, $service = $scpCrewService]" />
+            <set_value name="$scpCrewLists" exact="table[]" />
+            <set_value name="$scpCrewOver" exact="table[]" />
+            <set_value name="$scpCrewMoved" exact="table[$marine = 0, $service = 0]" />
+            <set_value name="$scpCrewMove" exact="0" />
+            <set_value name="$scpCrewMacro" exact="null" />
+            <set_value name="$scpCrewTemplate" exact="null" />
+            <do_for_each name="$scpCrewRole" in="[['marine', entityrole.marine], ['service', entityrole.service]]">
+              <set_value name="$scpCrewKey" exact="'$' + $scpCrewRole.{1}" />
+              <set_value name="$scpCrewList" exact="$scpObject.people.{$scpCrewRole.{2}}.list" />
+              <!-- sort_people is ascending, so index 1 is the weakest; shuffle first because equal
+                   skills would otherwise keep their input order. -->
+              <shuffle_list list="$scpCrewList" />
+              <sort_people name="$scpCrewList" object="$scpObject" templatelist="$scpCrewList" sorter="combinedskill" />
+              <set_value name="$scpCrewLists.{$scpCrewKey}" exact="$scpCrewList" />
+              <set_value name="$scpCrewOver.{$scpCrewKey}" exact="$scpCrewList.count - $scpCrewTargets.{$scpCrewKey}" />
+            </do_for_each>
+
+            <!-- After this no role is short while the other is over, so the removals and the hires
+                 below never race for the same berth. -->
+            <do_for_each name="$scpCrewSwap" in="[['$marine', '$service', entityrole.service], ['$service', '$marine', entityrole.marine]]">
+              <do_if value="$scpCrewOver.{$scpCrewSwap.{1}} gt 0 and $scpCrewOver.{$scpCrewSwap.{2}} lt 0">
+                <set_value name="$scpCrewMove" exact="[$scpCrewOver.{$scpCrewSwap.{1}}, 0 - $scpCrewOver.{$scpCrewSwap.{2}}].min" />
+                <do_all exact="$scpCrewMove" counter="$scpCrewI">
+                  <set_npc_template_role object="$scpObject" template="$scpCrewLists.{$scpCrewSwap.{1}}.{$scpCrewI}" role="$scpCrewSwap.{3}" />
+                </do_all>
+                <set_value name="$scpCrewMoved.{$scpCrewSwap.{1}}" exact="$scpCrewMove" />
+                <set_value name="$scpCrewOver.{$scpCrewSwap.{1}}" exact="$scpCrewOver.{$scpCrewSwap.{1}} - $scpCrewMove" />
+                <set_value name="$scpCrewOver.{$scpCrewSwap.{2}}" exact="$scpCrewOver.{$scpCrewSwap.{2}} + $scpCrewMove" />
+                <debug_text text="'SafeCheatPanel: %s re-assigned %s crew from %s to %s'. [
+                  $scpObject.debugname, $scpCrewMove, $scpCrewSwap.{1}, $scpCrewSwap.{2}]" chance="$debugChance" />
+              </do_if>
+            </do_for_each>
+
+            <do_for_each name="$scpCrewRole" in="[['marine', entityrole.marine, skilltype.boarding], ['service', entityrole.service, skilltype.engineering]]">
+              <set_value name="$scpCrewKey" exact="'$' + $scpCrewRole.{1}" />
+              <do_if value="$scpCrewOver.{$scpCrewKey} gt 0">
+                <!-- Weakest first, skipping the front of the list where the re-assigned ones sit. -->
+                <do_all exact="$scpCrewOver.{$scpCrewKey}" counter="$scpCrewI">
+                  <remove_npc_template object="$scpObject" template="$scpCrewLists.{$scpCrewKey}.{$scpCrewMoved.{$scpCrewKey} + $scpCrewI}" />
+                </do_all>
+                <debug_text text="'SafeCheatPanel: %s dismissed %s %s'. [
+                  $scpObject.debugname, $scpCrewOver.{$scpCrewKey}, $scpCrewRole.{1}]" chance="$debugChance" />
+              </do_if>
+              <do_elseif value="$scpCrewOver.{$scpCrewKey} lt 0">
+                <set_value name="$scpCrewMacro" exact="null" />
+                <get_character_definition macro="$scpCrewMacro" race="$scpCrewRace" tags="tag.{$scpCrewRole.{1}}" />
+                <do_if value="@$scpCrewMacro != null">
+                  <do_all exact="0 - $scpCrewOver.{$scpCrewKey}">
+                    <set_value name="$scpCrewTemplate" exact="null" />
+                    <create_npc_template object="$scpObject" role="$scpCrewRole.{2}" name="$scpCrewTemplate" macro="$scpCrewMacro" />
+                    <!-- Fallback ranges only; a role with exact stars is left to the caller's delayed block. -->
+                    <do_if value="@$scpCrewTemplate != null and @$scpCrewExperience != null and not $scpCrewSkills.{$scpCrewKey}?">
+                      <do_for_each name="$scpCrewSkill" in="lookup.skilltype.list">
+                        <do_if value="$scpCrewSkill == $scpCrewRole.{3}">
+                          <set_skill object="$scpObject" template="$scpCrewTemplate" type="$scpCrewSkill"
+                            min="if $scpCrewExperience then 10 else 6" max="if $scpCrewExperience then 14 else 9" />
+                        </do_if>
+                        <do_elseif value="$scpCrewSkill == skilltype.morale">
+                          <set_skill object="$scpObject" template="$scpCrewTemplate" type="$scpCrewSkill"
+                            min="if $scpCrewExperience then 8 else 4" max="if $scpCrewExperience then 12 else 7" />
+                        </do_elseif>
+                        <do_else>
+                          <set_skill object="$scpObject" template="$scpCrewTemplate" type="$scpCrewSkill"
+                            min="if $scpCrewExperience then 6 else 1" max="if $scpCrewExperience then 9 else 4" />
+                        </do_else>
+                      </do_for_each>
+                    </do_if>
+                  </do_all>
+                  <debug_text text="'SafeCheatPanel: %s hired %s %s, %s berths left'. [
+                    $scpObject.debugname, 0 - $scpCrewOver.{$scpCrewKey}, $scpCrewRole.{1}, $scpObject.people.free]" chance="$debugChance" />
+                </do_if>
+                <do_else>
+                  <debug_text text="'SafeCheatPanel: no %s character definition for race %s - %s left short'. [
+                    $scpCrewRole.{1}, @$scpCrewRace, $scpObject.debugname]" chance="$debugChance" />
+                </do_else>
+              </do_elseif>
+            </do_for_each>
+            <remove_value name="$scpCrewTargets" />
+            <remove_value name="$scpCrewLists" />
+            <remove_value name="$scpCrewOver" />
+            <remove_value name="$scpCrewMoved" />
+            <remove_value name="$scpCrewMove" />
+            <remove_value name="$scpCrewMacro" />
+            <remove_value name="$scpCrewTemplate" />
+            <remove_value name="$scpCrewKey" />
+            <remove_value name="$scpCrewList" />
+            <remove_value name="$scpCrewRole" />
+            <remove_value name="$scpCrewSwap" />
           </actions>
         </library>
 
@@ -418,48 +543,19 @@
                   <do_if value="$spawnOwner != $spawnData.$ownerId">
                     <set_owner object="$ship" faction="faction.{$spawnData.$ownerId}" overridenpc="true" />
                   </do_if>
-                  <do_if value="@$spawnData.$crew.$roles.count gt 0">
-                    <set_value name="$roles" exact="@$spawnData.$crew.$roles" />
-                    <do_for_each name="$role" in="$roles">
-                      <get_character_definition macro="$roleMacro" race="race.{$spawnData.$ownerRace}" tags="tag.{$role.$role}" />
-                      <do_if value="@$roleMacro != null">
-                        <do_all counter="$i" exact="$role.$count">
-                          <create_npc_template object="$ship" role="entityrole.{$role.$role}" name="$npcTemplate" macro="$roleMacro" />
-                          <do_if value="@$npcTemplate != null">
-                            <!-- Same split as the pilot: fallback here, exact stars in the delayed block. -->
-                            <do_if value="not $scpCrewSkills.{'$' + $role.$role}?">
-                              <do_for_each name="$skill" in="lookup.skilltype.list">
-                                <do_if value="$role.$role == 'service' and $skill == skilltype.engineering or
-                                  $role.$role == 'marine' and $skill == skilltype.boarding">
-                                  <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
-                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="10" max="14" />
-                                  </do_if>
-                                  <do_else>
-                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="6" max="9" />
-                                  </do_else>
-                                </do_if>
-                                <do_elseif value="$skill == skilltype.morale">
-                                  <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
-                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="8" max="12" />
-                                  </do_if>
-                                  <do_else>
-                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="4" max="7" />
-                                  </do_else>
-                                </do_elseif>
-                                <do_else>
-                                  <do_if value="@$spawnData.$crew.$hasCrewExperience == true">
-                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="6" max="9" />
-                                  </do_if>
-                                  <do_else>
-                                    <set_skill object="$ship" template="$npcTemplate" type="$skill" min="1" max="4" />
-                                  </do_else>
-                                </do_else>
-                              </do_for_each>
-                            </do_if>
-                          </do_if>
-                        </do_all>
-                      </do_if>
-                    </do_for_each>
+                  <!-- Runs last: reconciles whatever the loadout's crew flag left aboard to the slider counts. -->
+                  <do_if value="@$spawnData.$crew.$marines != null">
+                    <set_value name="$scpObject" exact="$ship" />
+                    <set_value name="$scpCrewMarines" exact="$spawnData.$crew.$marines" />
+                    <set_value name="$scpCrewService" exact="$spawnData.$crew.$service" />
+                    <set_value name="$scpCrewRace" exact="race.{$spawnData.$ownerRace}" />
+                    <set_value name="$scpCrewExperience" exact="@$spawnData.$crew.$hasCrewExperience == true" />
+                    <include_actions ref="Scp_Set_Crew_Complement" />
+                    <remove_value name="$scpObject" />
+                    <remove_value name="$scpCrewMarines" />
+                    <remove_value name="$scpCrewService" />
+                    <remove_value name="$scpCrewRace" />
+                    <remove_value name="$scpCrewExperience" />
                   </do_if>
                   <!-- Every ship: the delayed block writes crew skills, not just orders. -->
                   <add_to_group groupname="$ships" object="$ship" />

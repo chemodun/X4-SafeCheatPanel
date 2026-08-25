@@ -159,6 +159,11 @@
         <t id="7440">Set workforce explicitly</t>
         <t id="7441">When enabled, the station's workforce is set to the share of its habitation capacity selected below, filled proportionally across every race the station has habitats for.</t>
         <t id="7442">Share of the station's total workforce capacity. Applying a lower value sends workers away.</t>
+        <!-- Crew size and composition (ship spawn and edit). The slider labels come from vanilla:
+             1001,80 "Crew", 20208,20203 "Marines", 20208,20103 "Service crew". -->
+        <t id="7450">Crew Size and Composition</t>
+        <t id="7451">Number of crew members, as a share of the ship's crew capacity. The pilot is not counted. Applying a lower value dismisses the weakest crew first.</t>
+        <t id="7452">Share of the crew serving as marines; the rest are service crew. Crew already on board are re-assigned before anybody is dismissed.</t>
 
         <!-- Tab 8: Dev Mode -->
         <t id="8000">Dev Tools</t>

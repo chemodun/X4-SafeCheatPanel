@@ -29,7 +29,6 @@ ffi.cdef [[
 
 --region Config
 local menu = {}                  -- the map menu, which hosts the panel
-local shipConfigurationMenu = {} -- source of the loadout presets used by the spawn section
 local interactMenu = {}
 
 local scp = {
@@ -76,10 +75,12 @@ scp.map        = require("extensions.safe_cheat_panel.ui.scp_map")
 scp.destroy    = require("extensions.safe_cheat_panel.ui.scp_destroy")
 scp.crew       = require("extensions.safe_cheat_panel.ui.scp_crew")
 scp.identify   = require("extensions.safe_cheat_panel.ui.scp_identify")
+scp.crewSize   = require("extensions.safe_cheat_panel.ui.scp_crewsize")
 scp.workforce  = require("extensions.safe_cheat_panel.ui.scp_workforce")
 scp.destroy.join(scp)
 scp.crew.join(scp)
 scp.identify.join(scp)
+scp.crewSize.join(scp)
 scp.workforce.join(scp)
 scp.spawner.join(scp)
 
@@ -315,7 +316,6 @@ local function init()
   scp.info("init")
 
   menu = Helper.getMenu("MapMenu")
-  shipConfigurationMenu = Helper.getMenu("ShipConfigurationMenu")
 
   menu.registerCallback("createSideBar_on_start", scp.createSideBar)
   menu.registerCallback("createInfoFrame_on_menu_infoTableMode", scp.createInfoFrame)
@@ -342,7 +342,6 @@ local function init()
   scp.helpers.init(scp.playerId, config.configId)
   scp.inventory.prepareData()
   scp.factions.init(scp.playerId, config.variableId, config.blacklistedFactions)
-  scp.spawner.shipConfigurationMenu = shipConfigurationMenu
   scp.map.init(scp, config)
   scp.spawner.init()
   scp.menuHelper.init()

@@ -5,6 +5,7 @@
     <file name="ui/scp_menu_helper.lua" />
     <file name="ui/scp_equipment.lua" />
     <file name="ui/scp_crew.lua" />
+    <file name="ui/scp_crewsize.lua" />
     <file name="ui/scp_workforce.lua" />
     <file name="ui/scp_identify.lua" />
     <file name="ui/scp_blueprints.lua" />
