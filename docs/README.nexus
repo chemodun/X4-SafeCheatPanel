@@ -20,10 +20,10 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 [*] [b]Blueprints Tab[/b]: Unlock blueprints individually, by subcategory, or all at once.
 [*] [b]Factions Tab[/b]: Edit faction relations with the player and between non-player factions.
 [*] [b]Galaxy/Sectors Tab[/b]: Reveal sectors on the map at three levels of detail, or reveal all at once.
-[*] [b]Spawner Tab[/b]: Spawn stations, ships (with loadout, crew, and job-assignment options), and deployable objects.
+[*] [b]Spawner Tab[/b]: Spawn stations, ships (with loadout, crew skills, and job-assignment options), and deployable objects. Player-owned stations can be given a manager, a ship trader and a starting workforce, none of which the game itself ever assigns.
+[*] [b]Editor[/b]: The same tab doubles as an editor. Right-click a player-owned ship or station to load it in, then set its crew skills, re-equip it to another loadout, fill its empty control posts, or set its workforce. The loadout or construction plan it was built from is identified where that is possible.
 [*] [b]Destroy Object Tab[/b]: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
-[*] [b]Promote Crew Tab[/b]: Set a player ship's Pilot/Captain, Marines, and Service Crew skill levels via star sliders, with an option to set every skill (not just the role-relevant ones) to the chosen level.
-[*] [b]Right-click context menu[/b]: Spawn station, fix station, spawn ships, spawn objects, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector, destroy object, promote crew.
+[*] [b]Right-click context menu[/b]: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector, destroy object.
 [*] [b]Two modes[/b]: [b]Normal[/b] (player-owned spawns only) and [b]Extended[/b] (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
 [*] [b]Compatible with X4 8.00 and 9.00[/b].
 [*] [b]Can work with SWI[/b] - please use with the [url=https://www.nexusmods.com/x4foundations/mods/2134]kuertee UI Extensions and HUD for SW Interworlds adoption mod[/url].
@@ -123,6 +123,7 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [*] Select the owning faction (player only in normal mode; any faction in extended mode).
 [*] Select the crew race (all races available; Kha'ak, Xenon and Drones are not recommended).
 [*] For non-player-owned ships, optionally assign a basic job (Trade, Mine, Salvage, Build, or Fight); only jobs that fit the selected ship are offered, with the best match pre-selected.
+[*] Optionally set the Pilot/Captain, Marines, and Service Crew skill levels exactly, via 1-5 star sliders. The sliders only appear once the option is ticked - left alone, the crew keeps the loadout preset's randomised skill range, and no slider is shown claiming a level the spawn will not use.
 [*] Set the number of ships per row (up to 10) and the number of rows (up to 10).
 [/list]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/loadout_selection.png[/img]
@@ -135,6 +136,9 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [list]
 [*] Select a construction plan (player-created plans, and pre-defined plans in extended mode).
 [*] Select the owning faction (player only in normal mode; any faction in extended mode).
+[*] For a player-owned station, optionally assign a manager and a ship trader. The game gives neither to a player station on its own - a manager normally has to be hired, and a player wharf or shipyard never gets a trader at all. The ship trader option only appears when the selected plan includes a build module - the module that makes a station a wharf, shipyard or equipment dock, and the only thing that gives a trader a place to stand.
+[*] Optionally set the crew skill levels exactly, via 1-5 star sliders. As above, the sliders only appear once the option is ticked. Defence Officer and Engineer are always listed; the Manager and Ship Trader appear only if you asked for them above.
+[*] Optionally set the workforce, as a percentage of the station's total habitation capacity. The game gives a player-owned station no workforce at all, so without this the station starts empty and has to fill up over time. The option only appears when the selected plan includes at least one habitation module, and the slider only once the option is ticked. The percentage is applied to every race the plan has habitats for, so the workers arrive in the same proportion the plan itself calls for.
 [/list]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/station_spawner.png[/img]
 
@@ -145,6 +149,32 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [/list]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/object_spawner.png[/img]
 
+[size=3][u]Editing an Existing Ship or Station[/u][/size]
+
+Right-click a player-owned ship or station while the Spawner tab is open and choose [b]Edit Ship[/b] or [b]Edit Station[/b]. The tab switches to edit mode: the title changes, the mode dropdown is replaced by a fixed [b]Edit Mode[/b] entry, and the object's current configuration is loaded into the controls. Spawning is unavailable until the object is released again, but you can right-click a different ship or station at any time to switch to it directly.
+
+For a ship:
+[list]
+[*] The ship itself is shown but cannot be changed.
+[*] The loadout dropdown shows what the ship currently matches. A named loadout is recognised exactly; a ship with every slot filled is reported as [b]High[/b]; anything else is reported as [b]Custom[/b]. The Low and Medium presets are deliberately never claimed, because the game generates them with enough variation that they cannot be told apart after the fact.
+[*] Picking a different loadout re-equips the ship when you apply. Leaving the dropdown alone never touches its equipment.
+[*] The crew race is shown for information only, as the race shared by the whole crew, or [b]Mixed[/b] when they differ. Changing it is not offered yet.
+[*] Set the Pilot/Captain, Marines, and Service Crew skill levels via 1-5 star sliders; each label shows the category's current average.
+[/list]
+For a station:
+[list]
+[*] The construction plan is identified by comparing the station's modules against your saved and in-game plans, and shown as [b]Unknown[/b] when none match. It cannot be changed.
+[*] A missing manager or ship trader can be added; the ship trader option is only available on a station with a dock that can equip ships.
+[*] Set the Manager, Ship Trader, Defence Officer, and Engineer skill levels via 1-5 star sliders. A post that is neither filled nor being added gets no slider at all.
+[*] The Ship Trader is a special case: the game gives that post no skill relevance of its own, so its rating is read as the plain average of its five skills, and setting it writes all five.
+[*] The workforce can be set to a percentage of the station's habitation capacity, the same way as on a spawn. The label shows the station's current headcount against its capacity, and the slider starts on what the station already has, so applying an untouched slider changes nothing. Applying a lower value sends workers away. Stations with no habitation modules get no option at all.
+[/list]
+In both cases:
+[list]
+[*] By default, only the skill(s) relevant to the role or post are set exactly to the chosen level, while the remaining skills are scaled proportionally to their current values.
+[*] An optional checkbox sets [b]every[/b] skill (not just the relevant ones) to the chosen level instead.
+[*] [b]Cancel[/b] releases the object and drops any pending changes; [b]Reset[/b] reverts the pending changes but keeps the object loaded; [b]Apply[/b] commits them.
+[/list]
 [size=3][u][i]Destroy Object Tab[/i][/u][/size]
 [list]
 [*] The target object can only be set via the [b]Destroy Object[/b] right-click context menu action, which is only offered while this tab is open.
@@ -154,16 +184,6 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [*] The object is removed instantly, without an explosion.
 [/list]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/object_destroy.png[/img]
-
-[size=3][u][i]Promote Crew Tab[/i][/u][/size]
-[list]
-[*] The target ship can only be set via the [b]Promote Crew[/b] right-click context menu action (player-owned ships only), which is only offered while this tab is open.
-[*] Set the Pilot/Captain, Marines, and Service Crew skill levels independently via 1-5 star sliders; each label shows the category's current average.
-[*] By default, only the skill(s) relevant to the role are set exactly to the chosen level, while the remaining skills are scaled proportionally to their current values.
-[*] An optional checkbox sets [b]every[/b] skill (not just the role-relevant ones) to the chosen level instead.
-[*] [b]Cancel[/b] clears the selected ship and any pending changes; [b]Reset[/b] reverts pending slider changes without deselecting the ship; [b]Apply[/b] commits the changes.
-[/list]
-[img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/promote_crew.png[/img]
 
 [size=3][u][i]Right-click Context Menu on Map[/i][/u][/size]
 
@@ -183,7 +203,8 @@ Right-clicking on the map gives access to the following actions, depending on th
 [*] [b]Teleport Here[/b]: Teleports the player's currently piloted ship to the clicked position.
 [*] [b]Teleport To[/b]: Teleports the player character to the clicked object or position.
 [*] [b]Destroy Object[/b]: Sets the clicked object as the target on the Destroy Object tab. Only offered while that tab is open. The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
-[*] [b]Promote Crew[/b]: Sets the clicked ship as the target on the Promote Crew tab. Only offered while that tab is open, and only for player-owned ships.
+[*] [b]Edit Ship[/b]: Loads the clicked ship into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned ships. Stays available while another object is loaded, so you can switch targets directly.
+[*] [b]Edit Station[/b]: Loads the clicked station into the Spawner tab for editing. Same conditions as above.
 [/list]
 [size=3][u][i]Extension Options[/i][/u][/size]
 
@@ -213,6 +234,26 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [/list]
 [size=3][u][b]Changelog[/b][/u][/size]
 
+[size=3][u][i][8.00.39] - 2026-08-??[/i][/u][/size]
+[list]
+[*] [b]Added[/b]
+[list]
+[*] Spawner tab: [b]Edit Mode[/b]. Right-click a player-owned ship or station and choose Edit Ship or Edit Station to load it into the tab, then change its crew skill levels, re-equip a ship with a different loadout, or add a manager and a ship trader to a station.
+[*] Ship and station spawns can set crew skill levels explicitly, instead of taking the loadout preset's randomised range.
+[*] Stations can be spawned with a manager, and wharfs, shipyards and equipment docks with a ship trader. The game normally withholds both from player-owned stations.
+[*] Station workforce can be set as a percentage of the station's habitation capacity, on a spawn and in edit mode. A player-owned station otherwise starts with no workers at all. The percentage is applied per race, so a plan with habitats for several races fills proportionally.
+[/list]
+[*] [b]Changed[/b]
+[list]
+[*] Control post names now use the game's own wording for Manager, Engineer and Ship Trader, including the female forms.
+[*] The Promote Crew tab is gone. Everything it did is now in the Spawner tab's edit mode, alongside the new options.
+[/list]
+[*] [b]Fixed[/b]
+[list]
+[*] The ship trader's skill level was silently ignored when spawning or editing a station.
+[*] "Set all skills to the selected level" now counts as a change on its own, so Reset and Apply become available and it can be applied without moving a slider first.
+[/list]
+[/list]
 [size=3][u][i][8.00.38] - 2026-08-04[/i][/u][/size]
 [list]
 [*] [b]Fixed[/b]
