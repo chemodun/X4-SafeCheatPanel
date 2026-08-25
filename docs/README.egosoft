@@ -123,6 +123,7 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [*] Select the owning faction (player only in normal mode; any faction in extended mode).
 [*] Select the crew race (all races available; Kha'ak, Xenon and Drones are not recommended).
 [*] For non-player-owned ships, optionally assign a basic job (Trade, Mine, Salvage, Build, or Fight); only jobs that fit the selected ship are offered, with the best match pre-selected.
+[*] Set how big the crew is and how it is made up, with two sliders: the crew as a percentage of the ship's crew capacity (the pilot is not counted), and how much of that crew are marines rather than service crew. Both start at a full crew split down the middle, and they override whatever the loadout would have crewed.
 [*] Optionally set Pilot/Captain, Marines and Service Crew skill levels via 1-5 star sliders. Left off, the crew keeps the loadout preset's randomised range.
 [*] Set the number of ships per row (up to 10) and the number of rows (up to 10).
 [/list]
@@ -159,6 +160,7 @@ For a ship:
 [*] The loadout dropdown shows what the ship matches: a named loadout exactly, a fully-filled ship as [b]High[/b], anything else as [b]Custom[/b]. Low and Medium are never claimed - the game varies them too much to tell apart.
 [*] Picking a different loadout re-equips the ship on apply. Leaving it alone never touches its equipment.
 [*] The crew race is shown for information only, or [b]Mixed[/b] when they differ.
+[*] The same two crew sliders as on a spawn, but starting on what the ship actually has, so an untouched slider changes nothing. Raising the crew hires; lowering it dismisses the weakest first. Moving the marine share re-assigns crew already on board before anybody is dismissed.
 [*] Set Pilot/Captain, Marines and Service Crew skill levels via 1-5 star sliders; each label shows the current average.
 [/list]
 For a station:
@@ -238,7 +240,8 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [*] [b]Added[/b]
 [list]
 [*] Spawner tab [b]Edit Mode[/b]: right-click a player-owned ship or station to load it in, then set crew skills, re-equip a ship, fill a station's empty control posts or change its workforce.
-[*] Edit mode names the loadout or construction plan an object was built from.
+[*] Edit mode identifies the loadout or construction plan an object was built from.
+[*] Crew size and composition sliders for ships, on a spawn and in edit mode: how full the crew is, and how much of it are marines rather than service crew.
 [*] Crew skill levels can be set exactly on a spawn, not just left to the loadout preset.
 [*] Player stations can be spawned with a manager, and wharfs, shipyards and equipment docks with a ship trader.
 [*] Station workforce can be set as a percentage of habitation capacity, on a spawn and in edit mode.
