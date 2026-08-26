@@ -54,7 +54,7 @@ Open the map and click the **Safe Cheat Panel** icon in the left sidebar to open
 - Add spacesuit upgrades.
 - Add spacesuit ammo (0 - 10,000).
 
-![Spacesuit Upgrades](docs/images/spacesuit_upgrades.png)
+![Player Money and Spacesuit Upgrades](docs/images/player_money_and_spacesuit_upgrades.png)
 
 ### Inventory Tab
 
