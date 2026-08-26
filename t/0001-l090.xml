@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Safe Cheat Panel - Turkish text, page 1972092427 -->
+<diff>
+    <add sel="/language">
+        <page id="1972092427" title="Safe Cheat Panel" descr="" voice="no">
+            <!-- Panel identity -->
+            <t id="1">Safe Cheat Panel</t>
+            <t id="2">Safe Cheat Panel, Chem O`Dun tarafından hazırlandı.</t>
+
+            <!-- Right Click / Interact Menu -->
+            <t id="100">%s oluştur</t>
+            <t id="101">İstasyon oluştur</t>
+            <t id="102">Gemi oluştur</t>
+            <t id="103">Nesne oluştur</t>
+            <t id="104">Buraya ışınlan</t>
+            <t id="105">Şuraya ışınlan</t>
+            <t id="106">Pilot koltuğuna ışınlan</t>
+            <t id="107">İstasyon yönetim personelini onar</t>
+            <t id="108">Sektördeki istasyonları göster</t>
+            <t id="109">İnşayı zorla tamamla: mevcut istasyon</t>
+            <t id="110">İnşayı zorla tamamla: hizbin tüm istasyonları</t>
+            <t id="111">İkmal: mevcut istasyon</t>
+            <t id="112">İkmal: hizbin tüm istasyonları</t>
+            <t id="113">İkmal: mevcut inşaat deposu</t>
+            <t id="114">İkmal: hizbin tüm inşaat depoları</t>
+            <t id="115">Nesneyi yok et</t>
+            <t id="117">Gemiyi düzenle</t>
+            <t id="118">İstasyonu düzenle</t>
+
+            <!-- Tab 1: Player -->
+            <t id="1000">Oyuncu</t>
+            <t id="1001">Oyuncu hileleri</t>
+            <t id="1100">Para</t>
+            <t id="1101">Girilen tutar 0 ile 1.000.000.000.000.000 arasına sınırlanır</t>
+            <t id="1102">Planlar</t>
+            <t id="1103">Planların kilidini aç</t>
+            <t id="1104">Ansiklopedi</t>
+            <t id="1105">Tüm kayıtların kilidini aç</t>
+            <t id="1106">Araştırma</t>
+            <t id="1107">Tüm araştırmaların kilidini aç</t>
+            <t id="1108">Araştırma kilitli</t>
+            <t id="1109">Araştırmanın kilidini açana kadar devre dışı.</t>
+            <t id="1110">Girilen tutar 0 ile 10.000 arasına sınırlanır</t>
+            <t id="1111">Zaten açık</t>
+            <!-- Spacesuit Upgrades -->
+            <t id="1200">Uzay giysisi yükseltmeleri</t>
+            <t id="1201">Yükseltme ekle</t>
+            <t id="1202">Yükseltme zaten edinilmiş</t>
+            <!-- Spacesuit Ammo -->
+            <t id="1300">Uzay giysisi mühimmatı</t>
+            <t id="1301">Ekle</t>
+
+            <!-- Tab 2: Inventory -->
+            <t id="2000">Oyuncu envanteri</t>
+            <t id="2001">Envanter hileleri</t>
+            <t id="2002">Miktarı düzenlemek için düğmeye bas</t>
+            <t id="2003">İstediğin miktarı ayarla</t>
+            <t id="2010">Bir kategori seç</t>
+            <t id="2901">Modifikasyon parçaları</t>
+            <t id="2902">Seminerler</t>
+            <t id="2903">Yalnızca göreve özel eşyalar</t>
+
+            <!-- Tab 3: Research -->
+            <t id="3000">{1001,7400}</t>
+            <t id="3001">{1001,7400} hileleri</t>
+            <t id="3011">Tümünün kilidini aç</t>
+            <t id="3012">Açılacak bir şey yok</t>
+            <t id="3020">Araştırmaları tek tek işle</t>
+            <t id="3021">Kilidi aç</t>
+            <t id="3022">Kilitle</t>
+
+            <!-- Tab 4: Blueprint -->
+            <t id="4000">{1001,98}</t>
+            <t id="4001">{1001,98} hileleri</t>
+            <t id="4010">Kategori</t>
+            <t id="4011">Tümü</t>
+            <t id="4012">Alt kategori</t>
+            <t id="4020">Tümünün kilidini aç</t>
+            <t id="4021">Tümü açık</t>
+            <t id="4022">Kilidi aç</t>
+
+            <!-- Tab 5: Factions -->
+            <t id="5000">{1001, 7703}(Factions and Relations)</t>
+            <t id="5001">{1001, 7703} hileleri</t>
+            <t id="5002">{1001, 9928}(Relations)</t>
+            <t id="5005">Bir hizip seç</t>
+
+            <!-- Tab 6: Map / Sectors -->
+            <t id="6001">Göster</t>
+            <t id="6002">Tümünü göster</t>
+            <t id="6003">Tümü gösterildi</t>
+            <t id="6004">Tamamen gösterildi</t>
+            <t id="6005">Rotayı göster</t>
+            <t id="6006">Geçitleri göster</t>
+            <t id="6007">Tüm geçitleri göster</t>
+
+            <!-- Tab 7: Object Spawner -->
+            <t id="7000">Nesne oluşturucu</t>
+            <t id="7001">Nesne oluşturucu hileleri</t>
+            <t id="7002">İstasyon</t>
+            <t id="7003">Gemiler</t>
+            <t id="7004">Nesneler</t>
+            <t id="7005">Bir hizip seç</t>
+            <t id="7006">Mürettebat ırkı seç</t>
+            <t id="7007">Oluşturucu seçenekleri</t>
+            <t id="7008">Oluşturma kipi</t>
+            <!-- Station Spawner Mode -->
+            <t id="7100">Bir inşa planı seç</t>
+            <t id="7101">Plan türü</t>
+            <t id="7102">Oyun içi planlar</t>
+            <t id="7103">Oyuncunun hazırladığı planlar</t>
+            <t id="7104">Bir oyuncu planı seç</t>
+            <t id="7105">Kullanılabilir oyuncu planı yok</t>
+            <!-- Ship Spawner Mode -->
+            <t id="7200">Bir gemi seç</t>
+            <t id="7201">Sıra başına sayı</t>
+            <t id="7202">Sıra başına oluşturulacak gemi sayısı</t>
+            <t id="7203">Sıra sayısı</t>
+            <t id="7204">Oluşturulacak sıra sayısı</t>
+            <t id="7205">Merkezden oluştur</t>
+            <t id="7206">İşaretsiz:</t>
+            <t id="7207">Tıkladığın nokta oluşturma alanının sol üst köşesidir</t>
+            <t id="7208">İşaretli:</t>
+            <t id="7209">Tıkladığın nokta oluşturma alanının merkezidir</t>
+            <t id="7210">Görev ata</t>
+            <t id="7211">Etkinleştirildiğinde, oluşturulan gemilere seçilen göreve uygun bir varsayılan YZ emri verilir. Yalnızca oyuncuya ait olmayan gemiler için kullanılabilir.</t>
+            <t id="7212">Görev</t>
+            <t id="7213">Bir görev seç</t>
+            <t id="7219">--- Oyuncu tanımlı ---</t>
+            <!-- Object Spawner Mode -->
+            <t id="7300">Bir nesne seç</t>
+            <t id="7301">Sıra başına sayı</t>
+            <t id="7302">Sıra başına oluşturulacak nesne sayısı</t>
+            <t id="7303">Sıra sayısı</t>
+            <t id="7304">Oluşturulacak sıra sayısı</t>
+            <t id="7305">Metre cinsinden aralık</t>
+            <t id="7306">Nesneler arasındaki metre cinsinden mesafe</t>
+            <!-- Edit Mode (existing object loaded into the tab) -->
+            <t id="7400">Nesne düzenleyici</t>
+            <t id="7401">Düzenleme kipi</t>
+            <t id="7402">Özel</t>
+            <t id="7403">Karışık</t>
+            <t id="7404">Atanmamış</t>
+            <t id="7405">Bilinmiyor</t>
+            <!-- Crew skills (spawn and edit) -->
+            <t id="7410">Mürettebat becerileri</t>
+            <t id="7411">Mürettebat becerilerini açıkça belirle</t>
+            <t id="7412">Etkinleştirildiğinde mürettebat, donanım ön ayarının rastgele aralığı yerine tam olarak aşağıda belirlenen beceri seviyelerini alır.</t>
+            <t id="7413">Tüm becerileri seçilen seviyeye ayarla (yalnızca mevcut görevle ilgili olanları değil)</t>
+            <!-- Station control entities -->
+            <t id="7420">İstasyon mürettebatı</t>
+            <t id="7421">Bir müdür ata</t>
+            <t id="7422">Müdürü olmayan bir istasyon ne ticaret yapar ne de üretir. Orijinal oyunda, sen birini işe alana kadar oyuncu istasyonları müdürsüz kalır.</t>
+            <t id="7423">Bir gemi satıcısı ekle</t>
+            <t id="7424">Gemi satıcısına yer açan istasyonlar yalnızca gemi donatabilen bir rıhtım modülüne sahip olanlardır.</t>
+            <t id="7426">Savunma subayı</t>
+            <!-- Edit actions -->
+            <t id="7430">Uygula</t>
+            <!-- Station workforce. The section title and the slider label come from vanilla page 1001
+                 (2456 "Station Workforce", 9415 "Workforce" - the latter is vanilla's own workforce header). -->
+            <t id="7440">İş gücünü açıkça belirle</t>
+            <t id="7441">Etkinleştirildiğinde istasyonun iş gücü, aşağıda seçilen barınma kapasitesi oranına ayarlanır ve istasyonun barınağı bulunan tüm ırklara orantılı olarak dağıtılır.</t>
+            <t id="7442">İstasyonun toplam iş gücü kapasitesine oranı. Daha düşük bir değer uygulamak işçileri gönderir.</t>
+            <!-- Crew size and composition (ship spawn and edit). The slider labels come from vanilla:
+                 1001,80 "Crew", 20208,20203 "Marines", 20208,20103 "Service crew". -->
+            <t id="7450">Mürettebat büyüklüğü ve bileşimi</t>
+            <t id="7451">Geminin mürettebat kapasitesine oran olarak mürettebat sayısı. Pilot sayılmaz. Daha düşük bir değer uygulamak önce en zayıf mürettebatı görevden alır.</t>
+            <t id="7452">Deniz piyadesi olarak görev yapan mürettebatın oranı; geri kalanı servis mürettebatıdır. Gemide bulunan mürettebat, kimse görevden alınmadan önce yeniden görevlendirilir.</t>
+
+            <!-- Tab 8: Dev Mode -->
+            <t id="8000">Geliştirici araçları</t>
+            <t id="8001">Mod yazarları için faydalı işlevler</t>
+
+            <!-- Tab 9: Destroy Object -->
+            <t id="9000">Nesneyi yok et</t>
+            <t id="9001">Haritadaki herhangi bir nesneyi yok et</t>
+            <t id="9010">Seçili nesne yok. Bu sekmeyi açık bırak ve haritadaki bir nesnede sağ tık menüsünü kullan.</t>
+            <t id="9020">Seçili nesnenin yok edilmesini onayla</t>
+            <t id="9030">Yok et</t>
+
+            <!-- Settings (Options Menu) -->
+            <t id="90000">Ayarlar</t>
+            <t id="90010">Panel kipi</t>
+            <t id="90011">Normal</t>
+            <t id="90012">Genişletilmiş</t>
+            <t id="90013">Geliştirici</t>
+            <t id="90090">Hata ayıklama düzeyi</t>
+            <t id="90091">Hata ayıklama</t>
+            <t id="90092">İzleme</t>
+        </page>
+    </add>
+</diff>

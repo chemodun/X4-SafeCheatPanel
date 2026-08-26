@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Safe Cheat Panel - German text, page 1972092427 -->
+<diff>
+    <add sel="/language">
+        <page id="1972092427" title="Safe Cheat Panel" descr="" voice="no">
+            <!-- Panel identity -->
+            <t id="1">Safe Cheat Panel</t>
+            <t id="2">Safe Cheat Panel, erstellt von Chem O`Dun.</t>
+
+            <!-- Right Click / Interact Menu -->
+            <t id="100">%s erzeugen</t>
+            <t id="101">Station erzeugen</t>
+            <t id="102">Schiffe erzeugen</t>
+            <t id="103">Objekte erzeugen</t>
+            <t id="104">Hierher teleportieren</t>
+            <t id="105">Teleportieren zu</t>
+            <t id="106">Zum Pilotensitz teleportieren</t>
+            <t id="107">Stationspersonal reparieren</t>
+            <t id="108">Stationen im Sektor aufdecken</t>
+            <t id="109">Bau erzwingen: Aktuelle Station</t>
+            <t id="110">Bau erzwingen: Alle Stationen der Fraktion</t>
+            <t id="111">Auffüllen: Aktuelle Station</t>
+            <t id="112">Auffüllen: Alle Stationen der Fraktion</t>
+            <t id="113">Auffüllen: Aktueller Bauspeicher</t>
+            <t id="114">Auffüllen: Alle Bauspeicher der Fraktion</t>
+            <t id="115">Objekt zerstören</t>
+            <t id="117">Schiff bearbeiten</t>
+            <t id="118">Station bearbeiten</t>
+
+            <!-- Tab 1: Player -->
+            <t id="1000">Spieler</t>
+            <t id="1001">Spieler-Cheats</t>
+            <t id="1100">Geld</t>
+            <t id="1101">Der eingegebene Betrag wird auf 0 bis 1.000.000.000.000.000 begrenzt</t>
+            <t id="1102">Blaupausen</t>
+            <t id="1103">Blaupausen freischalten</t>
+            <t id="1104">Enzyklopädie</t>
+            <t id="1105">Alle Einträge freischalten</t>
+            <t id="1106">Forschung</t>
+            <t id="1107">Gesamte Forschung freischalten</t>
+            <t id="1108">Forschung ist gesperrt</t>
+            <t id="1109">Deaktiviert, bis du die Forschung freigeschaltet hast.</t>
+            <t id="1110">Der eingegebene Betrag wird auf 0 bis 10.000 begrenzt</t>
+            <t id="1111">Bereits freigeschaltet</t>
+            <!-- Spacesuit Upgrades -->
+            <t id="1200">Raumanzug-Verbesserungen</t>
+            <t id="1201">Verbesserung hinzufügen</t>
+            <t id="1202">Verbesserung bereits erworben</t>
+            <!-- Spacesuit Ammo -->
+            <t id="1300">Raumanzug-Munition</t>
+            <t id="1301">Hinzufügen</t>
+
+            <!-- Tab 2: Inventory -->
+            <t id="2000">Spielerinventar</t>
+            <t id="2001">Inventar-Cheats</t>
+            <t id="2002">Knopf drücken, um die Menge zu ändern</t>
+            <t id="2003">Gewünschte Menge festlegen</t>
+            <t id="2010">Kategorie wählen</t>
+            <t id="2901">Modifikationsteile</t>
+            <t id="2902">Seminare</t>
+            <t id="2903">Reine Missionsgegenstände</t>
+
+            <!-- Tab 3: Research -->
+            <t id="3000">{1001,7400}</t>
+            <t id="3001">{1001,7400}-Cheats</t>
+            <t id="3011">Alle freischalten</t>
+            <t id="3012">Nichts freizuschalten</t>
+            <t id="3020">Forschung einzeln bearbeiten</t>
+            <t id="3021">Freischalten</t>
+            <t id="3022">Sperren</t>
+
+            <!-- Tab 4: Blueprint -->
+            <t id="4000">{1001,98}</t>
+            <t id="4001">{1001,98}-Cheats</t>
+            <t id="4010">Kategorie</t>
+            <t id="4011">Alle</t>
+            <t id="4012">Unterkategorie</t>
+            <t id="4020">Alle freischalten</t>
+            <t id="4021">Alle freigeschaltet</t>
+            <t id="4022">Freischalten</t>
+
+            <!-- Tab 5: Factions -->
+            <t id="5000">{1001, 7703}(Factions and Relations)</t>
+            <t id="5001">{1001, 7703}-Cheats</t>
+            <t id="5002">{1001, 9928}(Relations)</t>
+            <t id="5005">Fraktion wählen</t>
+
+            <!-- Tab 6: Map / Sectors -->
+            <t id="6001">Aufdecken</t>
+            <t id="6002">Alle aufdecken</t>
+            <t id="6003">Alle aufgedeckt</t>
+            <t id="6004">Vollständig aufgedeckt</t>
+            <t id="6005">Route aufdecken</t>
+            <t id="6006">Tore aufdecken</t>
+            <t id="6007">Alle Tore aufdecken</t>
+
+            <!-- Tab 7: Object Spawner -->
+            <t id="7000">Objekterzeuger</t>
+            <t id="7001">Objekterzeuger-Cheats</t>
+            <t id="7002">Station</t>
+            <t id="7003">Schiffe</t>
+            <t id="7004">Objekte</t>
+            <t id="7005">Fraktion wählen</t>
+            <t id="7006">Volk der Crew wählen</t>
+            <t id="7007">Optionen des Erzeugers</t>
+            <t id="7008">Erzeugungsmodus</t>
+            <!-- Station Spawner Mode -->
+            <t id="7100">Bauplan wählen</t>
+            <t id="7101">Planart</t>
+            <t id="7102">Pläne aus dem Spiel</t>
+            <t id="7103">Vom Spieler erstellte Pläne</t>
+            <t id="7104">Spielerplan wählen</t>
+            <t id="7105">Keine Spielerpläne verfügbar</t>
+            <!-- Ship Spawner Mode -->
+            <t id="7200">Schiff wählen</t>
+            <t id="7201">Anzahl pro Reihe</t>
+            <t id="7202">Anzahl der Schiffe, die pro Reihe erzeugt werden</t>
+            <t id="7203">Anzahl der Reihen</t>
+            <t id="7204">Anzahl der zu erzeugenden Reihen</t>
+            <t id="7205">Von der Mitte aus erzeugen</t>
+            <t id="7206">Nicht aktiviert:</t>
+            <t id="7207">Der angeklickte Punkt ist die obere linke Ecke des Erzeugungsbereichs</t>
+            <t id="7208">Aktiviert:</t>
+            <t id="7209">Der angeklickte Punkt ist die Mitte des Erzeugungsbereichs</t>
+            <t id="7210">Aufgabe zuweisen</t>
+            <t id="7211">Wenn aktiviert, erhalten die erzeugten Schiffe einen Standardbefehl passend zur gewählten Aufgabe. Nur für Schiffe verfügbar, die nicht dem Spieler gehören.</t>
+            <t id="7212">Aufgabe</t>
+            <t id="7213">Aufgabe wählen</t>
+            <t id="7219">--- Vom Spieler definiert ---</t>
+            <!-- Object Spawner Mode -->
+            <t id="7300">Objekt wählen</t>
+            <t id="7301">Anzahl pro Reihe</t>
+            <t id="7302">Anzahl der Objekte, die pro Reihe erzeugt werden</t>
+            <t id="7303">Anzahl der Reihen</t>
+            <t id="7304">Anzahl der zu erzeugenden Reihen</t>
+            <t id="7305">Abstand in Metern</t>
+            <t id="7306">Abstand zwischen den Objekten in Metern</t>
+            <!-- Edit Mode (existing object loaded into the tab) -->
+            <t id="7400">Objekteditor</t>
+            <t id="7401">Bearbeitungsmodus</t>
+            <t id="7402">Benutzerdefiniert</t>
+            <t id="7403">Gemischt</t>
+            <t id="7404">Nicht zugewiesen</t>
+            <t id="7405">Unbekannt</t>
+            <!-- Crew skills (spawn and edit) -->
+            <t id="7410">Crew-Fähigkeiten</t>
+            <t id="7411">Crew-Fähigkeiten ausdrücklich festlegen</t>
+            <t id="7412">Wenn aktiviert, erhält die Crew genau die unten eingestellten Fähigkeitsstufen statt der zufälligen Spanne der Ausrüstungsvorlage.</t>
+            <t id="7413">Alle Fähigkeiten auf die gewählte Stufe setzen (nicht nur die für die aktuelle Rolle relevanten)</t>
+            <!-- Station control entities -->
+            <t id="7420">Stationscrew</t>
+            <t id="7421">Manager zuweisen</t>
+            <t id="7422">Eine Station ohne Manager handelt nicht und produziert nicht. Im Original bleiben Spielerstationen ohne Manager, bis du jemanden anheuerst.</t>
+            <t id="7423">Schiffshändler hinzufügen</t>
+            <t id="7424">Nur Stationen mit einem Dockmodul, das Schiffe ausrüsten kann, haben Platz für einen Schiffshändler.</t>
+            <t id="7426">Verteidigungsoffizier</t>
+            <!-- Edit actions -->
+            <t id="7430">Übernehmen</t>
+            <!-- Station workforce. The section title and the slider label come from vanilla page 1001
+                 (2456 "Station Workforce", 9415 "Workforce" - the latter is vanilla's own workforce header). -->
+            <t id="7440">Arbeitskräfte ausdrücklich festlegen</t>
+            <t id="7441">Wenn aktiviert, werden die Arbeitskräfte der Station auf den unten gewählten Anteil ihrer Wohnkapazität gesetzt und anteilig auf alle Völker verteilt, für die die Station Wohnmodule hat.</t>
+            <t id="7442">Anteil der gesamten Arbeitskräftekapazität der Station. Ein niedrigerer Wert schickt Arbeitskräfte fort.</t>
+            <!-- Crew size and composition (ship spawn and edit). The slider labels come from vanilla:
+                 1001,80 "Crew", 20208,20203 "Marines", 20208,20103 "Service crew". -->
+            <t id="7450">Größe und Zusammensetzung der Crew</t>
+            <t id="7451">Anzahl der Crewmitglieder als Anteil der Crewkapazität des Schiffes. Der Pilot zählt nicht mit. Ein niedrigerer Wert entlässt zuerst die schwächsten Crewmitglieder.</t>
+            <t id="7452">Anteil der Crew, der als Marines dient; der Rest ist Servicepersonal. Bereits an Bord befindliche Crew wird umverteilt, bevor jemand entlassen wird.</t>
+
+            <!-- Tab 8: Dev Mode -->
+            <t id="8000">Entwicklerwerkzeuge</t>
+            <t id="8001">Funktionen, die für Mod-Autoren nützlich sind</t>
+
+            <!-- Tab 9: Destroy Object -->
+            <t id="9000">Objekt zerstören</t>
+            <t id="9001">Beliebiges Kartenobjekt zerstören</t>
+            <t id="9010">Kein Objekt gewählt. Lass diesen Reiter offen und benutze das Rechtsklickmenü auf einem Kartenobjekt.</t>
+            <t id="9020">Zerstörung des gewählten Objekts bestätigen</t>
+            <t id="9030">Zerstören</t>
+
+            <!-- Settings (Options Menu) -->
+            <t id="90000">Einstellungen</t>
+            <t id="90010">Panel-Modus</t>
+            <t id="90011">Normal</t>
+            <t id="90012">Erweitert</t>
+            <t id="90013">Entwickler</t>
+            <t id="90090">Debug-Stufe</t>
+            <t id="90091">Debug</t>
+            <t id="90092">Ablaufverfolgung</t>
+        </page>
+    </add>
+</diff>

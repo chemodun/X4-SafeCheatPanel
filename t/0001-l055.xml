@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Safe Cheat Panel - Portuguese text, page 1972092427 -->
+<diff>
+    <add sel="/language">
+        <page id="1972092427" title="Safe Cheat Panel" descr="" voice="no">
+            <!-- Panel identity -->
+            <t id="1">Safe Cheat Panel</t>
+            <t id="2">Safe Cheat Panel criado por Chem O`Dun.</t>
+
+            <!-- Right Click / Interact Menu -->
+            <t id="100">Gerar %s</t>
+            <t id="101">Gerar estação</t>
+            <t id="102">Gerar naves</t>
+            <t id="103">Gerar objetos</t>
+            <t id="104">Teletransportar para aqui</t>
+            <t id="105">Teletransportar para</t>
+            <t id="106">Teletransportar para o assento do piloto</t>
+            <t id="107">Corrigir o pessoal de controlo da estação</t>
+            <t id="108">Revelar estações do setor</t>
+            <t id="109">Forçar conclusão da construção: estação atual</t>
+            <t id="110">Forçar conclusão da construção: todas as estações da fação</t>
+            <t id="111">Reabastecer: estação atual</t>
+            <t id="112">Reabastecer: todas as estações da fação</t>
+            <t id="113">Reabastecer: armazém de construção atual</t>
+            <t id="114">Reabastecer: todos os armazéns de construção da fação</t>
+            <t id="115">Destruir objeto</t>
+            <t id="117">Editar nave</t>
+            <t id="118">Editar estação</t>
+
+            <!-- Tab 1: Player -->
+            <t id="1000">Jogador</t>
+            <t id="1001">Batotas do jogador</t>
+            <t id="1100">Dinheiro</t>
+            <t id="1101">O valor introduzido será limitado entre 0 e 1 000 000 000 000 000</t>
+            <t id="1102">Plantas</t>
+            <t id="1103">Desbloquear plantas</t>
+            <t id="1104">Enciclopédia</t>
+            <t id="1105">Desbloquear todas as entradas</t>
+            <t id="1106">Investigação</t>
+            <t id="1107">Desbloquear toda a investigação</t>
+            <t id="1108">A investigação está bloqueada</t>
+            <t id="1109">Desativado até teres desbloqueado a investigação.</t>
+            <t id="1110">O valor introduzido será limitado entre 0 e 10 000</t>
+            <t id="1111">Já desbloqueado</t>
+            <!-- Spacesuit Upgrades -->
+            <t id="1200">Melhorias do fato espacial</t>
+            <t id="1201">Adicionar melhoria</t>
+            <t id="1202">Melhoria já adquirida</t>
+            <!-- Spacesuit Ammo -->
+            <t id="1300">Munições do fato espacial</t>
+            <t id="1301">Adicionar</t>
+
+            <!-- Tab 2: Inventory -->
+            <t id="2000">Inventário do jogador</t>
+            <t id="2001">Batotas do inventário</t>
+            <t id="2002">Prime o botão para editar a quantidade</t>
+            <t id="2003">Define a quantidade pretendida</t>
+            <t id="2010">Escolhe uma categoria</t>
+            <t id="2901">Peças de modificação</t>
+            <t id="2902">Seminários</t>
+            <t id="2903">Itens exclusivos de missão</t>
+
+            <!-- Tab 3: Research -->
+            <t id="3000">{1001,7400}</t>
+            <t id="3001">Batotas: {1001,7400}</t>
+            <t id="3011">Desbloquear tudo</t>
+            <t id="3012">Nada para desbloquear</t>
+            <t id="3020">Processar a investigação individualmente</t>
+            <t id="3021">Desbloquear</t>
+            <t id="3022">Bloquear</t>
+
+            <!-- Tab 4: Blueprint -->
+            <t id="4000">{1001,98}</t>
+            <t id="4001">Batotas: {1001,98}</t>
+            <t id="4010">Categoria</t>
+            <t id="4011">Tudo</t>
+            <t id="4012">Subcategoria</t>
+            <t id="4020">Desbloquear tudo</t>
+            <t id="4021">Tudo desbloqueado</t>
+            <t id="4022">Desbloquear</t>
+
+            <!-- Tab 5: Factions -->
+            <t id="5000">{1001, 7703}(Factions and Relations)</t>
+            <t id="5001">Batotas: {1001, 7703}</t>
+            <t id="5002">{1001, 9928}(Relations)</t>
+            <t id="5005">Escolhe uma fação</t>
+
+            <!-- Tab 6: Map / Sectors -->
+            <t id="6001">Revelar</t>
+            <t id="6002">Revelar tudo</t>
+            <t id="6003">Tudo revelado</t>
+            <t id="6004">Totalmente revelado</t>
+            <t id="6005">Revelar o percurso</t>
+            <t id="6006">Revelar portais</t>
+            <t id="6007">Revelar todos os portais</t>
+
+            <!-- Tab 7: Object Spawner -->
+            <t id="7000">Gerador de objetos</t>
+            <t id="7001">Batotas do gerador de objetos</t>
+            <t id="7002">Estação</t>
+            <t id="7003">Naves</t>
+            <t id="7004">Objetos</t>
+            <t id="7005">Escolhe uma fação</t>
+            <t id="7006">Escolhe uma raça para a tripulação</t>
+            <t id="7007">Opções do gerador</t>
+            <t id="7008">Modo do gerador</t>
+            <!-- Station Spawner Mode -->
+            <t id="7100">Escolhe um plano de construção</t>
+            <t id="7101">Tipo de plano</t>
+            <t id="7102">Planos do jogo</t>
+            <t id="7103">Planos criados pelo jogador</t>
+            <t id="7104">Escolhe um plano do jogador</t>
+            <t id="7105">Não há planos do jogador disponíveis</t>
+            <!-- Ship Spawner Mode -->
+            <t id="7200">Escolhe uma nave</t>
+            <t id="7201">Quantidade por fila</t>
+            <t id="7202">Número de naves a gerar por fila</t>
+            <t id="7203">Número de filas</t>
+            <t id="7204">Número de filas a gerar</t>
+            <t id="7205">Gerar a partir do centro</t>
+            <t id="7206">Desmarcado:</t>
+            <t id="7207">O ponto onde clicaste é o canto superior esquerdo da área de geração</t>
+            <t id="7208">Marcado:</t>
+            <t id="7209">O ponto onde clicaste é o centro da área de geração</t>
+            <t id="7210">Atribuir tarefa</t>
+            <t id="7211">Quando ativado, as naves geradas recebem uma ordem de IA predefinida correspondente à tarefa escolhida. Só disponível para naves que não pertencem ao jogador.</t>
+            <t id="7212">Tarefa</t>
+            <t id="7213">Escolhe uma tarefa</t>
+            <t id="7219">--- Definido pelo jogador ---</t>
+            <!-- Object Spawner Mode -->
+            <t id="7300">Escolhe um objeto</t>
+            <t id="7301">Quantidade por fila</t>
+            <t id="7302">Número de objetos a gerar por fila</t>
+            <t id="7303">Número de filas</t>
+            <t id="7304">Número de filas a gerar</t>
+            <t id="7305">Espaçamento em metros</t>
+            <t id="7306">Distância entre objetos em metros</t>
+            <!-- Edit Mode (existing object loaded into the tab) -->
+            <t id="7400">Editor de objetos</t>
+            <t id="7401">Modo de edição</t>
+            <t id="7402">Personalizado</t>
+            <t id="7403">Misto</t>
+            <t id="7404">Não atribuído</t>
+            <t id="7405">Desconhecido</t>
+            <!-- Crew skills (spawn and edit) -->
+            <t id="7410">Competências da tripulação</t>
+            <t id="7411">Definir explicitamente as competências da tripulação</t>
+            <t id="7412">Quando ativado, a tripulação recebe exatamente os níveis de competência definidos abaixo em vez do intervalo aleatório do equipamento predefinido.</t>
+            <t id="7413">Definir todas as competências para o nível escolhido (não apenas as relevantes para a função atual)</t>
+            <!-- Station control entities -->
+            <t id="7420">Tripulação da estação</t>
+            <t id="7421">Atribuir um gestor</t>
+            <t id="7422">Uma estação sem gestor não comercia nem produz. No jogo base, as estações do jogador ficam sem gestor até contratares alguém.</t>
+            <t id="7423">Adicionar um vendedor de naves</t>
+            <t id="7424">Só as estações com um módulo de doca capaz de equipar naves têm lugar para um vendedor de naves.</t>
+            <t id="7426">Oficial de defesa</t>
+            <!-- Edit actions -->
+            <t id="7430">Aplicar</t>
+            <!-- Station workforce. The section title and the slider label come from vanilla page 1001
+                 (2456 "Station Workforce", 9415 "Workforce" - the latter is vanilla's own workforce header). -->
+            <t id="7440">Definir explicitamente a mão de obra</t>
+            <t id="7441">Quando ativado, a mão de obra da estação é definida para a parte da sua capacidade de habitação escolhida abaixo, distribuída proporcionalmente por todas as raças para as quais a estação tem habitações.</t>
+            <t id="7442">Parte da capacidade total de mão de obra da estação. Aplicar um valor mais baixo manda trabalhadores embora.</t>
+            <!-- Crew size and composition (ship spawn and edit). The slider labels come from vanilla:
+                 1001,80 "Crew", 20208,20203 "Marines", 20208,20103 "Service crew". -->
+            <t id="7450">Dimensão e composição da tripulação</t>
+            <t id="7451">Número de tripulantes, como parte da capacidade de tripulação da nave. O piloto não conta. Aplicar um valor mais baixo dispensa primeiro os tripulantes menos capazes.</t>
+            <t id="7452">Parte da tripulação a servir como fuzileiros; o resto é pessoal de serviço. A tripulação já a bordo é reatribuída antes de alguém ser dispensado.</t>
+
+            <!-- Tab 8: Dev Mode -->
+            <t id="8000">Ferramentas de desenvolvimento</t>
+            <t id="8001">Funcionalidades úteis para os autores de mods</t>
+
+            <!-- Tab 9: Destroy Object -->
+            <t id="9000">Destruir objeto</t>
+            <t id="9001">Destruir qualquer objeto do mapa</t>
+            <t id="9010">Nenhum objeto selecionado. Deixa este separador aberto e usa o menu do botão direito num objeto do mapa.</t>
+            <t id="9020">Confirmar a destruição do objeto selecionado</t>
+            <t id="9030">Destruir</t>
+
+            <!-- Settings (Options Menu) -->
+            <t id="90000">Definições</t>
+            <t id="90010">Modo do painel</t>
+            <t id="90011">Normal</t>
+            <t id="90012">Alargado</t>
+            <t id="90013">Programador</t>
+            <t id="90090">Nível de depuração</t>
+            <t id="90091">Depuração</t>
+            <t id="90092">Rastreio</t>
+        </page>
+    </add>
+</diff>

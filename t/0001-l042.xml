@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Safe Cheat Panel - Czech text, page 1972092427 -->
+<diff>
+    <add sel="/language">
+        <page id="1972092427" title="Safe Cheat Panel" descr="" voice="no">
+            <!-- Panel identity -->
+            <t id="1">Safe Cheat Panel</t>
+            <t id="2">Safe Cheat Panel vytvořil Chem O`Dun.</t>
+
+            <!-- Right Click / Interact Menu -->
+            <t id="100">Vytvořit %s</t>
+            <t id="101">Vytvořit stanici</t>
+            <t id="102">Vytvořit lodě</t>
+            <t id="103">Vytvořit objekty</t>
+            <t id="104">Teleportovat se sem</t>
+            <t id="105">Teleportovat se na</t>
+            <t id="106">Teleportovat se do pilotního křesla</t>
+            <t id="107">Opravit řídicí personál stanice</t>
+            <t id="108">Odhalit stanice v sektoru</t>
+            <t id="109">Vynutit dokončení stavby: aktuální stanice</t>
+            <t id="110">Vynutit dokončení stavby: všechny stanice frakce</t>
+            <t id="111">Doplnit zásoby: aktuální stanice</t>
+            <t id="112">Doplnit zásoby: všechny stanice frakce</t>
+            <t id="113">Doplnit zásoby: aktuální stavební sklad</t>
+            <t id="114">Doplnit zásoby: všechny stavební sklady frakce</t>
+            <t id="115">Zničit objekt</t>
+            <t id="117">Upravit loď</t>
+            <t id="118">Upravit stanici</t>
+
+            <!-- Tab 1: Player -->
+            <t id="1000">Hráč</t>
+            <t id="1001">Hráčské cheaty</t>
+            <t id="1100">Peníze</t>
+            <t id="1101">Zadaná částka bude omezena na rozsah 0 až 1 000 000 000 000 000</t>
+            <t id="1102">Plány</t>
+            <t id="1103">Odemknout plány</t>
+            <t id="1104">Encyklopedie</t>
+            <t id="1105">Odemknout všechny záznamy</t>
+            <t id="1106">Výzkum</t>
+            <t id="1107">Odemknout veškerý výzkum</t>
+            <t id="1108">Výzkum je uzamčen</t>
+            <t id="1109">Nedostupné, dokud neodemkneš výzkum.</t>
+            <t id="1110">Zadaná částka bude omezena na rozsah 0 až 10 000</t>
+            <t id="1111">Již odemčeno</t>
+            <!-- Spacesuit Upgrades -->
+            <t id="1200">Vylepšení skafandru</t>
+            <t id="1201">Přidat vylepšení</t>
+            <t id="1202">Vylepšení již získáno</t>
+            <!-- Spacesuit Ammo -->
+            <t id="1300">Munice skafandru</t>
+            <t id="1301">Přidat</t>
+
+            <!-- Tab 2: Inventory -->
+            <t id="2000">Inventář hráče</t>
+            <t id="2001">Cheaty inventáře</t>
+            <t id="2002">Stiskni tlačítko pro úpravu množství</t>
+            <t id="2003">Nastav požadované množství</t>
+            <t id="2010">Vyber kategorii</t>
+            <t id="2901">Modifikační díly</t>
+            <t id="2902">Semináře</t>
+            <t id="2903">Předměty pouze pro mise</t>
+
+            <!-- Tab 3: Research -->
+            <t id="3000">{1001,7400}</t>
+            <t id="3001">Cheaty: {1001,7400}</t>
+            <t id="3011">Odemknout vše</t>
+            <t id="3012">Není co odemknout</t>
+            <t id="3020">Zpracovat výzkum jednotlivě</t>
+            <t id="3021">Odemknout</t>
+            <t id="3022">Zamknout</t>
+
+            <!-- Tab 4: Blueprint -->
+            <t id="4000">{1001,98}</t>
+            <t id="4001">Cheaty: {1001,98}</t>
+            <t id="4010">Kategorie</t>
+            <t id="4011">Vše</t>
+            <t id="4012">Podkategorie</t>
+            <t id="4020">Odemknout vše</t>
+            <t id="4021">Vše odemčeno</t>
+            <t id="4022">Odemknout</t>
+
+            <!-- Tab 5: Factions -->
+            <t id="5000">{1001, 7703}(Factions and Relations)</t>
+            <t id="5001">Cheaty: {1001, 7703}</t>
+            <t id="5002">{1001, 9928}(Relations)</t>
+            <t id="5005">Vyber frakci</t>
+
+            <!-- Tab 6: Map / Sectors -->
+            <t id="6001">Odhalit</t>
+            <t id="6002">Odhalit vše</t>
+            <t id="6003">Vše odhaleno</t>
+            <t id="6004">Zcela odhaleno</t>
+            <t id="6005">Odhalit trasu</t>
+            <t id="6006">Odhalit brány</t>
+            <t id="6007">Odhalit všechny brány</t>
+
+            <!-- Tab 7: Object Spawner -->
+            <t id="7000">Generátor objektů</t>
+            <t id="7001">Cheaty generátoru objektů</t>
+            <t id="7002">Stanice</t>
+            <t id="7003">Lodě</t>
+            <t id="7004">Objekty</t>
+            <t id="7005">Vyber frakci</t>
+            <t id="7006">Vyber rasu posádky</t>
+            <t id="7007">Možnosti generátoru</t>
+            <t id="7008">Režim generátoru</t>
+            <!-- Station Spawner Mode -->
+            <t id="7100">Vyber stavební plán</t>
+            <t id="7101">Typ plánu</t>
+            <t id="7102">Herní plány</t>
+            <t id="7103">Plány vytvořené hráčem</t>
+            <t id="7104">Vyber hráčský plán</t>
+            <t id="7105">Nejsou dostupné žádné hráčské plány</t>
+            <!-- Ship Spawner Mode -->
+            <t id="7200">Vyber loď</t>
+            <t id="7201">Počet v řadě</t>
+            <t id="7202">Počet lodí vytvořených v jedné řadě</t>
+            <t id="7203">Počet řad</t>
+            <t id="7204">Počet řad k vytvoření</t>
+            <t id="7205">Vytvořit od středu</t>
+            <t id="7206">Nezaškrtnuto:</t>
+            <t id="7207">Místo, kam jsi klikl, je levý horní roh oblasti vytváření</t>
+            <t id="7208">Zaškrtnuto:</t>
+            <t id="7209">Místo, kam jsi klikl, je střed oblasti vytváření</t>
+            <t id="7210">Přidělit úlohu</t>
+            <t id="7211">Když je zapnuto, vytvořené lodě dostanou výchozí příkaz AI odpovídající zvolené úloze. Dostupné jen pro lodě, které nepatří hráči.</t>
+            <t id="7212">Úloha</t>
+            <t id="7213">Vyber úlohu</t>
+            <t id="7219">--- Definováno hráčem ---</t>
+            <!-- Object Spawner Mode -->
+            <t id="7300">Vyber objekt</t>
+            <t id="7301">Počet v řadě</t>
+            <t id="7302">Počet objektů vytvořených v jedné řadě</t>
+            <t id="7303">Počet řad</t>
+            <t id="7304">Počet řad k vytvoření</t>
+            <t id="7305">Rozestup v metrech</t>
+            <t id="7306">Vzdálenost mezi objekty v metrech</t>
+            <!-- Edit Mode (existing object loaded into the tab) -->
+            <t id="7400">Editor objektů</t>
+            <t id="7401">Režim úprav</t>
+            <t id="7402">Vlastní</t>
+            <t id="7403">Smíšené</t>
+            <t id="7404">Nepřiděleno</t>
+            <t id="7405">Neznámé</t>
+            <!-- Crew skills (spawn and edit) -->
+            <t id="7410">Dovednosti posádky</t>
+            <t id="7411">Nastavit dovednosti posádky výslovně</t>
+            <t id="7412">Když je zapnuto, posádka dostane přesně ty úrovně dovedností, které nastavíš níže, místo náhodného rozsahu z předvolby výbavy.</t>
+            <t id="7413">Nastavit všechny dovednosti na zvolenou úroveň (nejen ty důležité pro aktuální roli)</t>
+            <!-- Station control entities -->
+            <t id="7420">Posádka stanice</t>
+            <t id="7421">Přidělit správce</t>
+            <t id="7422">Stanice bez správce neobchoduje ani nevyrábí. V základní hře zůstávají hráčské stanice bez správce, dokud někoho nenajmeš.</t>
+            <t id="7423">Přidat prodejce lodí</t>
+            <t id="7424">Místo pro prodejce lodí mají jen stanice s dokovacím modulem, který umí vybavovat lodě.</t>
+            <t id="7426">Důstojník obrany</t>
+            <!-- Edit actions -->
+            <t id="7430">Použít</t>
+            <!-- Station workforce. The section title and the slider label come from vanilla page 1001
+                 (2456 "Station Workforce", 9415 "Workforce" - the latter is vanilla's own workforce header). -->
+            <t id="7440">Nastavit pracovní sílu výslovně</t>
+            <t id="7441">Když je zapnuto, pracovní síla stanice se nastaví na níže zvolený podíl její ubytovací kapacity a rozdělí se poměrně mezi všechny rasy, pro které má stanice obytné moduly.</t>
+            <t id="7442">Podíl celkové kapacity pracovní síly stanice. Použití nižší hodnoty pracovníky odešle pryč.</t>
+            <!-- Crew size and composition (ship spawn and edit). The slider labels come from vanilla:
+                 1001,80 "Crew", 20208,20203 "Marines", 20208,20103 "Service crew". -->
+            <t id="7450">Velikost a složení posádky</t>
+            <t id="7451">Počet členů posádky jako podíl kapacity posádky lodi. Pilot se nepočítá. Použití nižší hodnoty propustí nejdříve nejslabší členy.</t>
+            <t id="7452">Podíl posádky sloužící jako mariňáci; zbytek je servisní personál. Posádka, která je již na palubě, se nejprve přeřadí, teprve pak se někdo propouští.</t>
+
+            <!-- Tab 8: Dev Mode -->
+            <t id="8000">Vývojářské nástroje</t>
+            <t id="8001">Funkce užitečné pro autory modů</t>
+
+            <!-- Tab 9: Destroy Object -->
+            <t id="9000">Zničit objekt</t>
+            <t id="9001">Znič libovolný objekt na mapě</t>
+            <t id="9010">Není vybrán žádný objekt. Nech tuto kartu otevřenou a použij nabídku pravého tlačítka na objektu na mapě.</t>
+            <t id="9020">Potvrdit zničení vybraného objektu</t>
+            <t id="9030">Zničit</t>
+
+            <!-- Settings (Options Menu) -->
+            <t id="90000">Nastavení</t>
+            <t id="90010">Režim panelu</t>
+            <t id="90011">Normální</t>
+            <t id="90012">Rozšířený</t>
+            <t id="90013">Vývojářský</t>
+            <t id="90090">Úroveň ladění</t>
+            <t id="90091">Ladění</t>
+            <t id="90092">Trasování</t>
+        </page>
+    </add>
+</diff>

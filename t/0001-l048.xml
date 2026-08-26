@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Safe Cheat Panel - Polish text, page 1972092427 -->
+<diff>
+    <add sel="/language">
+        <page id="1972092427" title="Safe Cheat Panel" descr="" voice="no">
+            <!-- Panel identity -->
+            <t id="1">Safe Cheat Panel</t>
+            <t id="2">Safe Cheat Panel stworzony przez Chem O`Dun.</t>
+
+            <!-- Right Click / Interact Menu -->
+            <t id="100">Utwórz %s</t>
+            <t id="101">Utwórz stację</t>
+            <t id="102">Utwórz statki</t>
+            <t id="103">Utwórz obiekty</t>
+            <t id="104">Teleportuj się tutaj</t>
+            <t id="105">Teleportuj się do</t>
+            <t id="106">Teleportuj się na fotel pilota</t>
+            <t id="107">Napraw personel kierujący stacją</t>
+            <t id="108">Odkryj stacje w sektorze</t>
+            <t id="109">Wymuś ukończenie budowy: bieżąca stacja</t>
+            <t id="110">Wymuś ukończenie budowy: wszystkie stacje frakcji</t>
+            <t id="111">Uzupełnij zapasy: bieżąca stacja</t>
+            <t id="112">Uzupełnij zapasy: wszystkie stacje frakcji</t>
+            <t id="113">Uzupełnij zapasy: bieżący magazyn budowy</t>
+            <t id="114">Uzupełnij zapasy: wszystkie magazyny budowy frakcji</t>
+            <t id="115">Zniszcz obiekt</t>
+            <t id="117">Edytuj statek</t>
+            <t id="118">Edytuj stację</t>
+
+            <!-- Tab 1: Player -->
+            <t id="1000">Gracz</t>
+            <t id="1001">Kody gracza</t>
+            <t id="1100">Pieniądze</t>
+            <t id="1101">Wprowadzona kwota zostanie ograniczona do przedziału od 0 do 1 000 000 000 000 000</t>
+            <t id="1102">Plany</t>
+            <t id="1103">Odblokuj plany</t>
+            <t id="1104">Encyklopedia</t>
+            <t id="1105">Odblokuj wszystkie wpisy</t>
+            <t id="1106">Badania</t>
+            <t id="1107">Odblokuj wszystkie badania</t>
+            <t id="1108">Badania są zablokowane</t>
+            <t id="1109">Niedostępne, dopóki nie odblokujesz badań.</t>
+            <t id="1110">Wprowadzona kwota zostanie ograniczona do przedziału od 0 do 10 000</t>
+            <t id="1111">Już odblokowane</t>
+            <!-- Spacesuit Upgrades -->
+            <t id="1200">Ulepszenia skafandra</t>
+            <t id="1201">Dodaj ulepszenie</t>
+            <t id="1202">Ulepszenie już zdobyte</t>
+            <!-- Spacesuit Ammo -->
+            <t id="1300">Amunicja skafandra</t>
+            <t id="1301">Dodaj</t>
+
+            <!-- Tab 2: Inventory -->
+            <t id="2000">Ekwipunek gracza</t>
+            <t id="2001">Kody ekwipunku</t>
+            <t id="2002">Naciśnij przycisk, aby zmienić ilość</t>
+            <t id="2003">Ustaw żądaną ilość</t>
+            <t id="2010">Wybierz kategorię</t>
+            <t id="2901">Części modyfikacyjne</t>
+            <t id="2902">Seminaria</t>
+            <t id="2903">Przedmioty wyłącznie misyjne</t>
+
+            <!-- Tab 3: Research -->
+            <t id="3000">{1001,7400}</t>
+            <t id="3001">Kody: {1001,7400}</t>
+            <t id="3011">Odblokuj wszystko</t>
+            <t id="3012">Nie ma czego odblokować</t>
+            <t id="3020">Przetwarzaj badania pojedynczo</t>
+            <t id="3021">Odblokuj</t>
+            <t id="3022">Zablokuj</t>
+
+            <!-- Tab 4: Blueprint -->
+            <t id="4000">{1001,98}</t>
+            <t id="4001">Kody: {1001,98}</t>
+            <t id="4010">Kategoria</t>
+            <t id="4011">Wszystko</t>
+            <t id="4012">Podkategoria</t>
+            <t id="4020">Odblokuj wszystko</t>
+            <t id="4021">Wszystko odblokowane</t>
+            <t id="4022">Odblokuj</t>
+
+            <!-- Tab 5: Factions -->
+            <t id="5000">{1001, 7703}(Factions and Relations)</t>
+            <t id="5001">Kody: {1001, 7703}</t>
+            <t id="5002">{1001, 9928}(Relations)</t>
+            <t id="5005">Wybierz frakcję</t>
+
+            <!-- Tab 6: Map / Sectors -->
+            <t id="6001">Odkryj</t>
+            <t id="6002">Odkryj wszystko</t>
+            <t id="6003">Wszystko odkryte</t>
+            <t id="6004">W pełni odkryte</t>
+            <t id="6005">Odkryj trasę</t>
+            <t id="6006">Odkryj bramy</t>
+            <t id="6007">Odkryj wszystkie bramy</t>
+
+            <!-- Tab 7: Object Spawner -->
+            <t id="7000">Generator obiektów</t>
+            <t id="7001">Kody generatora obiektów</t>
+            <t id="7002">Stacja</t>
+            <t id="7003">Statki</t>
+            <t id="7004">Obiekty</t>
+            <t id="7005">Wybierz frakcję</t>
+            <t id="7006">Wybierz rasę załogi</t>
+            <t id="7007">Opcje generatora</t>
+            <t id="7008">Tryb generatora</t>
+            <!-- Station Spawner Mode -->
+            <t id="7100">Wybierz plan budowy</t>
+            <t id="7101">Typ planu</t>
+            <t id="7102">Plany z gry</t>
+            <t id="7103">Plany stworzone przez gracza</t>
+            <t id="7104">Wybierz plan gracza</t>
+            <t id="7105">Brak dostępnych planów gracza</t>
+            <!-- Ship Spawner Mode -->
+            <t id="7200">Wybierz statek</t>
+            <t id="7201">Liczba w rzędzie</t>
+            <t id="7202">Liczba statków tworzonych w jednym rzędzie</t>
+            <t id="7203">Liczba rzędów</t>
+            <t id="7204">Liczba rzędów do utworzenia</t>
+            <t id="7205">Twórz od środka</t>
+            <t id="7206">Niezaznaczone:</t>
+            <t id="7207">Kliknięte miejsce to lewy górny róg obszaru tworzenia</t>
+            <t id="7208">Zaznaczone:</t>
+            <t id="7209">Kliknięte miejsce to środek obszaru tworzenia</t>
+            <t id="7210">Przydziel zadanie</t>
+            <t id="7211">Gdy włączone, utworzone statki otrzymują domyślny rozkaz SI odpowiadający wybranemu zadaniu. Dostępne tylko dla statków nienależących do gracza.</t>
+            <t id="7212">Zadanie</t>
+            <t id="7213">Wybierz zadanie</t>
+            <t id="7219">--- Zdefiniowane przez gracza ---</t>
+            <!-- Object Spawner Mode -->
+            <t id="7300">Wybierz obiekt</t>
+            <t id="7301">Liczba w rzędzie</t>
+            <t id="7302">Liczba obiektów tworzonych w jednym rzędzie</t>
+            <t id="7303">Liczba rzędów</t>
+            <t id="7304">Liczba rzędów do utworzenia</t>
+            <t id="7305">Odstęp w metrach</t>
+            <t id="7306">Odległość między obiektami w metrach</t>
+            <!-- Edit Mode (existing object loaded into the tab) -->
+            <t id="7400">Edytor obiektów</t>
+            <t id="7401">Tryb edycji</t>
+            <t id="7402">Własne</t>
+            <t id="7403">Mieszane</t>
+            <t id="7404">Nieprzydzielone</t>
+            <t id="7405">Nieznane</t>
+            <!-- Crew skills (spawn and edit) -->
+            <t id="7410">Umiejętności załogi</t>
+            <t id="7411">Ustaw umiejętności załogi wprost</t>
+            <t id="7412">Gdy włączone, załoga otrzymuje dokładnie te poziomy umiejętności, które ustawisz poniżej, zamiast losowego zakresu z gotowego wyposażenia.</t>
+            <t id="7413">Ustaw wszystkie umiejętności na wybrany poziom (nie tylko te istotne dla bieżącej roli)</t>
+            <!-- Station control entities -->
+            <t id="7420">Załoga stacji</t>
+            <t id="7421">Przydziel zarządcę</t>
+            <t id="7422">Stacja bez zarządcy nie handluje ani nie produkuje. W podstawowej grze stacje gracza pozostają bez zarządcy, dopóki kogoś nie zatrudnisz.</t>
+            <t id="7423">Dodaj handlarza statków</t>
+            <t id="7424">Miejsce dla handlarza statków mają tylko stacje z modułem dokującym zdolnym wyposażać statki.</t>
+            <t id="7426">Oficer obrony</t>
+            <!-- Edit actions -->
+            <t id="7430">Zastosuj</t>
+            <!-- Station workforce. The section title and the slider label come from vanilla page 1001
+                 (2456 "Station Workforce", 9415 "Workforce" - the latter is vanilla's own workforce header). -->
+            <t id="7440">Ustaw siłę roboczą wprost</t>
+            <t id="7441">Gdy włączone, siła robocza stacji zostaje ustawiona na wybrany poniżej udział jej pojemności mieszkalnej i rozdzielona proporcjonalnie na wszystkie rasy, dla których stacja ma moduły mieszkalne.</t>
+            <t id="7442">Udział całkowitej pojemności siły roboczej stacji. Zastosowanie niższej wartości odsyła pracowników.</t>
+            <!-- Crew size and composition (ship spawn and edit). The slider labels come from vanilla:
+                 1001,80 "Crew", 20208,20203 "Marines", 20208,20103 "Service crew". -->
+            <t id="7450">Liczebność i skład załogi</t>
+            <t id="7451">Liczba członków załogi jako udział pojemności załogi statku. Pilota się nie liczy. Zastosowanie niższej wartości zwalnia najpierw najsłabszych.</t>
+            <t id="7452">Udział załogi służącej jako marines; reszta to personel serwisowy. Załoga już na pokładzie jest najpierw przydzielana ponownie, dopiero potem ktokolwiek zostaje zwolniony.</t>
+
+            <!-- Tab 8: Dev Mode -->
+            <t id="8000">Narzędzia deweloperskie</t>
+            <t id="8001">Funkcje przydatne dla autorów modów</t>
+
+            <!-- Tab 9: Destroy Object -->
+            <t id="9000">Zniszcz obiekt</t>
+            <t id="9001">Zniszcz dowolny obiekt na mapie</t>
+            <t id="9010">Nie wybrano obiektu. Zostaw tę kartę otwartą i użyj menu prawego przycisku na obiekcie na mapie.</t>
+            <t id="9020">Potwierdź zniszczenie wybranego obiektu</t>
+            <t id="9030">Zniszcz</t>
+
+            <!-- Settings (Options Menu) -->
+            <t id="90000">Ustawienia</t>
+            <t id="90010">Tryb panelu</t>
+            <t id="90011">Normalny</t>
+            <t id="90012">Rozszerzony</t>
+            <t id="90013">Deweloperski</t>
+            <t id="90090">Poziom debugowania</t>
+            <t id="90091">Debugowanie</t>
+            <t id="90092">Śledzenie</t>
+        </page>
+    </add>
+</diff>

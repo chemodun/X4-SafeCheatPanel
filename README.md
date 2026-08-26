@@ -247,6 +247,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
   - Crew skill levels can be set exactly on a spawn, not just left to the loadout preset.
   - Player stations can be spawned with a manager, and wharfs, shipyards and equipment docks with a ship trader.
   - Station workforce can be set as a percentage of habitation capacity, on a spawn and in edit mode.
+  - Multiple translations added.
 - **Changed**
   - The Promote Crew tab is gone - its functions moved to the Spawner tab's edit mode.
   - The Spawner tab has its own icon.
