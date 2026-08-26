@@ -112,18 +112,23 @@ A **Reveal All** button reveals every sector at all levels at once.
 
 - Select a ship to spawn.
 - Select a loadout (game defaults: Low/Medium/High, or player-defined loadouts).
+  - ![Loadout Selection](docs/images/loadout_selection.png)
+  - ![Loadout Result](docs/images/loadout_result.png)
+  - ![Loadout Result. Part 2](docs/images/loadout_result_part_2.png)
+
 - Select the owning faction (player only in normal mode; any faction in extended mode).
 - Select the crew race (all races available; Kha'ak, Xenon and Drones are not recommended).
-- For non-player-owned ships, optionally assign a basic job (Trade, Mine, Salvage, Build, or Fight); only jobs that fit the selected ship are offered, with the best match pre-selected.
-- Set how big the crew is and how it is made up, with two sliders: the crew as a percentage of the ship's crew capacity (the pilot is not counted), and how much of that crew are marines rather than service crew. Both start at a full crew split down the middle, and they override whatever the loadout would have crewed.
-- Optionally set Pilot/Captain, Marines and Service Crew skill levels via 1-5 star sliders. Left off, the crew keeps the loadout preset's randomised range.
-- Set the number of ships per row (up to 10) and the number of rows (up to 10).
+  - ![Crew Race Selection](docs/images/crew_race_selection.png)
+  - ![Crew Result](docs/images/crew_result.png)
 
-![Loadout Selection](docs/images/loadout_selection.png)
-![Loadout Result](docs/images/loadout_result.png)![Loadout Result. Part 2](docs/images/loadout_result_part_2.png)
-![Crew Race Selection](docs/images/crew_race_selection.png)
-![Crew Result](docs/images/crew_result.png)
-![Job Selection](docs/images/job_selection.png)
+- For non-player-owned ships, optionally assign a basic job (Trade, Mine, Salvage, Build, or Fight); only jobs that fit the selected ship are offered, with the best match pre-selected.
+  - ![Job Selection](docs/images/job_selection.png)
+- Set how big the crew is and how it is made up, with two sliders: the crew as a percentage of the ship's crew capacity (the pilot is not counted), and how much of that crew are marines rather than service crew. Both start at a full crew split down the middle, and they override whatever the loadout would have crewed.
+  - ![Crew Size and Composition](docs/images/crew_size_and_composition.png)
+- Optionally set Pilot/Captain, Marines and Service Crew skill levels via 1-5 star sliders. Left off, the crew keeps the loadout preset's randomised range.
+  - ![Pilot and Crew Skills](docs/images/crew_skills.png)
+
+- Set the number of ships per row (up to 10) and the number of rows (up to 10).
 
 #### Station Spawner
 
@@ -148,6 +153,9 @@ Right-click a player-owned ship or station while the Spawner tab is open and cho
 
 For a ship:
 
+![Editing a Ship Menu Command](docs/images/editing_a_ship_menu_command.png)
+![Editing a Ship](docs/images/editing_a_ship.png)
+
 - The ship itself is shown but cannot be changed.
 - The loadout dropdown shows what the ship matches: a named loadout exactly, a fully-filled ship as **High**, anything else as **Custom**. Low and Medium are never claimed - the game varies them too much to tell apart.
 - Picking a different loadout re-equips the ship on apply. Leaving it alone never touches its equipment.
@@ -156,6 +164,9 @@ For a ship:
 - Set Pilot/Captain, Marines and Service Crew skill levels via 1-5 star sliders; each label shows the current average.
 
 For a station:
+
+![Editing a Station Menu Command](docs/images/editing_a_station_menu_command.png)
+![Editing a Station](docs/images/editing_a_station.png)
 
 - The construction plan is identified against your saved and in-game plans, or shown as **Unknown**. It cannot be changed.
 - A missing manager or ship trader can be added; the trader needs a station with a dock that can equip ships.
@@ -167,7 +178,7 @@ In both cases:
 
 - By default only the skills relevant to the role or post are set exactly; the rest are scaled proportionally to their current values.
 - An optional checkbox sets **every** skill to the chosen level instead.
-- **Cancel** releases the object and drops pending changes; **Reset** reverts them but keeps it loaded; **Apply** commits.
+- **Cancel** releases the object and drops pending changes, with return to the usual Spawner tab; **Reset** reverts them but keeps it loaded; **Apply** commits.
 
 ### Destroy Object Tab
 
@@ -227,7 +238,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
-### [8.00.39] - 2026-08-??
+### [8.00.41] - 2026-08-26
 
 - **Added**
   - Spawner tab **Edit Mode**: right-click a player-owned ship or station to load it in, then set crew skills, re-equip a ship, fill a station's empty control posts or change its workforce.
