@@ -4,12 +4,59 @@
   name="Safe Cheat Panel"
   description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface."
   author="Chem O`Dun"
-  version="80038"
-  date="2026-08-04"
+  version="80041"
+  date="2026-08-26"
   save="false"
   enabled="true"
   sync="false"
-  lastupdate="1785799796">
+  lastupdate="1787759085">
+  <text language="7"
+    description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface."></text>
+  <!-- French -->
+  <text language="33"
+    description="Un panneau de triche intégré à l'interface, accessible depuis la barre latérale gauche du menu de la carte. Il offre des outils pour modifier les statistiques du joueur, l'inventaire, la recherche, les plans, les relations entre factions et l'exploration de la galaxie, pour créer et modifier des vaisseaux et des stations, et pour créer ou détruire des objets - le tout dans une interface claire à onglets."></text>
+  <!-- Spanish -->
+  <text language="34"
+    description="Un panel de trucos integrado en la interfaz, accesible desde la barra lateral izquierda del menú del mapa. Ofrece herramientas para editar las estadísticas del jugador, el inventario, la investigación, los planos, las relaciones entre facciones y la exploración de la galaxia, para generar y editar naves y estaciones, y para generar o destruir objetos - todo mediante una interfaz limpia con pestañas."></text>
+  <!-- Italian -->
+  <text language="39"
+    description="Un pannello trucchi integrato nell'interfaccia, accessibile dalla barra laterale sinistra del menu della mappa. Offre strumenti per modificare le statistiche del giocatore, l'inventario, la ricerca, i progetti, le relazioni tra fazioni e l'esplorazione della galassia, per generare e modificare navi e stazioni e per generare o distruggere oggetti - il tutto in un'interfaccia ordinata a schede."></text>
+  <!-- Czech -->
+  <text language="42"
+    description="Panel cheatů v uživatelském rozhraní, dostupný z levého postranního panelu v nabídce mapy. Nabízí nástroje pro úpravu statistik hráče, inventáře, výzkumu, plánů, vztahů mezi frakcemi a prozkoumanosti galaxie, pro vytváření a úpravu lodí a stanic i pro vytváření a ničení objektů - vše v přehledném rozhraní s kartami."></text>
+  <!-- English -->
+  <text language="44"
+    description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface."></text>
+  <!-- Polish -->
+  <text language="48"
+    description="Panel kodów wbudowany w interfejs, dostępny z lewego paska bocznego w menu mapy. Daje narzędzia do edycji statystyk gracza, ekwipunku, badań, planów, relacji między frakcjami i stanu eksploracji galaktyki, do tworzenia i edycji statków oraz stacji, a także do tworzenia i niszczenia obiektów - wszystko w przejrzystym interfejsie z kartami."></text>
+  <!-- German -->
+  <text language="49"
+    description="Ein Cheat-Panel in der Benutzeroberfläche, erreichbar über die linke Seitenleiste im Kartenmenü. Es bietet Werkzeuge, um Spielerwerte, Inventar, Forschung, Blaupausen, Fraktionsbeziehungen und den Erkundungsstand der Galaxie zu bearbeiten, Schiffe und Stationen zu erzeugen und zu bearbeiten sowie Objekte zu erzeugen oder zu zerstören - alles in einer aufgeräumten Oberfläche mit Reitern."></text>
+  <!-- Portuguese -->
+  <text language="55"
+    description="Um painel de batotas integrado na interface, acessível a partir da barra lateral esquerda no menu do mapa. Oferece ferramentas para editar as estatísticas do jogador, o inventário, a investigação, as plantas, as relações entre fações e a exploração da galáxia, para gerar e editar naves e estações e para gerar ou destruir objetos - tudo numa interface limpa com separadores."></text>
+  <!-- Japanese -->
+  <text language="81"
+    description="マップメニューの左サイドバーから開けるUI型のチートパネルです。プレイヤーのステータス、所持品、研究、設計図、陣営関係、銀河の探索状況を編集し、艦船やステーションの生成と編集、オブジェクトの生成や破壊を、すっきりしたタブ形式のインターフェースからまとめて行えます。"></text>
+  <!-- Korean -->
+  <text language="82"
+    description="지도 메뉴의 왼쪽 사이드바에서 열 수 있는 UI 기반 치트 패널입니다. 플레이어 능력치, 소지품, 연구, 설계도, 세력 관계, 은하 탐사 상태를 편집하고 함선과 정거장을 생성하거나 편집하며 오브젝트를 생성하거나 파괴하는 기능을 깔끔한 탭 구조의 화면에서 제공합니다."></text>
+  <!-- Chinese Simplified -->
+  <text language="86"
+    description="一个基于界面的作弊面板，可从地图菜单的左侧边栏打开。提供编辑玩家属性、物品栏、研究、蓝图、派系关系和星系探索进度的工具，可生成并编辑舰船与空间站，还能生成或摧毁物体，全部集中在简洁的标签页界面中。"></text>
+  <!-- Chinese Traditional -->
+  <text language="88"
+    description="一個基於介面的作弊面板，可從地圖選單的左側邊欄開啟。提供編輯玩家屬性、物品欄、研究、藍圖、派系關係與星系探索進度的工具，可生成並編輯艦船與太空站，還能生成或摧毀物件，全部集中在簡潔的標籤頁介面中。"></text>
+  <!-- Turkish -->
+  <text language="90"
+    description="Harita menüsündeki sol kenar çubuğundan açılan, arayüz tabanlı bir hile paneli. Oyuncu değerlerini, envanteri, araştırmayı, planları, hizip ilişkilerini ve galaksinin keşif durumunu düzenlemek, gemi ve istasyon oluşturup düzenlemek, nesne oluşturmak veya yok etmek için araçlar sunar - hepsi derli toplu, sekmeli bir arayüzde."></text>
+  <!-- Bulgarian -->
+  <text language="359"
+    description="Панел с чийтове в интерфейса, достъпен от лявата странична лента в менюто на картата. Предлага инструменти за редактиране на показателите на играча, инвентара, проучванията, чертежите, отношенията между фракциите и проучеността на галактиката, за създаване и редактиране на кораби и станции и за създаване или унищожаване на обекти - всичко в подреден интерфейс с раздели."></text>
+  <!-- Ukrainian -->
+  <text language="380"
+    description="Панель читів в інтерфейсі, доступна з лівої бічної панелі в меню карти. Пропонує інструменти для редагування показників гравця, інвентаря, досліджень, креслень, стосунків між фракціями та стану дослідження галактики, для створення й редагування кораблів і станцій, а також для створення чи знищення об'єктів - усе в охайному інтерфейсі з вкладками."></text>
   <dependency id="kuerteeUIExtensionsAndHUD" optional="false" name="kuertee UI Extensions and HUD" />
   <dependency id="ws_2042901274" optional="false" name="SirNukes Mod Support APIs" version="195"></dependency>
   <dependency id="ws_3715253556" optional="false" name="Options Helper" version="100"></dependency>
