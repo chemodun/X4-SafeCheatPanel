@@ -114,6 +114,7 @@ ffi.cdef [[
 	bool IsLoadoutValid(UniverseID defensibleid, const char* macroname, const char* loadoutid, uint32_t* numinvalidpatches);
 	uint32_t GetLoadoutInvalidPatches(InvalidPatchInfo* result, uint32_t resultlen, UniverseID defensibleid, const char* macroname, const char* loadoutid);
 	bool IsLoadoutCompatible(const char* macroname, const char* loadoutid);
+	bool HasDefaultLoadout2(const char* macroname, bool allowloadoutoverride);
 	void GetLoadout2(UILoadout2* result, UniverseID defensibleid, const char* macroname, const char* loadoutid);
 	uint32_t GetLoadoutCounts2(UILoadoutCounts2* result, UniverseID defensibleid, const char* macroname, const char* loadoutid);
 	uint32_t GetNumConstructionPlans(void);
@@ -343,7 +344,19 @@ local function getShipPurposeOrderId(purposeId)
   return nil
 end
 
--- The macro's named loadouts, with the three generated presets pushed in front of them.
+-- A hull whose equipment is not sold carries its own default loadout; vanilla then offers that
+-- alone and no generated preset (menu_ship_configuration.lua).
+local function hasDefaultLoadout(macro)
+  return macro ~= nil and macro ~= "" and C.HasDefaultLoadout2(macro, true)
+end
+
+-- What the loadout dropdown starts on: the fullest entry the hull offers.
+local function defaultLoadoutChoice(macro)
+  if not hasDefaultLoadout(macro) then return "scpDefaultHigh" end
+  return scpIdentify.defaultLoadoutFill(macro).full and "default" or "scpDefaultFull"
+end
+
+-- The macro's named loadouts, headed by its default loadout or by the three generated presets.
 local function getShipLoadouts(macro)
   local loadouts = {}
   if macro == nil then return loadouts end
@@ -383,14 +396,38 @@ local function getShipLoadouts(macro)
     table.insert(loadouts, { id = id, text = ffi.string(buf[i].name), icon = ffi.string(buf[i].iconid), displayremoveoption = false, active = active, mouseovertext = mouseOverText })
   end
   table.sort(loadouts, sortText)
-  table.insert(loadouts, 1, { id = "scpDefaultLow",    text = ReadText(1001, 7910), icon = "", displayremoveoption = false, preset = 0.1, active = true })
-  table.insert(loadouts, 2, { id = "scpDefaultMedium", text = ReadText(1001, 7911), icon = "", displayremoveoption = false, preset = 0.5, active = true })
-  table.insert(loadouts, 3, { id = "scpDefaultHigh",   text = ReadText(1001, 7912), icon = "", displayremoveoption = false, preset = 1.0, active = true })
-  if #loadouts > 3 then
-    -- Inactive separator between the presets and the named loadouts.
-    table.insert(loadouts, 4, { id = "none", text = ReadText(1972092427, 7219), icon = "", displayremoveoption = false, active = false })
+  local heading = 3
+  if hasDefaultLoadout(macro) then
+    -- Its equipment is default-loadout only: never in a faction pool, so no preset can fit it.
+    table.insert(loadouts, 1, { id = "default", text = ReadText(1001, 3231), icon = "", displayremoveoption = false, active = true })
+    heading = 1
+    -- Most hull defaults leave slots free; this entry takes their equipment out to every slot.
+    if not scpIdentify.defaultLoadoutFill(macro).full then
+      table.insert(loadouts, 2, { id = "scpDefaultFull", text = ReadText(1001, 3231) .. " (" .. ReadText(1001, 19) .. ")", icon = "", displayremoveoption = false, active = true })
+      heading = 2
+    end
+  else
+    table.insert(loadouts, 1, { id = "scpDefaultLow",    text = ReadText(1001, 7910), icon = "", displayremoveoption = false, preset = 0.1, active = true })
+    table.insert(loadouts, 2, { id = "scpDefaultMedium", text = ReadText(1001, 7911), icon = "", displayremoveoption = false, preset = 0.5, active = true })
+    table.insert(loadouts, 3, { id = "scpDefaultHigh",   text = ReadText(1001, 7912), icon = "", displayremoveoption = false, preset = 1.0, active = true })
+  end
+  if #loadouts > heading then
+    -- Inactive separator between the generated entries and the named loadouts.
+    table.insert(loadouts, heading + 1, { id = "none", text = ReadText(1972092427, 7219), icon = "", displayremoveoption = false, active = false })
   end
   return loadouts
+end
+
+---Whether a loadout id is still on offer for a macro - named loadouts and the default/preset
+---split are both per-hull, so a selection does not survive every ship change.
+local function isLoadoutOffered(macro, loadoutId)
+  if loadoutId == nil then return false end
+  for _, option in ipairs(getShipLoadouts(macro)) do
+    if option.id == loadoutId and option.active then
+      return true
+    end
+  end
+  return false
 end
 
 local function getAllConstructionPlans()
@@ -420,7 +457,7 @@ end
 local scpSpawner = {}
 
 -- Head counts come from the crew sliders; all that is left to read is whether the crew starts out
--- experienced - the High preset does, a named loadout declares it.
+-- experienced - High and Default Full do, a plain Default only when it leaves no slot free.
 function scpSpawner.PresetAndCrewForSpawnShip(macro, loadoutId)
   local preset = -1
   if loadoutId == "scpDefaultLow" then
@@ -431,12 +468,59 @@ function scpSpawner.PresetAndCrewForSpawnShip(macro, loadoutId)
     preset = 1
   end
   local crew = { hasCrewExperience = preset == 1 }
-  if preset <= 0 then
+  -- Preset stays negative for both hull-default entries: MD takes the loadout whole through
+  -- get_loadout, exactly as it does a named one, and must not generate over it.
+  if loadoutId == "scpDefaultFull" then
+    crew.hasCrewExperience = true
+  elseif loadoutId == "default" then
+    crew.hasCrewExperience = scpIdentify.defaultLoadoutFill(macro).full
+  elseif preset <= 0 then
     local loadout = Helper.getLoadoutHelper2(C.GetLoadout2, C.GetLoadoutCounts2, "UILoadout2", 0, macro, loadoutId)
     local loadoutInfo = Helper.convertLoadout(0, macro, loadout, nil, "UILoadout2")
     crew.hasCrewExperience = loadoutInfo.hascrewexperience
   end
   return preset, crew
+end
+
+---One line per equipment plan for the log: how many candidates each loadout flag ended up with.
+local function describePlan(plan)
+  if plan == nil then return "none" end
+  local parts = {}
+  for flag, pools in pairs(plan) do
+    local candidates = 0
+    for _, pool in ipairs(pools) do
+      candidates = candidates + #pool
+    end
+    parts[#parts + 1] = flag .. "=" .. #pools .. "x" .. candidates
+  end
+  table.sort(parts)
+  return #parts > 0 and table.concat(parts, " ") or "empty"
+end
+
+---The loadout flags a fill pass may apply, for the log.
+local function describeFlags(flags)
+  if flags == nil then return "none" end
+  local parts = {}
+  for flag in pairs(flags) do
+    parts[#parts + 1] = flag
+  end
+  table.sort(parts)
+  return #parts > 0 and table.concat(parts, " ") or "empty"
+end
+
+---What MD is asked for: the loadout id it fetches and the candidate pool it fills slots from.
+---Default Full resolves to the default loadout with a pool attached, not to an id of its own.
+local function loadoutRequest(macro, loadoutId, preset, spawnFaction)
+  if loadoutId == "scpDefaultFull" then
+    local fill = scpIdentify.defaultLoadoutFill(macro)
+    scpSpawner.scp.debug("Loadout: " .. tostring(macro) .. " takes its hull default filled out - pool "
+      .. describePlan(fill.plan) .. ", applied to " .. describeFlags(fill.free))
+    return "default", fill.plan, fill.free
+  end
+  local plan = scpEquipment.buildLoadoutPlan(macro, preset, spawnFaction)
+  scpSpawner.scp.debug("Loadout: " .. tostring(macro) .. " takes " .. tostring(loadoutId)
+    .. " (preset " .. tostring(preset) .. ", faction " .. tostring(spawnFaction) .. ") - pool " .. describePlan(plan))
+  return loadoutId, plan, nil
 end
 
 function scpSpawner.getShipDefaultFaction(macro)
@@ -501,7 +585,7 @@ function scpSpawner.initShips()
     state.ships = getAllShips()
     if #state.ships > 0 then
       state.ships_sel.id            = state.ships[1].id
-      state.ships_sel.loadout       = "scpDefaultHigh"
+      state.ships_sel.loadout       = defaultLoadoutChoice(state.ships[1].id)
       state.ships_sel.name          = state.ships[1].text
       state.ships_sel.ownerId       = #state.factions > 0 and state.factions[1].id or "player"
       state.ships_sel.ownerRace     = #state.factions > 0 and state.factions[1].ownerrace or nil
@@ -688,12 +772,15 @@ function scpSpawner.applyEdit()
     -- Only a moved loadout dropdown re-equips; leaving it alone never touches the equipment.
     local preset = scpSpawner.PresetAndCrewForSpawnShip(state.target.macro, state.target.newLoadout)
     local loadoutFaction = getShipDefaultFaction(state.target.macro)
+    local mdLoadout, equipment, fillFlags = loadoutRequest(state.target.macro, state.target.newLoadout, preset,
+      (preset > 0 and loadoutFaction) or "player")
     -- The equipment libraries read the macro off $spawnData.$ship, so it travels under that name.
     data.ship           = state.target.macro
-    data.loadout        = state.target.newLoadout
+    data.loadout        = mdLoadout
     data.preset         = preset
     data.loadoutFaction = loadoutFaction
-    data.equipment      = scpEquipment.buildLoadoutPlan(state.target.macro, preset, (preset > 0 and loadoutFaction) or "player")
+    data.equipment      = equipment
+    data.fillFlags      = fillFlags
   end
   scpSpawner.scp.debug("Edit: apply pressed, allSkills=" .. tostring(data.allSkills) .. ", loadout=" .. tostring(data.loadout)
     .. ", workforce=" .. tostring(data.workforce)
@@ -787,6 +874,10 @@ end
 function scpSpawner.setShipSpawnData(id, dataType)
   if dataType == "ship" then
     state.ships_sel.id = id
+    -- A loadout the new hull does not offer falls back to its head entry.
+    if not isLoadoutOffered(id, state.ships_sel.loadout) then
+      state.ships_sel.loadout = defaultLoadoutChoice(id)
+    end
   elseif dataType == "loadout" then
     state.ships_sel.loadout = id
   elseif dataType == "faction" then
@@ -1654,13 +1745,16 @@ function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow
   local spawnFaction = (preset > 0 and loadoutFaction) or ownerId
   -- Player-owned ships stay under direct player control; never auto-assign them a job.
   local purposeOrderId = (ownerId ~= "player" and assignPurpose) and getShipPurposeOrderId(purpose) or nil
+  local mdLoadout, equipment, fillFlags = loadoutRequest(ship, loadout, preset, spawnFaction)
   local data = {
     ship = ship,
-    loadout = loadout,
+    loadout = mdLoadout,
     crew = crew,
     preset = preset,
-    -- Candidates for slots the faction item pool cannot reach; nil for named loadouts.
-    equipment = scpEquipment.buildLoadoutPlan(ship, preset, spawnFaction),
+    -- Candidates for slots the faction pool cannot reach or a hull default left free; nil for a named loadout.
+    equipment = equipment,
+    -- Which categories the fill pass may apply to; a full one must be left as the default left it.
+    fillFlags = fillFlags,
     offsetComponent = ConvertStringToLuaID(tostring(interactMenu.offsetcomponent)),
     ownerId = ownerId,
     ownerRace = ownerRace,
@@ -1677,6 +1771,15 @@ function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow
     rows = rows,
     numPerRow = numPerRow
   }
+  scpSpawner.scp.debug("Spawn: " .. tostring(ship) .. " x" .. tostring(rows * numPerRow)
+    .. " for " .. tostring(ownerId) .. "/" .. tostring(ownerRace)
+    .. ", loadout " .. tostring(loadout) .. " sent as " .. tostring(mdLoadout)
+    .. ", preset " .. tostring(preset)
+    .. ", experienced crew " .. tostring(crew.hasCrewExperience)
+    .. ", marines " .. tostring(crew.marines) .. ", service " .. tostring(crew.service)
+    .. ", equipment " .. describePlan(equipment)
+    .. ", fill " .. describeFlags(fillFlags)
+    .. ", job " .. tostring(purposeOrderId))
   AddUITriggeredEvent("scp_main", "scp_spawn_ship", data)
   scpHelpers.interactMenuFinishAction()
 end

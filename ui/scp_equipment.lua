@@ -51,6 +51,8 @@ ffi.cdef [[
 	const char* GetSlotSize(UniverseID defensibleid, UniverseID moduleid, const char* macroname, bool ismodule, const char* upgradetypename, size_t slot);
 	bool IsSlotMandatory(UniverseID defensibleid, UniverseID moduleid, const char* macroname, bool ismodule, const char* upgradetypename, size_t slot);
 	bool IsUpgradeMacroCompatible(UniverseID objectid, UniverseID moduleid, const char* macroname, bool ismodule, const char* upgradetypename, size_t slot, const char* upgrademacroname);
+	size_t GetNumVirtualUpgradeSlots(UniverseID objectid, const char* macroname, const char* upgradetypename);
+	bool IsVirtualUpgradeMacroCompatible(UniverseID defensibleid, const char* macroname, const char* upgradetypename, size_t slot, const char* upgrademacroname);
 ]]
 
 local scpEquipment = {}
@@ -59,13 +61,14 @@ local scpHelpers = require("extensions.safe_cheat_panel.ui.scp_helpers")
 
 local isV9 = false
 
--- Slot-bearing upgrade types with the MD loadout flag each is applied under. Thrusters are
--- left out: their virtual slots have no MD-visible occupancy, and their wares are never missing.
+-- Slot-bearing upgrade types with the MD loadout flag each is applied under. No thruster ware
+-- carries an <owner> faction, so the faction pass never fits one and the plan must.
 local slotTypes = {
   { type = "engine", flag = "engines", groups = true },
   { type = "shield", flag = "shields", groups = true },
   { type = "weapon", flag = "weapons", groups = false },
   { type = "turret", flag = "turrets", groups = true },
+  { type = "thruster", flag = "thrusters", groups = false, virtual = true },
 }
 
 function scpEquipment.init(isVersion9)
@@ -201,6 +204,26 @@ local function getSlotBuckets(macro, upgradeType, candidates, allowed)
   return loose, grouped
 end
 
+--- Virtual slots (thrusters) carry no size, tags or group, so one bucket per compatible macro
+--- set is all there is to bucket by.
+local function getVirtualSlotBuckets(macro, upgradeType, candidates, allowed)
+  local numSlots = tonumber(C.GetNumVirtualUpgradeSlots(0, macro, upgradeType))
+  ---@type table<string, table>, table[]
+  local byKey, buckets = {}, {}
+  for slot = 1, numSlots do
+    local picks, compatible = collect(candidates, function(candidate)
+      return C.IsVirtualUpgradeMacroCompatible(0, macro, upgradeType, slot, candidate)
+    end, allowed)
+    local key = table.concat(picks, ",")
+    if byKey[key] == nil then
+      byKey[key] = { label = "virtual", slots = 0, mandatory = 0, picks = picks, compatible = compatible }
+      table.insert(buckets, byKey[key])
+    end
+    byKey[key].slots = byKey[key].slots + 1
+  end
+  return buckets
+end
+
 --- Slot groups of one upgrade type, bucketed by their compatible macro set: a group is
 --- addressed as a whole and its compatibility can be narrower than the per-slot test.
 local function getGroupBuckets(macro, upgradeType, candidates, allowed)
@@ -279,7 +302,11 @@ end
 --- get filled is left to generate_loadout's <quantity level="$preset">, since a capped pool
 --- starves grouped slots. Buckets with no usable candidate are omitted, nil if none are left.
 function scpEquipment.buildLoadoutPlan(macro, preset, faction)
-  if macro == nil or preset == nil or preset <= 0 then return nil end
+  if macro == nil or preset == nil or preset <= 0 then
+    -- A named or hull-default loadout brings its own equipment; there is nothing to plan for it.
+    scpHelpers.debug(string.format("No equipment plan for %s: preset is %s", tostring(macro), tostring(preset)))
+    return nil
+  end
 
   local raceSet, raceList = getMakerRaces(macro)
   local races = #raceList > 0 and table.concat(raceList, "+") or "<none>"
@@ -297,7 +324,13 @@ function scpEquipment.buildLoadoutPlan(macro, preset, faction)
   for _, entry in ipairs(slotTypes) do
     ---@type string[][]
     local pools = {}
-    local buckets, grouped = getSlotBuckets(macro, entry.type, pool[entry.type], allowed)
+    ---@type table[], table[]
+    local buckets, grouped
+    if entry.virtual then
+      buckets, grouped = getVirtualSlotBuckets(macro, entry.type, pool[entry.type], allowed), {}
+    else
+      buckets, grouped = getSlotBuckets(macro, entry.type, pool[entry.type], allowed)
+    end
     if #grouped > 0 then
       -- Per group where the engine reports them, else fall back to the plain slot buckets.
       local groupBuckets = entry.groups and getGroupBuckets(macro, entry.type, pool[entry.type], allowed) or {}

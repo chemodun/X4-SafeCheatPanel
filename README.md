@@ -111,7 +111,7 @@ A **Reveal All** button reveals every sector at all levels at once.
 #### Ship Spawner
 
 - Select a ship to spawn.
-- Select a loadout (game defaults: Low/Medium/High, or player-defined loadouts).
+- Select a loadout (game defaults: Low/Medium/High, or player-defined loadouts). Ships that come with their own fixed loadout - the ones whose equipment is never sold - offer that **Default** instead of the three presets, exactly as the game's own ship configuration screen does. If such a loadout leaves slots free, a second entry, **Default (Max)**, is offered alongside it: the same equipment, taken out to every slot the hull has. Nothing the ship was not meant to carry is ever fitted.
   - ![Loadout Selection](docs/images/loadout_selection.png)
   - ![Loadout Result](docs/images/loadout_result.png)
   - ![Loadout Result. Part 2](docs/images/loadout_result_part_2.png)
@@ -157,7 +157,7 @@ For a ship:
 ![Editing a Ship](docs/images/editing_a_ship.png)
 
 - The ship itself is shown but cannot be changed.
-- The loadout dropdown shows what the ship matches: a named loadout exactly, a fully-filled ship as **High**, anything else as **Custom**. Low and Medium are never claimed - the game varies them too much to tell apart.
+- The loadout dropdown shows what the ship matches: a named loadout exactly, a fully-filled ship as **High**, anything else as **Custom**. Low and Medium are never claimed - the game varies them too much to tell apart. A ship with its own fixed loadout is matched against that **Default**, or against **Default (Max)** when every slot is filled with the default's own equipment, and is **Custom** otherwise.
 - Picking a different loadout re-equips the ship on apply. Leaving it alone never touches its equipment.
 - The crew race is shown for information only, or **Mixed** when they differ.
 - The same two crew sliders as on a spawn, but starting on what the ship actually has, so an untouched slider changes nothing. Raising the crew hires; lowering it dismisses the weakest first. Moving the marine share re-assigns crew already on board before anybody is dismissed.
@@ -237,6 +237,11 @@ Debug logging can be enabled to write detailed information about the mod's opera
 - [SirNukes](https://next.nexusmods.com/profile/sirnukes?gameId=2659) - for the `Mod Support APIs` that power the UI hooks and options menu.
 
 ## Changelog
+
+### [8.00.42] - 2026-08-27
+
+- **Fixed**
+  - For specific ships with default loadouts, the loadout dropdown now correctly shows **Default** and, where it applies, **Default (Max)**, instead of Low/Medium/High. Should resolve the issue with some VRO ships. Already spawned ships can be edited to fix their loadout.
 
 ### [8.00.41] - 2026-08-26
 

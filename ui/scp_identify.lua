@@ -247,11 +247,88 @@ local function isFullyEquipped(object, counts)
       end
     end
   end
+  -- Thrusters sit on a virtual slot, outside the loop above, but objectCounts already counts them.
+  local thrusterSlots = tonumber(C.GetNumVirtualUpgradeSlots(object, "", "thruster"))
+  if thrusterSlots > 0 then
+    anySlot = true
+    local filled = 0
+    for _, amount in pairs(counts["thruster"] or {}) do
+      filled = filled + amount
+    end
+    scpIdentify.scp.trace("Identify: thruster " .. filled .. "/" .. thrusterSlots)
+    if filled < thrusterSlots then
+      return false
+    end
+  end
   return anySlot
 end
 
+-- Slot categories a fixed loadout can fill, and the MD loadout flag each travels under.
+local slotFlags = {
+  { type = "engine",   flag = "engines" },
+  { type = "shield",   flag = "shields" },
+  { type = "weapon",   flag = "weapons" },
+  { type = "turret",   flag = "turrets" },
+  { type = "thruster", flag = "thrusters", virtual = true },
+}
+
+-- A hull default is static content, so its reading never has to be repeated.
+local defaultFills = {}
+
+---How much of a macro's slot capacity its own default loadout takes up, and what it uses to do it.
+---The plan is the MD candidate pool that fills the remaining slots from that same equipment.
+---@return table fill { full = boolean, plan = table<string, string[][]>|nil, free = table<string, boolean>, macros = table<string, boolean> }
+function scpIdentify.defaultLoadoutFill(macro)
+  if macro == nil or macro == "" then return { full = true, macros = {}, free = {} } end
+  if defaultFills[macro] ~= nil then return defaultFills[macro] end
+
+  local counts = loadoutCounts(Helper.getLoadoutHelper(C.GetLoadout, C.GetLoadoutCounts, 0, macro, "default"))
+  local fill = { full = true, macros = {} }
+  local plan, free = {}, {}
+  for _, entry in ipairs(slotFlags) do
+    local slots = entry.virtual and tonumber(C.GetNumVirtualUpgradeSlots(0, macro, entry.type))
+        or tonumber(C.GetNumUpgradeSlots(0, macro, entry.type))
+    if slots > 0 then
+      ---@type integer, string[]
+      local filled, used = 0, {}
+      for usedMacro, amount in pairs(counts[entry.type] or {}) do
+        filled = filled + amount
+        used[#used + 1] = usedMacro
+        fill.macros[usedMacro] = true
+      end
+      if filled < slots then
+        fill.full = false
+        free[entry.flag] = true
+      end
+      -- Full categories stay in the pool too: a shield group is only generated alongside the
+      -- turret or engine group it hangs off. Only the free ones are applied.
+      if #used > 0 then
+        table.sort(used)
+        plan[entry.flag] = { used }
+      end
+      scpIdentify.scp.trace("Identify: default loadout of " .. macro .. " fills " .. entry.type .. " " .. filled .. "/" .. slots)
+    end
+  end
+  fill.plan = next(plan) ~= nil and plan or nil
+  fill.free = free
+  defaultFills[macro] = fill
+  scpIdentify.scp.debug("Identify: default loadout of " .. macro .. " leaves "
+    .. (fill.full and "no slot free" or "slots free - Default counts as Medium, Default Full is offered"))
+  return fill
+end
+
+---Whether every macro a ship carries comes out of the allowed set.
+local function usesOnly(counts, allowed)
+  for _, macros in pairs(counts) do
+    for macro in pairs(macros) do
+      if not allowed[macro] then return false end
+    end
+  end
+  return true
+end
+
 ---Which entry of the loadout dropdown an existing ship currently matches.
----@return string|nil id of a named loadout, "scpDefaultHigh" when every slot is full, else nil
+---@return string|nil id of a named loadout, the High preset or Default Full when every slot is full, else nil
 function scpIdentify.shipLoadout(object, macro, loadoutOptions)
   if object == nil or macro == nil then return nil end
   local counts = objectCounts(object)
@@ -271,9 +348,19 @@ function scpIdentify.shipLoadout(object, macro, loadoutOptions)
     end
   end
 
+  -- A hull that carries its own default loadout is offered no preset at all: a full fit on one is
+  -- Default Full as long as it kept to the default's own equipment, and custom otherwise.
   if isFullyEquipped(object, counts) then
-    scpIdentify.scp.debug("Identify: ship has every slot filled, reporting the High preset")
-    return "scpDefaultHigh"
+    for _, option in ipairs(loadoutOptions) do
+      if option.preset == 1.0 then
+        scpIdentify.scp.debug("Identify: ship has every slot filled, reporting the High preset")
+        return option.id
+      end
+      if option.id == "scpDefaultFull" and usesOnly(counts, scpIdentify.defaultLoadoutFill(macro).macros) then
+        scpIdentify.scp.debug("Identify: ship is the hull default filled out, reporting Default Full")
+        return option.id
+      end
+    end
   end
   scpIdentify.scp.debug("Identify: ship loadout matches nothing, reporting Custom")
   return nil

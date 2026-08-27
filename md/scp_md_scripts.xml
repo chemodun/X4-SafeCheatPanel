@@ -139,7 +139,7 @@
           </actions>
         </cue>
 
-        <cue name="Scp_Edit_Object" instantiate="true">
+        <cue name="Scp_Edit_Object" instantiate="true" version="2">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_edit_object'" />
           </conditions>
@@ -170,7 +170,7 @@
               <do_if value="$editData.$preset gt 0">
                 <include_actions ref="Scp_Build_Equipment_Loadout" />
                 <do_if value="@$scpLoadout != null">
-                  <apply_loadout object="$ship" loadout="$scpLoadout" flags="engines weapons turrets turretgroups shields shieldgroups" />
+                  <apply_loadout object="$ship" loadout="$scpLoadout" flags="engines weapons turrets turretgroups shields shieldgroups thrusters" />
                 </do_if>
                 <!-- Skipped when the macro has no owner or maker race to draw a pool from. -->
                 <do_if value="@$editData.$loadoutFaction != null">
@@ -185,6 +185,9 @@
                 <get_loadout result="$scpLoadout" macro="macro.{$editData.$ship}" loadout="$editData.$loadout" />
                 <do_if value="@$scpLoadout != null">
                   <apply_loadout object="$ship" loadout="$scpLoadout" />
+                </do_if>
+                <do_if value="@$editData.$equipment != null">
+                  <include_actions ref="Scp_Fill_Equipment_Slots" />
                 </do_if>
               </do_else>
               <remove_value name="$spawnData" />
@@ -439,7 +442,7 @@
           </actions>
         </library>
 
-        <cue name="Scp_Spawn_Ship" instantiate="true">
+        <cue name="Scp_Spawn_Ship" instantiate="true" version="2">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_ship'" />
           </conditions>
@@ -467,6 +470,9 @@
             <do_else>
               <get_loadout result="$scpLoadout" macro="macro.{$spawnData.$ship}" loadout="$spawnData.$loadout" />
             </do_else>
+            <debug_text text="'SafeCheatPanel: loadout for %s - asked for %s at preset %s, plan present %s, loadout resolved %s'. [
+              $spawnData.$ship, @$spawnData.$loadout, $spawnData.$preset,
+              @$spawnData.$equipment != null, @$scpLoadout != null]" chance="$debugChance" />
             <do_while value="$rows lt $spawnData.$rows">
               <do_while value="$numPerRow lt $spawnData.$numPerRow">
                 <!-- Two shapes: <loadout> is static, it cannot be conditional inside one create_ship. -->
@@ -528,8 +534,8 @@
                       $ship.turrets.all.count, $ship.turrets.numslots,
                       $ship.shields.all.count, $ship.shields.numslots,
                       $ship.engines.all.count, $ship.engines.numslots]" chance="$traceChance" />
-                    <!-- Only the categories Lua does not model - the four slot ones are already
-                         fitted from the Lua pools, being out of this faction pool's reach. -->
+                    <!-- Mainly what Lua does not model; the slot categories are already fitted from
+                         its pools. Thrusters stay in as a last resort for a hull with no candidate. -->
                     <generate_loadout result="$loadouts" macro="macro.{$spawnData.$ship}" level="$spawnData.$preset" faction="faction.{$spawnOwner}" variation="0" />
                     <do_if value="@$loadouts.count gt 0">
                       <apply_loadout object="$ship" loadout="$loadouts.{1}" flags="add thrusters ammo units software drones crew" />
@@ -538,6 +544,17 @@
                       <debug_text text="'SafeCheatPanel: no base loadout generated for ship %s'. [$ship.debugname]" chance="$debugChance" />
                     </do_else>
                     <include_actions ref="Scp_Fit_Equipment_From_Pools" />
+                  </do_if>
+                  <do_elseif value="@$spawnData.$equipment != null">
+                    <include_actions ref="Scp_Fill_Equipment_Slots" />
+                  </do_elseif>
+                  <do_if value="@$ship != null">
+                    <debug_text text="'SafeCheatPanel: %s equipped - weapons %s/%s, turrets %s/%s, shields %s/%s, engines %s/%s'. [
+                      $ship.debugname,
+                      $ship.weapons.all.count - $ship.turrets.all.count, $ship.weapons.numslots,
+                      $ship.turrets.all.count, $ship.turrets.numslots,
+                      $ship.shields.all.count, $ship.shields.numslots,
+                      $ship.engines.all.count, $ship.engines.numslots]" chance="$debugChance" />
                   </do_if>
                   <!-- Hand over to the intended owner now that the equipment is on. -->
                   <do_if value="$spawnOwner != $spawnData.$ownerId">
@@ -886,42 +903,16 @@
         </library>
 
         <!--
-      Builds the engine/shield/weapon/turret loadout create_ship is handed, from the Lua
-      candidate pools. All four generated at once: shield groups are only emitted alongside
+      Builds the engine/shield/weapon/turret/thruster loadout create_ship is handed, from the Lua
+      candidate pools. All generated at once: shield groups are only emitted alongside
       the turret or engine group they hang off.
       Expects $spawnData and $debugChance; sets $scpLoadout, null when there is nothing to fit.
     -->
-        <library name="Scp_Build_Equipment_Loadout" purpose="include_actions" version="1">
+        <library name="Scp_Build_Equipment_Loadout" purpose="include_actions" version="3">
           <actions>
-            <set_value name="$fitPool" exact="[]" />
-            <do_if value="@$spawnData.$equipment != null">
-              <set_value name="$fitCategories" exact="[]" />
-              <do_if value="$spawnData.$equipment.$engines?">
-                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$engines" />
-              </do_if>
-              <do_if value="$spawnData.$equipment.$weapons?">
-                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$weapons" />
-              </do_if>
-              <do_if value="$spawnData.$equipment.$turrets?">
-                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$turrets" />
-              </do_if>
-              <do_if value="$spawnData.$equipment.$shields?">
-                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$shields" />
-              </do_if>
-              <do_for_each name="$fitCategory" in="$fitCategories">
-                <do_for_each name="$fitBucket" in="$fitCategory">
-                  <do_for_each name="$fitName" in="$fitBucket">
-                    <append_to_list name="$fitPool" exact="macro.{$fitName}" />
-                  </do_for_each>
-                </do_for_each>
-              </do_for_each>
-              <remove_value name="$fitCategories" />
-              <remove_value name="$fitCategory" />
-              <remove_value name="$fitBucket" />
-              <remove_value name="$fitName" />
-            </do_if>
+            <include_actions ref="Scp_Fit_All_Pools_Build" />
             <do_if value="$fitPool.count gt 0">
-              <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" flags="engines weapons turrets turretgroups shields shieldgroups">
+              <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" flags="engines weapons turrets turretgroups shields shieldgroups thrusters">
                 <quantity level="$spawnData.$preset" variation="0" />
                 <quality level="$spawnData.$preset" variation="0" />
               </generate_loadout>
@@ -939,11 +930,12 @@
 
         <!--
       Post-spawn repairs on a ship created with the loadout above: the floor guard for a
-      category that still came out empty, and the ammo pass. A category with no candidates is
-      absent from the plan and stays empty by design - Lua logs what came up dry.
+      category that still came out empty, the thruster top-up and the ammo pass. A category
+      with no candidates is absent from the plan and stays empty by design - Lua logs what
+      came up dry.
       Expects $ship, $spawnData, $debugChance and $traceChance in scope.
     -->
-        <library name="Scp_Fit_Equipment_From_Pools" purpose="include_actions" version="5">
+        <library name="Scp_Fit_Equipment_From_Pools" purpose="include_actions" version="6">
           <actions>
             <do_if value="@$spawnData.$equipment != null">
               <debug_text text="'SafeCheatPanel: %s before fitting - weapons %s/%s, turrets %s/%s, shields %s/%s, engines %s/%s, missiles %s/%s; plan %s'. [
@@ -1010,6 +1002,21 @@
                 <debug_text text="'SafeCheatPanel: shield floor guard on %s - %s/%s, used %s'. [
                   $ship.debugname, $ship.shields.all.count, $ship.shields.numslots, @$fitUsed]" chance="$debugChance" />
               </do_if>
+              <!-- Thrusters have no MD-visible occupancy, so there is nothing to guard on:
+                   the pass always runs and "add" keeps whatever the ship already carries. -->
+              <do_if value="$spawnData.$equipment.$thrusters?">
+                <set_value name="$fitCategory" exact="$spawnData.$equipment.$thrusters" />
+                <include_actions ref="Scp_Fit_Category_Pool_Build" />
+                <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" flags="thrusters">
+                  <quantity level="1" variation="0" />
+                  <quality level="$spawnData.$preset" variation="0" />
+                </generate_loadout>
+                <do_if value="@$fitLoadouts.count gt 0">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add thrusters" />
+                </do_if>
+                <debug_text text="'SafeCheatPanel: thruster top-up on %s - pool %s, used %s'. [
+                  $ship.debugname, $fitPool.count, @$fitUsed]" chance="$debugChance" />
+              </do_if>
               <remove_value name="$fitCategory" />
               <!-- Ammo last: a loadout only carries ammo for the launchers it contains, so the
                    ammo bucket holds those launchers too, even though only the ammo is applied. -->
@@ -1033,6 +1040,96 @@
               <remove_value name="$fitPool" />
               <remove_value name="$fitLoadouts" />
             </do_if>
+          </actions>
+        </library>
+
+        <!--
+      $fitPool: every slot-category candidate in $spawnData.$equipment, flattened into one
+      generate_loadout macro list. Empty when the plan is absent or holds no slot category.
+    -->
+        <library name="Scp_Fit_All_Pools_Build" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$fitPool" exact="[]" />
+            <do_if value="@$spawnData.$equipment != null">
+              <set_value name="$fitCategories" exact="[]" />
+              <do_if value="$spawnData.$equipment.$engines?">
+                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$engines" />
+              </do_if>
+              <do_if value="$spawnData.$equipment.$weapons?">
+                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$weapons" />
+              </do_if>
+              <do_if value="$spawnData.$equipment.$turrets?">
+                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$turrets" />
+              </do_if>
+              <do_if value="$spawnData.$equipment.$shields?">
+                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$shields" />
+              </do_if>
+              <do_if value="$spawnData.$equipment.$thrusters?">
+                <append_to_list name="$fitCategories" exact="$spawnData.$equipment.$thrusters" />
+              </do_if>
+              <do_for_each name="$fitCategory" in="$fitCategories">
+                <do_for_each name="$fitBucket" in="$fitCategory">
+                  <do_for_each name="$fitName" in="$fitBucket">
+                    <append_to_list name="$fitPool" exact="macro.{$fitName}" />
+                  </do_for_each>
+                </do_for_each>
+              </do_for_each>
+              <remove_value name="$fitCategories" />
+              <remove_value name="$fitCategory" />
+              <remove_value name="$fitBucket" />
+              <remove_value name="$fitName" />
+            </do_if>
+          </actions>
+        </library>
+
+        <!--
+      Takes a fixed loadout the ship was born with out to every slot it left free, drawing only on
+      that loadout's own equipment. Runs after create_ship, so "add" keeps what is already placed.
+      Expects $ship, $spawnData and $debugChance in scope.
+    -->
+        <library name="Scp_Fill_Equipment_Slots" purpose="include_actions" version="2">
+          <actions>
+            <include_actions ref="Scp_Fit_All_Pools_Build" />
+            <do_if value="$fitPool.count gt 0">
+              <generate_loadout result="$fitLoadouts" macro="macro.{$spawnData.$ship}" macros="$fitPool" used="$fitUsed" flags="engines weapons turrets turretgroups shields shieldgroups thrusters">
+                <quantity level="1" variation="0" />
+                <quality level="1" variation="0" />
+              </generate_loadout>
+              <do_if value="@$fitLoadouts.count gt 0">
+                <!-- Only a category the default left free is applied: a generated group entry replaces
+                     the group whole even under "add", so a full one would be rewritten, not left be. -->
+                <do_if value="@$spawnData.$fillFlags.$engines == true">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add engines" />
+                </do_if>
+                <do_if value="@$spawnData.$fillFlags.$thrusters == true">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add thrusters" />
+                </do_if>
+                <do_if value="@$spawnData.$fillFlags.$weapons == true">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add weapons" />
+                </do_if>
+                <do_if value="@$spawnData.$fillFlags.$turrets == true">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add turrets turretgroups" />
+                </do_if>
+                <!-- Shields last: a group's shield slot is only fillable once the group is populated. -->
+                <do_if value="@$spawnData.$fillFlags.$shields == true">
+                  <apply_loadout object="$ship" loadout="$fitLoadouts.{1}" flags="add shields shieldgroups" />
+                </do_if>
+              </do_if>
+              <debug_text text="'SafeCheatPanel: filled out the fixed loadout of %s - weapons %s/%s, turrets %s/%s, shields %s/%s, engines %s/%s, pool %s, used %s, applied %s'. [
+                $ship.debugname,
+                $ship.weapons.all.count - $ship.turrets.all.count, $ship.weapons.numslots,
+                $ship.turrets.all.count, $ship.turrets.numslots,
+                $ship.shields.all.count, $ship.shields.numslots,
+                $ship.engines.all.count, $ship.engines.numslots,
+                $fitPool.count, @$fitUsed, @$spawnData.$fillFlags]" chance="$debugChance" />
+              <remove_value name="$fitUsed" />
+              <remove_value name="$fitLoadouts" />
+            </do_if>
+            <do_else>
+              <debug_text text="'SafeCheatPanel: %s was to have its fixed loadout filled out, but the plan holds no candidates'. [
+                $ship.debugname]" chance="$debugChance" />
+            </do_else>
+            <remove_value name="$fitPool" />
           </actions>
         </library>
 

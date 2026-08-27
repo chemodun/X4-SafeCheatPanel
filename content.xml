@@ -4,12 +4,12 @@
   name="Safe Cheat Panel"
   description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface."
   author="Chem O`Dun"
-  version="80041"
-  date="2026-08-26"
+  version="80042"
+  date="2026-08-27"
   save="false"
   enabled="true"
   sync="false"
-  lastupdate="1787759085">
+  lastupdate="1787854412">
   <text language="7"
     description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface."></text>
   <!-- French -->
