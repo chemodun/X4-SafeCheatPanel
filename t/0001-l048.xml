@@ -178,6 +178,17 @@
             <t id="9020">Potwierdź zniszczenie wybranego obiektu</t>
             <t id="9030">Zniszcz</t>
 
+            <!-- Tab 10: Encyclopedia -->
+            <t id="10000">{1001,2400}</t>
+            <t id="10001">Kody: {1001,2400}</t>
+            <t id="10010">Kategoria</t>
+            <t id="10011">{1001,2963}</t>
+            <t id="10012">Podkategoria</t>
+            <t id="10020">Odkryj wszystko</t>
+            <t id="10021">Wszystko odkryte</t>
+            <t id="10022">Odkryj</t>
+            <t id="10023">Odkryte</t>
+
             <!-- Settings (Options Menu) -->
             <t id="90000">Ustawienia</t>
             <t id="90010">Tryb panelu</t>

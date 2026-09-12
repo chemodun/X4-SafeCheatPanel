@@ -178,6 +178,17 @@
             <t id="9020">Potvrdit zničení vybraného objektu</t>
             <t id="9030">Zničit</t>
 
+            <!-- Tab 10: Encyclopedia -->
+            <t id="10000">{1001,2400}</t>
+            <t id="10001">Cheaty: {1001,2400}</t>
+            <t id="10010">Kategorie</t>
+            <t id="10011">{1001,2963}</t>
+            <t id="10012">Podkategorie</t>
+            <t id="10020">Odhalit vše</t>
+            <t id="10021">Vše odhaleno</t>
+            <t id="10022">Odhalit</t>
+            <t id="10023">Odhaleno</t>
+
             <!-- Settings (Options Menu) -->
             <t id="90000">Nastavení</t>
             <t id="90010">Režim panelu</t>

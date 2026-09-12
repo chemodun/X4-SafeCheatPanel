@@ -18,6 +18,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Inventory Tab**: Edit player inventory wares across multiple categories.
 - **Research Tab**: Unlock or lock research individually, with full dependency handling.
 - **Blueprints Tab**: Unlock blueprints individually, by subcategory, or all at once.
+- **Encyclopedia Tab**: Reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - individually, by subcategory, or all at once.
 - **Factions Tab**: Edit faction relations with the player and between non-player factions.
 - **Galaxy/Sectors Tab**: Reveal sectors on the map at three levels of detail, or reveal all at once.
 - **Spawner Tab**: Spawn stations, ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
@@ -83,6 +84,24 @@ Browse and unlock blueprints by category and subcategory, or unlock all at once.
 ![Blueprints](docs/images/blueprints_start.png)
 ![Blueprints - All Partly Expanded](docs/images/blueprints_all_partly_expanded.png)
 ![Blueprints - Modules](docs/images/blueprints_modules_all.png)
+
+### Encyclopedia Tab
+
+Reveal encyclopedia entries the same way the Blueprints tab unlocks blueprints: pick a category and a subcategory, then reveal all of the current scope or any single entry. An entry that is already known shows as "Revealed" instead of a button. There is no option to hide an entry again once revealed.
+
+The categories, and their order, follow the in-game encyclopedia itself:
+
+- **Races** - every playable and non-playable race.
+- **Factions** - every faction, plus the licences each one issues.
+- **Ships** - by size class, drones included.
+- **Station Modules** - production, build, storage, habitation, welfare, defence, dock, processing, venture and other modules.
+- **Military** - weapons, missile launchers, turrets, missile turrets, missiles, mines and bombs.
+- **Equipment** - engines, thrusters, shield generators, satellites, navigation beacons, resource probes, laser towers, software and paint modifications.
+- **Wares** - trade wares and inventory items.
+
+Revealing a faction adds its encyclopedia article only. It does not count as having met that faction, so it does not make the faction appear in the Factions tab, which still waits until you discover it in-game.
+
+Unlike the game's own "Reveal encyclopedia" developer cheat, this reveals nothing but encyclopedia entries: the map and the research tree are left alone.
 
 ### Factions Tab
 
@@ -237,6 +256,11 @@ Debug logging can be enabled to write detailed information about the mod's opera
 - [SirNukes](https://next.nexusmods.com/profile/sirnukes?gameId=2659) - for the `Mod Support APIs` that power the UI hooks and options menu.
 
 ## Changelog
+
+### [8.00.43] - 2026-09-??
+
+- **Added**
+  - New **Encyclopedia** tab: reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - one entry at a time, a whole subcategory, or everything at once. Unlike the game's own developer cheat, it touches nothing but the encyclopedia; the map and the research tree are left alone.
 
 ### [8.00.42] - 2026-08-27
 

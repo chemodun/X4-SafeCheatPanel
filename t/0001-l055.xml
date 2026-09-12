@@ -178,6 +178,17 @@
             <t id="9020">Confirmar a destruição do objeto selecionado</t>
             <t id="9030">Destruir</t>
 
+            <!-- Tab 10: Encyclopedia -->
+            <t id="10000">{1001,2400}</t>
+            <t id="10001">Batotas: {1001,2400}</t>
+            <t id="10010">Categoria</t>
+            <t id="10011">{1001,2963}</t>
+            <t id="10012">Subcategoria</t>
+            <t id="10020">Revelar tudo</t>
+            <t id="10021">Tudo revelado</t>
+            <t id="10022">Revelar</t>
+            <t id="10023">Revelado</t>
+
             <!-- Settings (Options Menu) -->
             <t id="90000">Definições</t>
             <t id="90010">Modo do painel</t>

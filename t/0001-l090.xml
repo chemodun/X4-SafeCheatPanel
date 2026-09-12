@@ -178,6 +178,17 @@
             <t id="9020">Seçili nesnenin yok edilmesini onayla</t>
             <t id="9030">Yok et</t>
 
+            <!-- Tab 10: Encyclopedia -->
+            <t id="10000">{1001,2400}</t>
+            <t id="10001">{1001,2400} hileleri</t>
+            <t id="10010">Kategori</t>
+            <t id="10011">{1001,2963}</t>
+            <t id="10012">Alt kategori</t>
+            <t id="10020">Tümünü göster</t>
+            <t id="10021">Tümü gösterildi</t>
+            <t id="10022">Göster</t>
+            <t id="10023">Gösterildi</t>
+
             <!-- Settings (Options Menu) -->
             <t id="90000">Ayarlar</t>
             <t id="90010">Panel kipi</t>

@@ -178,6 +178,17 @@
             <t id="9020">Confirm destruction of the selected object</t>
             <t id="9030">Destroy</t>
 
+            <!-- Tab 10: Encyclopedia -->
+            <t id="10000">{1001,2400}</t>
+            <t id="10001">{1001,2400} Cheats</t>
+            <t id="10010">Category</t>
+            <t id="10011">{1001,2963}</t>
+            <t id="10012">Sub-category</t>
+            <t id="10020">Reveal All</t>
+            <t id="10021">All Revealed</t>
+            <t id="10022">Reveal</t>
+            <t id="10023">Revealed</t>
+
             <!-- Settings (Options Menu) -->
             <t id="90000">Settings</t>
             <t id="90010">Panel Mode</t>

@@ -178,6 +178,17 @@
             <t id="9020">Conferma la distruzione dell'oggetto selezionato</t>
             <t id="9030">Distruggi</t>
 
+            <!-- Tab 10: Encyclopedia -->
+            <t id="10000">{1001,2400}</t>
+            <t id="10001">Trucchi: {1001,2400}</t>
+            <t id="10010">Categoria</t>
+            <t id="10011">{1001,2963}</t>
+            <t id="10012">Sottocategoria</t>
+            <t id="10020">Rivela tutto</t>
+            <t id="10021">Tutto rivelato</t>
+            <t id="10022">Rivela</t>
+            <t id="10023">Rivelato</t>
+
             <!-- Settings (Options Menu) -->
             <t id="90000">Impostazioni</t>
             <t id="90010">Modalità del pannello</t>

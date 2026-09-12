@@ -178,6 +178,17 @@
             <t id="9020">Zerstörung des gewählten Objekts bestätigen</t>
             <t id="9030">Zerstören</t>
 
+            <!-- Tab 10: Encyclopedia -->
+            <t id="10000">{1001,2400}</t>
+            <t id="10001">{1001,2400}-Cheats</t>
+            <t id="10010">Kategorie</t>
+            <t id="10011">{1001,2963}</t>
+            <t id="10012">Unterkategorie</t>
+            <t id="10020">Alle aufdecken</t>
+            <t id="10021">Alle aufgedeckt</t>
+            <t id="10022">Aufdecken</t>
+            <t id="10023">Aufgedeckt</t>
+
             <!-- Settings (Options Menu) -->
             <t id="90000">Einstellungen</t>
             <t id="90010">Panel-Modus</t>

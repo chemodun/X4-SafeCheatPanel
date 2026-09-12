@@ -59,24 +59,25 @@ local scp = {
   table = {},
 }
 
-scp.helpers    = require("extensions.safe_cheat_panel.ui.scp_helpers")
-scp.menuHelper = require("extensions.safe_cheat_panel.ui.scp_menu_helper")
-scp.equipment  = require("extensions.safe_cheat_panel.ui.scp_equipment")
+scp.helpers      = require("extensions.safe_cheat_panel.ui.scp_helpers")
+scp.menuHelper   = require("extensions.safe_cheat_panel.ui.scp_menu_helper")
+scp.equipment    = require("extensions.safe_cheat_panel.ui.scp_equipment")
 scp.equipment.init(scp.isV9)
-scp.blueprints = require("extensions.safe_cheat_panel.ui.scp_blueprints")
-scp.spawner    = require("extensions.safe_cheat_panel.ui.scp_spawner")
-scp.player     = require("extensions.safe_cheat_panel.ui.scp_player")
-scp.station    = require("extensions.safe_cheat_panel.ui.scp_station")
+scp.blueprints   = require("extensions.safe_cheat_panel.ui.scp_blueprints")
+scp.encyclopedia = require("extensions.safe_cheat_panel.ui.scp_encyclopedia")
+scp.spawner      = require("extensions.safe_cheat_panel.ui.scp_spawner")
+scp.player       = require("extensions.safe_cheat_panel.ui.scp_player")
+scp.station      = require("extensions.safe_cheat_panel.ui.scp_station")
 scp.station.join(scp)
-scp.research   = require("extensions.safe_cheat_panel.ui.scp_research")
-scp.inventory  = require("extensions.safe_cheat_panel.ui.scp_inventory")
-scp.factions   = require("extensions.safe_cheat_panel.ui.scp_factions")
-scp.map        = require("extensions.safe_cheat_panel.ui.scp_map")
-scp.destroy    = require("extensions.safe_cheat_panel.ui.scp_destroy")
-scp.crew       = require("extensions.safe_cheat_panel.ui.scp_crew")
-scp.identify   = require("extensions.safe_cheat_panel.ui.scp_identify")
-scp.crewSize   = require("extensions.safe_cheat_panel.ui.scp_crewsize")
-scp.workforce  = require("extensions.safe_cheat_panel.ui.scp_workforce")
+scp.research     = require("extensions.safe_cheat_panel.ui.scp_research")
+scp.inventory    = require("extensions.safe_cheat_panel.ui.scp_inventory")
+scp.factions     = require("extensions.safe_cheat_panel.ui.scp_factions")
+scp.map          = require("extensions.safe_cheat_panel.ui.scp_map")
+scp.destroy      = require("extensions.safe_cheat_panel.ui.scp_destroy")
+scp.crew         = require("extensions.safe_cheat_panel.ui.scp_crew")
+scp.identify     = require("extensions.safe_cheat_panel.ui.scp_identify")
+scp.crewSize     = require("extensions.safe_cheat_panel.ui.scp_crewsize")
+scp.workforce    = require("extensions.safe_cheat_panel.ui.scp_workforce")
 scp.destroy.join(scp)
 scp.crew.join(scp)
 scp.identify.join(scp)
@@ -110,6 +111,7 @@ local config = {
       end
     },
     { category = "scpBlueprint",   name = ReadText(1972092427, 4000), icon = "scp_blueprints", helpOverlayID = "help_category_cheatsblueprint", helpOverlayText = ReadText(1972092427, 4001), display = function() return true end },
+    { category = "scpEncyclopedia", name = ReadText(1972092427, 10000), icon = "tlt_encyclopedia", helpOverlayID = "help_category_cheatsencyclopedia", helpOverlayText = ReadText(1972092427, 10001), display = function() return true end },
     { category = "scpFactions",    name = ReadText(1972092427, 5000), icon = "pi_diplomacy",   helpOverlayID = "help_category_cheatsfactions",  helpOverlayText = ReadText(1972092427, 5001), display = function() return true end },
     { category = "scpMap",         name = ReadText(1001, 9181),    icon = "tlt_map",        helpOverlayID = "help_category_cheatsmap",       helpOverlayText = ReadText(1001, 9181), display = function() return true end },
     { category = "scpObjectSpawn", name = ReadText(1972092427, 7000), icon = "scp_objectspawn", helpOverlayID = "help_category_cheatsspawn",     helpOverlayText = ReadText(1972092427, 7001), display = function() return true end },
@@ -537,6 +539,8 @@ function scp.createCheatMenu(frame, _)
     numdisplayed = scp.destroy.createSection(mainTable, numdisplayed, scp)
   elseif scp.tableMode == "scpBlueprint" then
     numdisplayed = scp.blueprints.createSection(mainTable, numdisplayed, scp)
+  elseif scp.tableMode == "scpEncyclopedia" then
+    numdisplayed = scp.encyclopedia.createSection(mainTable, numdisplayed, scp)
   end
 
   local tabTable = frame:addTable(maxNumCategoryColumns, { tabOrder = 2, reserveScrollBar = false })
