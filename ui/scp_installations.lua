@@ -127,9 +127,10 @@ local function build(scp)
 end
 
 ---Dropdown rows for every pre-built installation.
+---@return table
 function scpInstallations.getAll(scp)
   if entries == nil then build(scp) end
-  return entries
+  return entries or {}
 end
 
 ---Label for a macro that is not in the swept list, for an installation loaded into edit mode.
