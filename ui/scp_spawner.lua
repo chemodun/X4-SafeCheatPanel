@@ -446,6 +446,8 @@ end
 local function getAllConstructionPlans()
   local inGamePlans = {}
   local playerPlans = {}
+  -- The id only disambiguates plans for someone editing them; Normal mode shows the name alone.
+  local showPlanIds = scpHelpers.isExtendedMode()
   local n = C.GetNumConstructionPlans()
   local buf = ffi.new("UIConstructionPlan[?]", n)
   n = C.GetConstructionPlans(buf, n)
@@ -458,7 +460,8 @@ local function getAllConstructionPlans()
       playerPlans[#playerPlans + 1] = { id = id, name = name, text = name, active = true, icon = "", displayremoveoption = false }
     elseif C.IsConstructionPlanValid(id, numinvalidpatches) then
       -- text is the label; name is what the spawned station is called, so the id never reaches it.
-      inGamePlans[#inGamePlans + 1] = { id = id, name = name, text = name .. " [" .. id .. "]", active = true, icon = "", displayremoveoption = false }
+      local text = showPlanIds and (name .. " [" .. id .. "]") or name
+      inGamePlans[#inGamePlans + 1] = { id = id, name = name, text = text, active = true, icon = "", displayremoveoption = false }
     end
   end
   table.sort(inGamePlans, sortText)

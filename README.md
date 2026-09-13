@@ -89,6 +89,8 @@ Browse and unlock blueprints by category and subcategory, or unlock all at once.
 
 Reveal encyclopedia entries the same way the Blueprints tab unlocks blueprints: pick a category and a subcategory, then reveal all of the current scope or any single entry. An entry that is already known shows as "Revealed" instead of a button. There is no option to hide an entry again once revealed.
 
+![Encyclopedia Tab](docs/images/encyclopedia.png)
+
 The categories, and their order, follow the in-game encyclopedia itself:
 
 - **Races** - every playable and non-playable race.
@@ -152,7 +154,7 @@ A **Reveal All** button reveals every sector at all levels at once.
 #### Station Spawner
 
 - Select a construction plan (player-created plans, and pre-defined plans in extended mode). Pre-defined plans and installations are listed with their id, so entries sharing a name stay apart.
-- Or pick **Pre-built Installations** instead of a plan (available in extended mode) - Kha'ak hives and nests, the fixed Xenon and pirate stations and the like, listed from the game itself.
+- Or pick **Pre-built Installations** instead of a plan (available in extended mode) - Kha'ak installations, the fixed Xenon and pirate stations and the like, listed from the game itself.
 - An installation is real and armed, but does not join its owner's defence logic, so it will not breed fleets.
 - Select the owning faction (player only in normal mode; any faction in extended mode).
 - For a player-owned station, optionally assign a manager and a ship trader - the game gives neither on its own. The trader option appears only when the plan includes a build module; an installation is offered neither.
@@ -263,7 +265,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 - **Added**
   - New **Encyclopedia** tab: reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - one entry at a time, a whole subcategory, or everything at once. The map and the research tree are left alone.
-  - Spawner tab: **Pre-built Installations** as a third station type, in extended mode - Kha'ak hives and nests, the fixed Xenon and pirate stations and the like, listed from the game itself. Pre-defined plans and installations now show their id alongside the name, so entries sharing a name stay apart.
+  - Spawner tab: **Pre-built Installations** as a third station type, in extended mode - Kha'ak installations, the fixed Xenon and pirate stations and the like, listed from the game itself.
 
 ### [8.00.42] - 2026-08-27
 
