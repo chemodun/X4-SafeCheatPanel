@@ -21,7 +21,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 [*] [b]Encyclopedia Tab[/b]: Reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - individually, by subcategory, or all at once.
 [*] [b]Factions Tab[/b]: Edit faction relations with the player and between non-player factions.
 [*] [b]Galaxy/Sectors Tab[/b]: Reveal sectors on the map at three levels of detail, or reveal all at once.
-[*] [b]Spawner Tab[/b]: Spawn stations, ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
+[*] [b]Spawner Tab[/b]: Spawn stations - from a construction plan or as a pre-built installation - plus ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
 [*] [b]Editor[/b]: The same tab edits existing objects. Right-click a player-owned ship or station to load it in, then set crew skills, re-equip it, fill empty control posts or set its workforce.
 [*] [b]Destroy Object Tab[/b]: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
 [*] [b]Right-click context menu[/b]: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector, destroy object.
@@ -167,8 +167,10 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [size=120][u]Station Spawner[/u][/size]
 [list]
 [*] Select a construction plan (player-created plans, and pre-defined plans in extended mode).
+[*] Or pick [b]Pre-built Installations[/b] instead of a plan - Kha'ak hives and nests, the fixed Xenon and pirate stations and the like, listed from the game itself.
+[*] An installation is real and armed, but does not join its owner's defence logic, so it will not breed fleets.
 [*] Select the owning faction (player only in normal mode; any faction in extended mode).
-[*] For a player-owned station, optionally assign a manager and a ship trader - the game gives neither on its own. The trader option appears only when the plan includes a build module.
+[*] For a player-owned station, optionally assign a manager and a ship trader - the game gives neither on its own. The trader option appears only when the plan includes a build module; an installation is offered neither.
 [*] Optionally set crew skill levels via 1-5 star sliders. Defence Officer and Engineer are always listed; Manager and Ship Trader only if you asked for them.
 [*] Optionally set the workforce, as a percentage of habitation capacity - a player station otherwise starts with none. Needs a plan with habitation modules; every race fills proportionally.
 [/list]
@@ -202,7 +204,7 @@ For a station:
 [spoiler][img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/editing_a_station_menu_command.png[/img][/spoiler]
 [spoiler][img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/editing_a_station.png[/img][/spoiler]
 [list]
-[*] The construction plan is identified against your saved and in-game plans, or shown as [b]Unknown[/b]. It cannot be changed.
+[*] The construction plan is identified against your saved and in-game plans, or shown as [b]Unknown[/b]; a pre-built installation is named as one. It cannot be changed.
 [*] A missing manager or ship trader can be added; the trader needs a station with a dock that can equip ships.
 [*] Set Manager, Ship Trader, Defence Officer and Engineer skill levels via 1-5 star sliders. A post that is neither filled nor being added gets no slider.
 [*] The Ship Trader has no skill relevance of its own, so its rating is the plain average of its five skills, and setting it writes all five.
@@ -276,7 +278,8 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [list]
 [*] [b]Added[/b]
 [list]
-[*] New [b]Encyclopedia[/b] tab: reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - one entry at a time, a whole subcategory, or everything at once. Unlike the game's own developer cheat, it touches nothing but the encyclopedia; the map and the research tree are left alone.
+[*] New [b]Encyclopedia[/b] tab: reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - one entry at a time, a whole subcategory, or everything at once. The map and the research tree are left alone.
+[*] Spawner tab: [b]Pre-built Installations[/b] as a third station type - Kha'ak hives and nests, the fixed Xenon and pirate stations and the like, listed from the game itself.
 [/list]
 [/list]
 [size=125][u][8.00.42] - 2026-08-27[/u][/size]
