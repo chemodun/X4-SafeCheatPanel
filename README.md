@@ -261,7 +261,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
-### [8.00.43] - 2026-09-??
+### [8.00.43] - 2026-09-14
 
 - **Added**
   - New **Encyclopedia** tab: reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - one entry at a time, a whole subcategory, or everything at once. The map and the research tree are left alone.
