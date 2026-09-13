@@ -111,6 +111,9 @@
             <t id="7103">Planos criados pelo jogador</t>
             <t id="7104">Escolhe um plano do jogador</t>
             <t id="7105">Não há planos do jogador disponíveis</t>
+            <t id="7106">Instalações pré-construídas</t>
+            <t id="7107">Escolha uma instalação</t>
+            <t id="7108">Não há instalações disponíveis</t>
             <!-- Ship Spawner Mode -->
             <t id="7200">Escolhe uma nave</t>
             <t id="7201">Quantidade por fila</t>

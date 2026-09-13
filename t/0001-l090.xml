@@ -111,6 +111,9 @@
             <t id="7103">Oyuncunun hazırladığı planlar</t>
             <t id="7104">Bir oyuncu planı seç</t>
             <t id="7105">Kullanılabilir oyuncu planı yok</t>
+            <t id="7106">Hazır tesisler</t>
+            <t id="7107">Bir tesis seçin</t>
+            <t id="7108">Kullanılabilir tesis yok</t>
             <!-- Ship Spawner Mode -->
             <t id="7200">Bir gemi seç</t>
             <t id="7201">Sıra başına sayı</t>

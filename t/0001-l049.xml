@@ -111,6 +111,9 @@
             <t id="7103">Vom Spieler erstellte Pläne</t>
             <t id="7104">Spielerplan wählen</t>
             <t id="7105">Keine Spielerpläne verfügbar</t>
+            <t id="7106">Vorgefertigte Anlagen</t>
+            <t id="7107">Anlage auswählen</t>
+            <t id="7108">Keine Anlagen verfügbar</t>
             <!-- Ship Spawner Mode -->
             <t id="7200">Schiff wählen</t>
             <t id="7201">Anzahl pro Reihe</t>

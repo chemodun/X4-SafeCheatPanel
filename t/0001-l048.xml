@@ -111,6 +111,9 @@
             <t id="7103">Plany stworzone przez gracza</t>
             <t id="7104">Wybierz plan gracza</t>
             <t id="7105">Brak dostępnych planów gracza</t>
+            <t id="7106">Gotowe instalacje</t>
+            <t id="7107">Wybierz instalację</t>
+            <t id="7108">Brak dostępnych instalacji</t>
             <!-- Ship Spawner Mode -->
             <t id="7200">Wybierz statek</t>
             <t id="7201">Liczba w rzędzie</t>

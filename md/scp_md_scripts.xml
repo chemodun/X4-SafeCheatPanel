@@ -688,21 +688,32 @@
           </actions>
         </cue>
 
-        <cue name="Scp_Spawn_Station" instantiate="true">
+        <cue name="Scp_Spawn_Station" instantiate="true" version="2">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_station'" />
           </conditions>
           <actions>
             <set_value name="$spawnData" exact="event.param3" />
-            <create_station rawname="$spawnData.$name" name="$station" sector="$spawnData.$offsetComponent" macro="macro.station_gen_factory_base_01_macro" constructionplan="$spawnData.$constructionPlan" owner="faction.{$spawnData.$ownerId}" state="componentstate.operational">
-              <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
-              <safepos includeplotbox="1" />
-            </create_station>
+            <!-- A pre-built installation is a bare station macro with no construction plan. -->
+            <set_value name="$scpIsInstallation" exact="$spawnData.$stationMacro?" />
+            <do_if value="$scpIsInstallation">
+              <create_station rawname="$spawnData.$name" name="$station" sector="$spawnData.$offsetComponent" macro="macro.{$spawnData.$stationMacro}" owner="faction.{$spawnData.$ownerId}" state="componentstate.operational">
+                <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
+                <safepos includeplotbox="1" />
+              </create_station>
+            </do_if>
+            <do_else>
+              <create_station rawname="$spawnData.$name" name="$station" sector="$spawnData.$offsetComponent" macro="macro.station_gen_factory_base_01_macro" constructionplan="$spawnData.$constructionPlan" owner="faction.{$spawnData.$ownerId}" state="componentstate.operational">
+                <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
+                <safepos includeplotbox="1" />
+              </create_station>
+            </do_else>
             <do_if value="$station">
               <do_if value="$station.owner != faction.player">
                 <!-- NPC-owned: 'init station' runs InitStationActions, which adds the manager,
-                     the defence and engineer NPCs and the AI unit. -->
-                <signal_objects object="player.galaxy" param="'init station'" param2="$station" param3="true" />
+                     the defence and engineer NPCs and the AI unit. param3 is $gamestartstation,
+                     which drives the workforce fill - false for a fixed station, as in vanilla. -->
+                <signal_objects object="player.galaxy" param="'init station'" param2="$station" param3="not $scpIsInstallation" />
               </do_if>
               <do_else>
                 <!-- Player-owned: mirrors PlayerStationBuilt; the InitUniverse libraries below
@@ -726,8 +737,9 @@
           <delay min="400ms" max="600ms" />
           <actions>
             <do_if value="@$station != null">
-              <debug_text text="'SafeCheatPanel: Spawned station %s - canequipships %s, posts manager %s / trader %s / defence %s / engineer %s'. [
-                $station.debugname, $station.canequipships, @$station.controlentity.{controlpost.manager}.exists, @$station.controlentity.{controlpost.shiptrader}.exists,
+              <debug_text text="'SafeCheatPanel: Spawned station %s from %s - canequipships %s, posts manager %s / trader %s / defence %s / engineer %s'. [
+                $station.debugname, if $scpIsInstallation then 'installation macro ' + @$spawnData.$stationMacro else 'plan ' + @$spawnData.$constructionPlan,
+                $station.canequipships, @$station.controlentity.{controlpost.manager}.exists, @$station.controlentity.{controlpost.shiptrader}.exists,
                 @$station.controlentity.{controlpost.defence}.exists, @$station.controlentity.{controlpost.engineer}.exists]" chance="$debugChance" />
             </do_if>
             <do_if value="@$spawnData.$crewSkills != null and @$station != null">

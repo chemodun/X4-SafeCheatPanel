@@ -144,6 +144,7 @@ local scpCrew       = require("extensions.safe_cheat_panel.ui.scp_crew")
 local scpIdentify   = require("extensions.safe_cheat_panel.ui.scp_identify")
 local scpCrewSize   = require("extensions.safe_cheat_panel.ui.scp_crewsize")
 local scpWorkforce  = require("extensions.safe_cheat_panel.ui.scp_workforce")
+local scpInstallations = require("extensions.safe_cheat_panel.ui.scp_installations")
 
 local menu         = Helper.getMenu("MapMenu")
 local interactMenu = Helper.getMenu("InteractMenu")
@@ -218,9 +219,11 @@ local spawnModes = {
   { id = "spawnModeObject",  text = ReadText(1001, 93), active = true, icon = "", displayremoveoption = false },
 }
 
+-- "installation" selects a station macro instead of a plan.
 local stationPlanTypes = {
-  { id = "inGame", text = ReadText(1972092427, 7102), active = true, icon = "", displayremoveoption = false },
-  { id = "player", text = ReadText(1972092427, 7103), active = true, icon = "", displayremoveoption = false },
+  { id = "inGame",       text = ReadText(1972092427, 7102), active = true, icon = "", displayremoveoption = false },
+  { id = "player",       text = ReadText(1972092427, 7103), active = true, icon = "", displayremoveoption = false },
+  { id = "installation", text = ReadText(1972092427, 7106), active = true, icon = "", displayremoveoption = false },
 }
 
 -- Stands in for spawnModes while a target is loaded: one inactive entry naming the mode.
@@ -563,12 +566,20 @@ function scpSpawner.reset(blacklisted)
   state.object.ownerId = "player"
 end
 
+---The list the Plan Type dropdown currently draws from. Installations are macros, not plans, but
+---they travel through the same selection field.
+local function planListFor(planType)
+  if planType == "installation" then return scpInstallations.getAll(scpSpawner.scp) end
+  if planType == "player" then return state.playerPlans end
+  return state.constructionPlans
+end
+
 function scpSpawner.initStations()
   if #state.constructionPlans == 0 then
     state.constructionPlans, state.playerPlans = getAllConstructionPlans()
   end
   if state.station.plan == nil then
-    local planList = (state.station.planType == "player") and state.playerPlans or state.constructionPlans
+    local planList = planListFor(state.station.planType)
     if #planList > 0 then
       state.station.plan = planList[1].id
       state.station.name = planList[1].text
@@ -620,6 +631,8 @@ end
 function scpSpawner.init()
   RegisterEvent("scp_main.objectInspected", scpSpawner.onObjectInspected)
   RegisterEvent("scp_main.objectEdited", scpSpawner.onObjectEdited)
+  -- Swept once here rather than on the dropdown that needs it.
+  scpInstallations.getAll(scpSpawner.scp)
 end
 
 local function dropTarget()
@@ -687,7 +700,12 @@ function scpSpawner.startEdit(isStation)
   -- Crew baselines are seeded on every render, not here, so they stay right after an apply.
   if isStation then
     scpSpawner.initStations()
-    state.target.plan, state.target.planType = scpIdentify.stationPlan(object, state.constructionPlans, state.playerPlans)
+    -- An installation has no modules, so plan matching could only report "unknown".
+    if scpInstallations.isInstallation(state.target.macro) then
+      state.target.plan, state.target.planType = state.target.macro, "installation"
+    else
+      state.target.plan, state.target.planType = scpIdentify.stationPlan(object, state.constructionPlans, state.playerPlans)
+    end
   else
     state.target.loadout = scpIdentify.shipLoadout(object, state.target.macro, getShipLoadouts(state.target.macro))
     state.target.newLoadout = state.target.loadout
@@ -819,9 +837,18 @@ local function isPresetLoadout(loadoutId)
   return loadoutId == "scpDefaultLow" or loadoutId == "scpDefaultMedium" or loadoutId == "scpDefaultHigh"
 end
 
+---An installation is a bare macro, so the plan-shaped questions have no answer for one.
+local function stationPlanCanEquipShips()
+  return state.station.planType ~= "installation" and scpIdentify.planCanEquipShips(state.station.plan)
+end
+
+local function stationPlanHasHabitation()
+  return state.station.planType ~= "installation" and scpIdentify.planHasHabitation(state.station.plan)
+end
+
 ---Switching to a plan that builds no pier or build module must drop a pending trader request.
 local function clearTraderIfPlanCannotEquip()
-  if state.station.addTrader and not scpIdentify.planCanEquipShips(state.station.plan) then
+  if state.station.addTrader and not stationPlanCanEquipShips() then
     state.station.addTrader = false
     state.crew.targets.trader = nil
   end
@@ -829,7 +856,7 @@ end
 
 ---Same for the workforce: a plan without a habitation module builds nowhere to put workers.
 local function clearWorkforceIfPlanHasNoHabitation()
-  if state.workforce.enabled and not scpIdentify.planHasHabitation(state.station.plan) then
+  if state.workforce.enabled and not stationPlanHasHabitation() then
     scpWorkforce.resetState(state.workforce)
   end
 end
@@ -837,8 +864,7 @@ end
 function scpSpawner.setStationSpawnData(id, dataType)
   if dataType == "station" then
     state.station.plan = id
-    local planList = (state.station.planType == "player") and state.playerPlans or state.constructionPlans
-    for _, plan in pairs(planList) do
+    for _, plan in pairs(planListFor(state.station.planType)) do
       if plan.id == id then
         state.station.name = plan.text
         break
@@ -846,14 +872,19 @@ function scpSpawner.setStationSpawnData(id, dataType)
     end
   elseif dataType == "planType" then
     state.station.planType = id
-    -- The two plan lists are disjoint, so the selected plan never survives a type switch.
-    local planList = (id == "player") and state.playerPlans or state.constructionPlans
+    -- The three lists are disjoint, so the selected plan never survives a type switch.
+    local planList = planListFor(id)
     if #planList > 0 then
       state.station.plan = planList[1].id
       state.station.name = planList[1].text
     else
       state.station.plan = nil
       state.station.name = nil
+    end
+    -- An installation is built from a bare macro, so it has no modules for a manager to run.
+    if id == "installation" then
+      state.station.addManager = false
+      state.crew.targets.manager = nil
     end
   elseif dataType == "addManager" then
     state.station.addManager = id
@@ -1013,16 +1044,19 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
     isHeader         = nil,
   })
 
-  if state.station.planType == "player" then
+  -- Either list can come back empty, so each carries a fallback title.
+  if state.station.planType == "player" or state.station.planType == "installation" then
+    local isInstallation = state.station.planType == "installation"
+    local planList = planListFor(state.station.planType)
     numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
-      text  = ReadText(1972092427, 7104),
+      text  = ReadText(1972092427, isInstallation and 7107 or 7104),
       fixed = nil,
     })
-    if #state.playerPlans > 0 then
+    if #planList > 0 then
       rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
       numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
-        active           = #state.playerPlans > 1,
-        dropDownData     = state.playerPlans,
+        active           = #planList > 1,
+        dropDownData     = planList,
         startOption      = state.station.plan,
         text             = nil,
         textOverride     = "",
@@ -1036,7 +1070,7 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
       })
     else
       numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
-        text  = ReadText(1972092427, 7105),
+        text  = ReadText(1972092427, isInstallation and 7108 or 7105),
         fixed = nil,
       })
     end
@@ -1083,31 +1117,34 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
     isHeader         = nil,
   })
 
-  -- Vanilla only withholds the manager and trader from player-owned stations.
+  -- Vanilla only withholds the manager and trader from player-owned stations; an installation has
+  -- no modules for either to sit in.
   if state.station.ownerId == "player" then
-    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
-      text  = ReadText(1972092427, 7420),
-      fixed = nil,
-    })
-    rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
-    numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroup, "spawn_add_manager", numDisplayed, {
-      active        = true,
-      checked       = state.station.addManager,
-      text          = ReadText(1972092427, 7421),
-      mouseOverText = ReadText(1972092427, 7422),
-      textColIndex  = 2,
-      onClick       = function(_, checked) scpSpawner.setStationSpawnData(checked, "addManager") end,
-    })
-    -- A trader has nowhere to stand unless the plan builds a pier or a build module.
-    if scpIdentify.planCanEquipShips(state.station.plan) then
-      numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroup, "spawn_add_trader", numDisplayed, {
-        active        = true,
-        checked       = state.station.addTrader,
-        text          = ReadText(1972092427, 7423),
-        mouseOverText = ReadText(1972092427, 7424),
-        textColIndex  = 2,
-        onClick       = function(_, checked) scpSpawner.setStationSpawnData(checked, "addTrader") end,
+    if state.station.planType ~= "installation" then
+      numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+        text  = ReadText(1972092427, 7420),
+        fixed = nil,
       })
+      rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+      numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroup, "spawn_add_manager", numDisplayed, {
+        active        = true,
+        checked       = state.station.addManager,
+        text          = ReadText(1972092427, 7421),
+        mouseOverText = ReadText(1972092427, 7422),
+        textColIndex  = 2,
+        onClick       = function(_, checked) scpSpawner.setStationSpawnData(checked, "addManager") end,
+      })
+      -- A trader has nowhere to stand unless the plan builds a pier or a build module.
+      if stationPlanCanEquipShips() then
+        numDisplayed = scp.menuHelper.createCheckBoxOnLeft(rowGroup, "spawn_add_trader", numDisplayed, {
+          active        = true,
+          checked       = state.station.addTrader,
+          text          = ReadText(1972092427, 7423),
+          mouseOverText = ReadText(1972092427, 7424),
+          textColIndex  = 2,
+          onClick       = function(_, checked) scpSpawner.setStationSpawnData(checked, "addTrader") end,
+        })
+      end
     end
 
     numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
@@ -1122,7 +1159,7 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
     end
 
     -- A plan with no habitation module builds a station with no workforce capacity.
-    if scpIdentify.planHasHabitation(state.station.plan) then
+    if stationPlanHasHabitation() then
       rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
       numDisplayed = scpWorkforce.addRows(rowGroup, numDisplayed, scp, state.workforce, nil)
     end
@@ -1345,6 +1382,14 @@ local function fixedOption(id, text)
   return { { id = id, text = text, active = false, icon = "", displayremoveoption = false } }
 end
 
+---Label for the read-only Plan Type row in edit mode; nil is a station matching no known plan.
+local function planTypeText(planType)
+  for _, entry in ipairs(stationPlanTypes) do
+    if entry.id == planType then return entry.text end
+  end
+  return ReadText(1972092427, 7405)
+end
+
 local function addEditButtons(frameTable, numDisplayed)
   local row = frameTable:addRow("edit_buttons", { fixed = true, bgColor = Color["row_background_unselectable"] })
   row[1]:setColSpan(4):createButton({ active = true }):setText(ReadText(1001, 64), { halign = "center" }) -- Cancel
@@ -1490,12 +1535,15 @@ function scpSpawner.createStationEditMenu(frameTable, numDisplayed, scp)
   -- Modules cannot be rearranged from here, so both plan controls are display-only.
   local planText, planId = ReadText(1972092427, 7405), "scpUnknown"
   if state.target.plan then
-    local planList = (state.target.planType == "player") and state.playerPlans or state.constructionPlans
-    for _, plan in ipairs(planList) do
+    for _, plan in ipairs(planListFor(state.target.planType)) do
       if plan.id == state.target.plan then
         planText, planId = plan.text, plan.id
         break
       end
+    end
+    -- An installation the sweep did not list still names itself off its macro.
+    if planId == "scpUnknown" and state.target.planType == "installation" then
+      planText, planId = scpInstallations.getLabel(state.target.plan), state.target.plan
     end
   end
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
@@ -1505,8 +1553,7 @@ function scpSpawner.createStationEditMenu(frameTable, numDisplayed, scp)
   rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
   numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = false,
-    dropDownData     = fixedOption(state.target.planType or "scpUnknown",
-      state.target.planType and ReadText(1972092427, state.target.planType == "player" and 7103 or 7102) or ReadText(1972092427, 7405)),
+    dropDownData     = fixedOption(state.target.planType or "scpUnknown", planTypeText(state.target.planType)),
     startOption      = state.target.planType or "scpUnknown",
     text             = nil,
     textOverride     = "",
@@ -1785,10 +1832,13 @@ function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow
 end
 
 function scpSpawner.spawnStation(stationName, constructionPlan, ownerId)
+  -- An installation travels as a macro instead, and MD builds it with no constructionplan.
+  local isInstallation = state.station.planType == "installation"
   local data = {
     name = stationName,
     offsetComponent = ConvertStringToLuaID(tostring(interactMenu.offsetcomponent)),
-    constructionPlan = constructionPlan,
+    constructionPlan = (not isInstallation) and constructionPlan or nil,
+    stationMacro = isInstallation and constructionPlan or nil,
     ownerId = ownerId,
     -- Vanilla withholds both posts from player-owned stations; these two put them back.
     addManager = ownerId == "player" and state.station.addManager or false,

@@ -111,6 +111,9 @@
             <t id="7103">Player Developed Plans</t>
             <t id="7104">Choose a player plan</t>
             <t id="7105">No player plans available</t>
+            <t id="7106">Pre-built Installations</t>
+            <t id="7107">Choose an installation</t>
+            <t id="7108">No installations available</t>
             <!-- Ship Spawner Mode -->
             <t id="7200">Choose a Ship</t>
             <t id="7201">Number per row</t>
