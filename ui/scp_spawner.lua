@@ -226,6 +226,16 @@ local stationPlanTypes = {
   { id = "installation", text = ReadText(1972092427, 7106), active = true, icon = "", displayremoveoption = false },
 }
 
+-- Pre-built installations are an Extended-mode feature; the other two types are always offered.
+local function getStationPlanTypes()
+  if scpHelpers.isExtendedMode() then return stationPlanTypes end
+  local types = {}
+  for _, entry in ipairs(stationPlanTypes) do
+    if entry.id ~= "installation" then types[#types + 1] = entry end
+  end
+  return types
+end
+
 -- Stands in for spawnModes while a target is loaded: one inactive entry naming the mode.
 local editModes = {
   { id = "editMode", text = ReadText(1972092427, 7401), active = false, icon = "", displayremoveoption = false },
@@ -445,9 +455,10 @@ local function getAllConstructionPlans()
     local name   = ffi.string(buf[i].name)
     local source = ffi.string(buf[i].source)
     if source == "local" then
-      playerPlans[#playerPlans + 1] = { id = id, text = name, active = true, icon = "", displayremoveoption = false }
+      playerPlans[#playerPlans + 1] = { id = id, name = name, text = name, active = true, icon = "", displayremoveoption = false }
     elseif C.IsConstructionPlanValid(id, numinvalidpatches) then
-      inGamePlans[#inGamePlans + 1] = { id = id, text = name, active = true, icon = "", displayremoveoption = false }
+      -- text is the label; name is what the spawned station is called, so the id never reaches it.
+      inGamePlans[#inGamePlans + 1] = { id = id, name = name, text = name .. " [" .. id .. "]", active = true, icon = "", displayremoveoption = false }
     end
   end
   table.sort(inGamePlans, sortText)
@@ -551,6 +562,9 @@ function scpSpawner.reset(blacklisted)
   state.playerPlans = {}
   state.station.plan = nil
   state.station.name = nil
+  if state.station.planType == "installation" and not scpHelpers.isExtendedMode() then
+    state.station.planType = "inGame"
+  end
   -- Cleared so a mode switch cannot leave an owner the rebuilt faction list no longer offers.
   state.station.ownerId = nil
   state.ships = {}
@@ -564,6 +578,11 @@ function scpSpawner.reset(blacklisted)
   scpSpawner.initStations()
   scpSpawner.initShips()
   state.object.ownerId = "player"
+end
+
+---The spawned station's name: the label carries the plan or macro id, the name does not.
+local function planName(plan)
+  return plan.name or plan.text
 end
 
 ---The list the Plan Type dropdown currently draws from. Installations are macros, not plans, but
@@ -582,7 +601,7 @@ function scpSpawner.initStations()
     local planList = planListFor(state.station.planType)
     if #planList > 0 then
       state.station.plan = planList[1].id
-      state.station.name = planList[1].text
+      state.station.name = planName(planList[1])
     end
   end
   -- Owner applies to both plan types; getSpawnerFactions puts the player first.
@@ -866,7 +885,7 @@ function scpSpawner.setStationSpawnData(id, dataType)
     state.station.plan = id
     for _, plan in pairs(planListFor(state.station.planType)) do
       if plan.id == id then
-        state.station.name = plan.text
+        state.station.name = planName(plan)
         break
       end
     end
@@ -876,7 +895,7 @@ function scpSpawner.setStationSpawnData(id, dataType)
     local planList = planListFor(id)
     if #planList > 0 then
       state.station.plan = planList[1].id
-      state.station.name = planList[1].text
+      state.station.name = planName(planList[1])
     else
       state.station.plan = nil
       state.station.name = nil
@@ -1031,7 +1050,7 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
   local rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
   numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
     active           = true,
-    dropDownData     = stationPlanTypes,
+    dropDownData     = getStationPlanTypes(),
     startOption      = state.station.planType,
     text             = nil,
     textOverride     = "",

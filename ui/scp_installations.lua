@@ -68,6 +68,11 @@ local function macroName(macro)
   return name
 end
 
+---Label carrying the id, so macros sharing a name stay distinguishable.
+function scpInstallations.formatLabel(name, macro)
+  return name .. " [" .. macro .. "]"
+end
+
 ---Is this macro a pre-built installation rather than a plan-built base?
 function scpInstallations.isInstallation(macro)
   if macro == nil or macro == "" then return false end
@@ -103,16 +108,12 @@ local function build(scp)
   end
   table.sort(macros)
 
-  -- Several macros share one name, so the id only joins the label where it disambiguates.
-  local nameCount = {}
+  -- text is the label; name is what the spawned station is called, so the id never reaches it.
   for _, macro in ipairs(macros) do
-    nameCount[names[macro]] = (nameCount[names[macro]] or 0) + 1
-  end
-
-  for _, macro in ipairs(macros) do
-    local name = names[macro]
-    local label = nameCount[name] > 1 and (name .. " (" .. macro .. ")") or name
-    entries[#entries + 1] = { id = macro, text = label, active = true, icon = "", displayremoveoption = false }
+    entries[#entries + 1] = {
+      id = macro, name = names[macro], text = scpInstallations.formatLabel(names[macro], macro),
+      active = true, icon = "", displayremoveoption = false,
+    }
   end
   table.sort(entries, function(a, b) return a.text < b.text end)
 
@@ -135,7 +136,8 @@ end
 
 ---Label for a macro that is not in the swept list, for an installation loaded into edit mode.
 function scpInstallations.getLabel(macro)
-  return macroName(macro) or macro
+  local name = macroName(macro)
+  return name and scpInstallations.formatLabel(name, macro) or macro
 end
 
 Register_Require_Response("extensions.safe_cheat_panel.ui.scp_installations", scpInstallations)
