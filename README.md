@@ -261,6 +261,11 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
+### [8.00.44] - 2026-09-??
+
+- **Fixed**
+  - Sector Reveal tab: the sector list could come up empty and stay empty for the rest of the session. The list is now re-requested when the tab is opened, and the tab refreshes itself as soon as the list arrives.
+
 ### [8.00.43] - 2026-09-14
 
 - **Added**

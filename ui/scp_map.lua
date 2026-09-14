@@ -18,6 +18,17 @@ local scpMap = {
 
 local cache = {}
 
+-- The MD round trip is one frame, so this only has to outlast a reply in flight.
+local REQUEST_RETRY_SECONDS = 2
+
+-- refreshInfoFrame rebuilds the whole left frame, whatever tab is in it, so the MD replies
+-- may only refresh while the sector list is the thing on screen.
+local function refreshIfShown()
+  if menu.infoTableMode == "safeCheatPanel" and scpMap.scp and scpMap.scp.tableMode == "scpMap" then
+    menu.refreshInfoFrame()
+  end
+end
+
 function scpMap.createSection(frameTable, numDisplayed, scp)
   -- scpMap.sectors and .superHighways come from MD through the blackboard, see requestSectors.
   local sectors = {}
@@ -88,6 +99,9 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
     end
     return listToReveal
   end
+
+  -- The sidebar requests the list once; re-request here so a lost signal recovers on re-entry.
+  scpMap.requestSectors()
 
   local isAllRevealed = true
   local isUnknownGates = false
@@ -413,21 +427,31 @@ function scpMap.collectSuperHighways()
       end
     end
   end
+  refreshIfShown()
 end
 
 function scpMap.requestSuperHighways()
   if scpMap.superHighways == nil then
-    SetNPCBlackboard(scpMap.scp.playerId, scpMap.scpConfig.variableId, {})
-    AddUITriggeredEvent("scp_main", "scp_collect_super_highways")
+    -- Same gate as the sectors: a refresh must not clear the blackboard mid-fill.
+    if scpMap.highwaysRequestedAt == nil or getElapsedTime() - scpMap.highwaysRequestedAt > REQUEST_RETRY_SECONDS then
+      scpMap.highwaysRequestedAt = getElapsedTime()
+      SetNPCBlackboard(scpMap.scp.playerId, scpMap.scpConfig.variableId, {})
+      AddUITriggeredEvent("scp_main", "scp_collect_super_highways")
+    end
   end
 end
 
 -- The sector and highway lists are not reachable from Lua: MD fills the blackboard and
 -- signals back, so both requests clear it first and the section renders empty until then.
+-- A lost signal would leave the tab empty for the rest of the Lua state, so an empty list
+-- is re-requested, at most once per REQUEST_RETRY_SECONDS.
 function scpMap.requestSectors()
   if #scpMap.sectors == 0 then
-    SetNPCBlackboard(scpMap.scp.playerId, scpMap.scpConfig.variableId, {})
-    AddUITriggeredEvent("scp_main", "scp_collect_sectors")
+    if scpMap.requestedAt == nil or getElapsedTime() - scpMap.requestedAt > REQUEST_RETRY_SECONDS then
+      scpMap.requestedAt = getElapsedTime()
+      SetNPCBlackboard(scpMap.scp.playerId, scpMap.scpConfig.variableId, {})
+      AddUITriggeredEvent("scp_main", "scp_collect_sectors")
+    end
   else
     scpMap.requestSuperHighways()
   end
@@ -441,6 +465,7 @@ function scpMap.collectSectors()
   end
   scpMap.sectors = sectors
   scpMap.requestSuperHighways()
+  refreshIfShown()
 end
 
 function scpMap.onSelectElement(uiTable, modified, row, isDblClick, input, rowData)
