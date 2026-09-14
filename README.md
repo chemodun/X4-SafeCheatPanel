@@ -1,6 +1,6 @@
 # Safe Cheat Panel
 
-A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface.
+A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, encyclopedia entries, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface.
 
 **Warning**: Spawning unusual objects (such as multiple Player HQs) can corrupt saves. Use responsibly.
 
@@ -153,7 +153,7 @@ A **Reveal All** button reveals every sector at all levels at once.
 
 #### Station Spawner
 
-- Select a construction plan (player-created plans, and pre-defined plans in extended mode). Pre-defined plans and installations are listed with their id, so entries sharing a name stay apart.
+- Select a construction plan - your own, or one of the game's pre-defined plans. In extended mode, pre-defined plans and installations are also listed with their id, so entries sharing a name stay apart.
 - Or pick **Pre-built Installations** instead of a plan (available in extended mode) - Kha'ak installations, the fixed Xenon and pirate stations and the like, listed from the game itself.
 - An installation is real and armed, but does not join its owner's defence logic, so it will not breed fleets.
 - Select the owning faction (player only in normal mode; any faction in extended mode).
