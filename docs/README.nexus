@@ -1,6 +1,6 @@
 [size=4][u]Safe Cheat Panel[/u][/size]
 
-A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface.
+A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, encyclopedia entries, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface.
 
 [b]Warning[/b]: Spawning unusual objects (such as multiple Player HQs) can corrupt saves. Use responsibly.
 
@@ -168,7 +168,7 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [/list]
 [size=3][u]Station Spawner[/u][/size]
 [list]
-[*] Select a construction plan (player-created plans, and pre-defined plans in extended mode). Pre-defined plans and installations are listed with their id, so entries sharing a name stay apart.
+[*] Select a construction plan - your own, or one of the game's pre-defined plans. In extended mode, pre-defined plans and installations are also listed with their id, so entries sharing a name stay apart.
 [*] Or pick [b]Pre-built Installations[/b] instead of a plan (available in extended mode) - Kha'ak installations, the fixed Xenon and pirate stations and the like, listed from the game itself.
 [*] An installation is real and armed, but does not join its owner's defence logic, so it will not breed fleets.
 [*] Select the owning faction (player only in normal mode; any faction in extended mode).
@@ -277,6 +277,13 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [/list]
 [size=3][u][b]Changelog[/b][/u][/size]
 
+[size=3][u][i][8.00.44] - 2026-09-??[/i][/u][/size]
+[list]
+[*] [b]Fixed[/b]
+[list]
+[*] Sector Reveal tab: the sector list could come up empty and stay empty for the rest of the session. The list is now re-requested when the tab is opened, and the tab refreshes itself as soon as the list arrives.
+[/list]
+[/list]
 [size=3][u][i][8.00.43] - 2026-09-14[/i][/u][/size]
 [list]
 [*] [b]Added[/b]
