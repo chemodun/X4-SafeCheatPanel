@@ -15,7 +15,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 ## Features
 
 - **Player Tab**: Set player money and add spacesuit upgrades and ammo.
-- **Inventory Tab**: Edit player inventory wares across multiple categories.
+- **Inventory Tab**: Edit player inventory wares across multiple categories, one by one or a whole category at once.
 - **Research Tab**: Unlock or lock research individually, with full dependency handling.
 - **Blueprints Tab**: Unlock blueprints individually, by subcategory, or all at once.
 - **Encyclopedia Tab**: Reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - individually, by subcategory, or all at once.
@@ -24,7 +24,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Spawner Tab**: Spawn stations - from a construction plan or as a pre-built installation - plus ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
 - **Editor**: The same tab edits existing objects. Right-click a player-owned ship or station to load it in, then set crew skills, re-equip it, fill empty control posts or set its workforce.
 - **Destroy Object Tab**: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
-- **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), teleport ship, teleport player, reveal all stations in sector, destroy object.
+- **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), fill station storage (current and all faction stations), teleport the piloted ship or the station the player stands on, teleport player, reveal all stations in sector, clear the fog of war in sector, destroy object.
 - **Two modes**: **Normal** (player-owned spawns only) and **Extended** (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
 - **Compatible with X4 8.00 and 9.00**.
 - **Can work with SWI** - please use with the [kuertee UI Extensions and HUD for SW Interworlds adoption mod](https://www.nexusmods.com/x4foundations/mods/2134).
@@ -45,6 +45,10 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 
 - **Nexus Mods**: [Safe Cheat Panel](https://www.nexusmods.com/x4foundations/mods/1971)
 
+## Save state
+
+**No** (removing the extension does not break saves).
+
 ## Usage
 
 Open the map and click the **Safe Cheat Panel** icon in the left sidebar to open the panel.
@@ -60,6 +64,8 @@ Open the map and click the **Safe Cheat Panel** icon in the left sidebar to open
 ### Inventory Tab
 
 Edit player inventory wares. Items are grouped by category - select a category from the dropdown to view and edit amounts (0 - 10,000).
+
+The **All items in this category** row on top raises every item in the category to a chosen amount at once - for example, every paint modification to 1. Items you already hold more of are left as they are. Its button shows the lowest amount in the category.
 
 Categories: Inventory, Modification Parts, Seminars, Curiosities, Luxury Items, and Mission-Only Items.
 
@@ -220,15 +226,18 @@ Right-clicking on the map gives access to the following actions, depending on th
 - **Spawn Station**: Spawns a station at the clicked position using the current Spawner tab settings.
 - **Fix Station**: Appears only on stations that are missing control entities (defence officer or engineer). Initialises the station correctly.
 - **Reveal Stations in Sector**: Reveals all stations in the sector of the clicked position on the map, including their names and positions.
+- **Clear Fog of War in Sector**: Clears the map's fog of war over the whole sector of the clicked position. Reveals the space only, not the objects in it - combine it with **Reveal Stations in Sector** for those.
 - **Spawn Ships**: Spawns ships at the clicked position using the current Spawner tab settings.
 - **Spawn Objects**: Spawns deployable objects at the clicked position using the current Spawner tab settings.
 - **Force Build Completion: Current Station**: Instantly completes the construction of a station that is currently building, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *In* **extended** *mode available for non-player faction stations*.
 - **Force Build Completion: All Faction Stations**: Instantly completes the construction of all stations belonging to the same faction, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
-- **Restock: Current Station**: Instantly restocks the current station with all required resources. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *In* **extended** *mode available for non-player faction stations*.
-- **Restock: All Faction Stations**: Instantly restocks all stations belonging to the same faction with all required resources. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
+- **Restock: Current Station**: Instantly restocks the current station's resources and buyable trade wares up to their buy limits, the amount the station would buy itself. Works from the station's own storage numbers, so it also works when the station posts no buy offers. Takes into account incoming ware reservations and the free storage space. *In* **extended** *mode available for non-player faction stations*.
+- **Restock: All Faction Stations**: The same restock for all stations belonging to the same faction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
+- **Fill Storage: Current Station**: Instantly fills the current station's resources, intermediate wares and buyable trade wares up to their storage targets (the full bars in the Logical Station Overview), ignoring buy limits. Takes into account incoming ware reservations and the free storage space. *In* **extended** *mode available for non-player faction stations*.
+- **Fill Storage: All Faction Stations**: The same fill for all stations belonging to the same faction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
 - **Restock: Current Build Storage**: Instantly restocks the current station's build storage with all required resources. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *In* **extended** *mode available for non-player faction stations*.
 - **Restock: All Faction Build Storages**: Instantly restocks all stations belonging to the same faction with all required resources in their build storages. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
-- **Teleport Here**: Teleports the player's currently piloted ship to the clicked position.
+- **Teleport Here**: Teleports the player's currently piloted ship to the clicked position. When the player is not piloting but standing on a station, teleports that station with the player aboard: a player-owned station in normal mode, any station in extended mode.
 - **Teleport To**: Teleports the player character to the clicked object or position.
 - **Destroy Object**: Sets the clicked object as the target on the Destroy Object tab. Only offered while that tab is open. The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
 - **Edit Ship**: Loads the clicked ship into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned ships. Stays available while another object is loaded, so you can switch targets directly.
@@ -261,10 +270,16 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
-### [8.00.44] - 2026-09-??
+### [8.00.44] - 2026-10-04
 
+- **Added**
+  - Right-click **Fill Storage** for the current station and all faction stations.
+  - Right-click **Teleport Here** also moves the station the player stands on.
+  - Right-click **Clear Fog of War in Sector**.
+  - Inventory tab: raise a whole category to one amount at once.
 - **Fixed**
-  - Sector Reveal tab: the sector list could come up empty and stay empty for the rest of the session. The list is now re-requested when the tab is opened, and the tab refreshes itself as soon as the list arrives.
+  - Sector Reveal tab: the sector list could stay empty.
+  - **Restock** did nothing when the station had no buy offers (some ship-building mods, universal mode).
 
 ### [8.00.43] - 2026-09-14
 

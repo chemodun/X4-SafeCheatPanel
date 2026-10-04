@@ -26,6 +26,9 @@
             <t id="115">Détruire l'objet</t>
             <t id="117">Modifier le vaisseau</t>
             <t id="118">Modifier la station</t>
+            <t id="119">Remplir le stockage : station actuelle</t>
+            <t id="120">Remplir le stockage : toutes les stations de la faction</t>
+            <t id="121">Dissiper le brouillard de guerre du secteur</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Joueur</t>
@@ -55,6 +58,9 @@
             <t id="2001">Triches de l'inventaire</t>
             <t id="2002">Appuyez sur le bouton pour modifier la quantité</t>
             <t id="2003">Définir la quantité souhaitée</t>
+            <t id="2004">Tous les objets de cette catégorie</t>
+            <t id="2005">Appuyez sur le bouton pour porter chaque objet de cette catégorie à une quantité choisie</t>
+            <t id="2006">Les objets en dessous de cette quantité y sont portés, aucun n'est réduit</t>
             <t id="2010">Choisissez une catégorie</t>
             <t id="2901">Pièces de modification</t>
             <t id="2902">Séminaires</t>

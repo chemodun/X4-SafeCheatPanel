@@ -12,6 +12,9 @@ local menu = Helper.getMenu("MapMenu")
 
 local PAGE_ID = 1972092427
 
+-- state.selected value of the bulk row; no ware id starts with "*".
+local ALL_WARES = "*all"
+
 local inventoryCategories = {
   { id = "crafting",    name = ReadText(1001, 2827) },
   { id = "upgrade",     name = ReadText(1001, 7716) },
@@ -132,6 +135,25 @@ function scpInventory.SetWare(wareId, oldAmount, newAmount)
   menu.refreshInfoFrame()
 end
 
+-- Raises every ware below target up to it; wares already at or above it are left alone.
+function scpInventory.RaiseWares(wareIds, amounts, target, scp)
+  target = math.max(0, math.min(target, 10000))
+  local raised = 0
+  for _, wareId in ipairs(wareIds) do
+    local amount = amounts[wareId] or 0
+    if amount < target then
+      AddInventory(nil, wareId, target - amount, true)
+      raised = raised + 1
+      scp.trace("Inventory: raise " .. wareId .. " " .. tostring(amount) .. " -> " .. tostring(target))
+    end
+  end
+  scp.debug("Inventory: raised " .. tostring(raised) .. " of " .. tostring(#wareIds) .. " wares to " .. tostring(target))
+  if raised > 0 then
+    PlaySound("ui_crafting_success")
+  end
+  menu.refreshInfoFrame()
+end
+
 function scpInventory.setCategory(value)
   state.category = value ~= nil and math.floor(tonumber(value)) or 1
   menu.refreshInfoFrame()
@@ -175,61 +197,109 @@ function scpInventory.createSection(frameTable, numDisplayed, scp)
       fixed = true,
     })
     local wareRowGroup = scp.isV9 and frameTable:addRowGroup({}) or frameTable
+    local visibleWares = {}
+    local amounts      = {}
+    local minAmount    = math.huge
     for j = 1, #category.data do
       local wareId = category.data[j]
       -- Venture rewards fall into "useful" but are account items, not inventory ones.
-      if category.id ~= "useful" or not onlineItems[wareId] then
-        local ware = wareId and state.wares[wareId] or nil
-        if ware ~= nil then
-          local amount    = playerInventory[wareId] and playerInventory[wareId].amount or 0
-          local isIllegal = policeFaction and IsWareIllegalTo(wareId, "player", policeFaction)
-          local textColor = amount == 0 and Color["text_inactive"] or isIllegal and Color["text_illegal"] or nil
-          if state.selected == wareId then
-            -- menu.noupdate holds off the frame refresh that would reset the slider mid-drag.
-            numDisplayed = scp.menuHelper.createSliderRow(wareRowGroup, true, numDisplayed, {
-              text                = ware.name,
-              mouseOverText       = ReadText(PAGE_ID, 2003),
-              startValue          = amount,
-              onSliderChanged     = function(_, value)
-                menu.noupdate = true
-                state.newAmount = value
-              end,
-              onSliderConfirm     = function()
-                state.selected = nil
-                if state.newAmount ~= amount and state.newAmount ~= nil then
-                  scp.inventory.SetWare(wareId, amount, state.newAmount)
-                end
-                state.newAmount = nil
-              end,
-              onSliderActivated   = function() menu.noupdate = true end,
-              onSliderDeactivated = function() menu.noupdate = false end,
-              min                 = 0,
-              max                 = 10000,
-              step                = 1,
-              textColIndex        = nil,
-              sliderColIndex      = nil,
-              sliderSpan          = nil,
-              textColor           = textColor,
-            })
-          else
-            numDisplayed = scp.menuHelper.createButton(wareRowGroup, true, numDisplayed, {
-              text            = ware.name,
-              active          = true,
-              mouseOverText   = ReadText(PAGE_ID, 2002),
-              buttonText      = ConvertMoneyString(amount, false, true),
-              onClick         = function()
-                state.selected = state.selected == wareId and nil or wareId
-                return menu.refreshInfoFrame()
-              end,
-              textColIndex    = nil,
-              buttonColIndex  = nil,
-              textColor       = textColor,
-              buttonTextColor = amount > 0 and Color["text_positive"] or nil,
-              fixed           = nil,
-              isHeader        = nil,
-            }) or numDisplayed
-          end
-        end
+      if (category.id ~= "useful" or not onlineItems[wareId]) and state.wares[wareId] ~= nil then
+        local amount = playerInventory[wareId] and playerInventory[wareId].amount or 0
+        visibleWares[#visibleWares + 1] = wareId
+        amounts[wareId] = amount
+        minAmount = math.min(minAmount, amount)
+      end
+    end
+
+    if #visibleWares > 1 then
+      if state.selected == ALL_WARES then
+        numDisplayed = scp.menuHelper.createSliderRow(wareRowGroup, true, numDisplayed, {
+          text                = ReadText(PAGE_ID, 2004),
+          mouseOverText       = ReadText(PAGE_ID, 2006),
+          startValue          = minAmount,
+          onSliderChanged     = function(_, value)
+            menu.noupdate = true
+            state.newAmount = value
+          end,
+          onSliderConfirm     = function()
+            state.selected = nil
+            if state.newAmount ~= nil and state.newAmount > minAmount then
+              scpInventory.RaiseWares(visibleWares, amounts, state.newAmount, scp)
+            else
+              menu.refreshInfoFrame()
+            end
+            state.newAmount = nil
+          end,
+          onSliderActivated   = function() menu.noupdate = true end,
+          onSliderDeactivated = function() menu.noupdate = false end,
+          min                 = 0,
+          max                 = 10000,
+          step                = 1,
+        })
+      else
+        numDisplayed = scp.menuHelper.createButton(wareRowGroup, true, numDisplayed, {
+          text            = ReadText(PAGE_ID, 2004),
+          active          = true,
+          mouseOverText   = ReadText(PAGE_ID, 2005),
+          buttonText      = ConvertMoneyString(minAmount, false, true),
+          onClick         = function()
+            state.selected = ALL_WARES
+            return menu.refreshInfoFrame()
+          end,
+          buttonTextColor = minAmount > 0 and Color["text_positive"] or nil,
+        })
+      end
+    end
+
+    for _, wareId in ipairs(visibleWares) do
+      local ware      = state.wares[wareId]
+      local amount    = amounts[wareId]
+      local isIllegal = policeFaction and IsWareIllegalTo(wareId, "player", policeFaction)
+      local textColor = amount == 0 and Color["text_inactive"] or isIllegal and Color["text_illegal"] or nil
+      if state.selected == wareId then
+        -- menu.noupdate holds off the frame refresh that would reset the slider mid-drag.
+        numDisplayed = scp.menuHelper.createSliderRow(wareRowGroup, true, numDisplayed, {
+          text                = ware.name,
+          mouseOverText       = ReadText(PAGE_ID, 2003),
+          startValue          = amount,
+          onSliderChanged     = function(_, value)
+            menu.noupdate = true
+            state.newAmount = value
+          end,
+          onSliderConfirm     = function()
+            state.selected = nil
+            if state.newAmount ~= amount and state.newAmount ~= nil then
+              scp.inventory.SetWare(wareId, amount, state.newAmount)
+            end
+            state.newAmount = nil
+          end,
+          onSliderActivated   = function() menu.noupdate = true end,
+          onSliderDeactivated = function() menu.noupdate = false end,
+          min                 = 0,
+          max                 = 10000,
+          step                = 1,
+          textColIndex        = nil,
+          sliderColIndex      = nil,
+          sliderSpan          = nil,
+          textColor           = textColor,
+        })
+      else
+        numDisplayed = scp.menuHelper.createButton(wareRowGroup, true, numDisplayed, {
+          text            = ware.name,
+          active          = true,
+          mouseOverText   = ReadText(PAGE_ID, 2002),
+          buttonText      = ConvertMoneyString(amount, false, true),
+          onClick         = function()
+            state.selected = state.selected == wareId and nil or wareId
+            return menu.refreshInfoFrame()
+          end,
+          textColIndex    = nil,
+          buttonColIndex  = nil,
+          textColor       = textColor,
+          buttonTextColor = amount > 0 and Color["text_positive"] or nil,
+          fixed           = nil,
+          isHeader        = nil,
+        }) or numDisplayed
       end
     end
   end

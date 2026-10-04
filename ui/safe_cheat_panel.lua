@@ -215,6 +215,22 @@ local config = {
       scriptFunction = function() scp.station.fillWaresGapStationForAllFaction() end
     },
     {
+      id = "fillStorageStation",
+      type = "scp_cheat",
+      actiontype = "lua;fillStorageStation",
+      isValidFunction = function() return scp.station.isValidFillStorageStation() end,
+      text = ReadText(1972092427, 119),
+      scriptFunction = function() scp.station.fillStorageStation() end
+    },
+    {
+      id = "fillStorageStationForAllFaction",
+      type = "scp_cheat",
+      actiontype = "lua;fillStorageStationForAllFaction",
+      isValidFunction = function() return scp.isExtendedMode() and scp.station.isValidFillWaresGapStationForAllFaction() end,
+      text = ReadText(1972092427, 120),
+      scriptFunction = function() scp.station.fillStorageStationForAllFaction() end
+    },
+    {
       id = "fillWaresGapBuildStorage",
       type = "scp_cheat",
       actiontype = "lua;fillWaresGapBuildStorage",
@@ -472,15 +488,26 @@ function scp.addAction(actions, definedActions, action, isToBeDisplayed)
   definedActions[action.actiontype] = #actions
 end
 
-function scp.isValidTeleportObject()
-  local component = C.GetPlayerShipID()
-  local convertedComponent = ConvertStringTo64Bit(tostring(C.GetPlayerShipID()))
-  if component ~= nil and convertedComponent ~= 0 then
-    local pilot = GetComponentData(convertedComponent, "pilot")
-    local isPlayerPilot = GetComponentData(pilot, "name") == ffi.string(C.GetPlayerName())
-    return isPlayerPilot
+-- The ship the player pilots, else the station the player stands on (a non-player one only in extended mode); nil otherwise.
+function scp.getPlayerTeleportTarget()
+  local ship = ConvertStringTo64Bit(tostring(C.GetPlayerShipID()))
+  if ship ~= 0 then
+    local pilot = GetComponentData(ship, "pilot")
+    if pilot and GetComponentData(pilot, "name") == ffi.string(C.GetPlayerName()) then
+      return ship
+    end
   end
-  return false
+  local container = ConvertStringTo64Bit(tostring(C.GetPlayerContainerID()))
+  if container ~= 0 and C.IsComponentClass(container, "station") then
+    if GetComponentData(container, "isplayerowned") or scp.isExtendedMode() then
+      return container
+    end
+  end
+  return nil
+end
+
+function scp.isValidTeleportObject()
+  return scp.getPlayerTeleportTarget() ~= nil
 end
 
 function scp.teleportObject()
@@ -488,8 +515,14 @@ function scp.teleportObject()
   if menu.selectedcomponent ~= nil then
     targetObject = ConvertStringToLuaID(tostring(interactMenu.componentSlot.component))
   else
-    targetObject = ConvertStringToLuaID(tostring(C.GetPlayerShipID()))
+    local target = scp.getPlayerTeleportTarget()
+    if target == nil then
+      scp.helpers.interactMenuFinishAction()
+      return
+    end
+    targetObject = ConvertStringToLuaID(tostring(target))
   end
+  scp.debug("Teleport: " .. tostring(targetObject) .. " to " .. tostring(interactMenu.offsetcomponent))
   local data = {
     object = targetObject,
     offsetComponent = ConvertStringToLuaID(tostring(interactMenu.offsetcomponent)),

@@ -26,6 +26,9 @@
             <t id="115">Zniszcz obiekt</t>
             <t id="117">Edytuj statek</t>
             <t id="118">Edytuj stację</t>
+            <t id="119">Zapełnij magazyn: bieżąca stacja</t>
+            <t id="120">Zapełnij magazyn: wszystkie stacje frakcji</t>
+            <t id="121">Usuń mgłę wojny w sektorze</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Gracz</t>
@@ -55,6 +58,9 @@
             <t id="2001">Kody ekwipunku</t>
             <t id="2002">Naciśnij przycisk, aby zmienić ilość</t>
             <t id="2003">Ustaw żądaną ilość</t>
+            <t id="2004">Wszystkie przedmioty w tej kategorii</t>
+            <t id="2005">Naciśnij przycisk, aby podnieść każdy przedmiot w tej kategorii do wybranej ilości</t>
+            <t id="2006">Przedmioty poniżej tej ilości zostaną do niej podniesione, żaden nie zostanie zmniejszony</t>
             <t id="2010">Wybierz kategorię</t>
             <t id="2901">Części modyfikacyjne</t>
             <t id="2902">Seminaria</t>

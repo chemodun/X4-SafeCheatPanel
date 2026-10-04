@@ -136,34 +136,68 @@ function scpStation.getBuildStorageGap(station, buildStorage)
   return neededResources
 end
 
--- What the station is buying: GetTradeList needs a counterpart, so any ship of the same
--- owner stands in as one.
-function scpStation.getStationGap(station, owner)
-  local stationObject = ConvertStringToLuaID(tostring(station))
-  local ships = GetContainedShipsByOwner(owner)
-  local shipObject = nil
-  local neededResources = {}
-  for i = 1, #ships do
-    local ship = ships[i]
-    local classid = GetComponentData(ship, "classid")
-    local isship = Helper.isComponentClass(classid, "ship")
-    if isship then
-      shipObject = ConvertStringToLuaID(tostring(ship))
-      break
+-- Target minus stock for every ware the station takes in; the target is the buy limit (restock)
+-- or the storage target (fill). Not its buy offers: those depend on the trade/supply budget
+-- and vanish when the budget is not computed.
+function scpStation.getStationGap(station, toStorage)
+  local station64 = ConvertStringTo64Bit(tostring(station))
+  local allresources, tradewares, cargo = GetComponentData(station64, "allresources", "tradewares", "cargo")
+  cargo = cargo or {}
+  local wares = {}
+  for _, ware in ipairs(allresources or {}) do
+    wares[ware] = true
+  end
+  for _, ware in ipairs(tradewares or {}) do
+    if C.GetContainerWareIsBuyable(station64, ware) then
+      wares[ware] = true
     end
   end
-  if shipObject == nil then return {} end
-  local tradeOffers = GetTradeList(stationObject, shipObject)
+  local neededResources = {}
   local count = 0
-  for _, tradeData in pairs(tradeOffers) do
-    if tradeData.ware and tradeData.isbuyoffer and not tradeData.ismissionoffer then
-      neededResources[tradeData.ware] = tradeData.amount
+  for ware in pairs(wares) do
+    local limit = toStorage and (GetWareProductionLimit(station64, ware) or 0) or C.GetContainerBuyLimit(station64, ware)
+    local gap = limit - (cargo[ware] or 0)
+    scpStation.trace(string.format("Ware %s: %s %s, stored %s, gap %s", ware, toStorage and "storage" or "buy limit", limit, cargo[ware] or 0, gap))
+    if gap > 0 then
+      neededResources[ware] = gap
       count = count + 1
     end
   end
-  count = scpStation.applyReservations(station, neededResources, count)
+  count = scpStation.applyReservations(station64, neededResources, count)
+  count = scpStation.applyFreeCapacity(station64, neededResources, count)
   scpStation.debug(string.format("Number of resources on station with gaps: %d", count))
   return neededResources
+end
+
+-- Scales the gaps down per transport type when a manual storage level over-allocates the modules.
+function scpStation.applyFreeCapacity(container64, neededResources, count)
+  local free = {}
+  local n = C.GetNumCargoTransportTypes(container64, true)
+  local buf = ffi.new("StorageInfo[?]", n)
+  n = C.GetCargoTransportTypes(buf, n, container64, true, false)
+  for i = 0, n - 1 do
+    free[ffi.string(buf[i].transport)] = math.max(0, buf[i].capacity - buf[i].spaceused)
+  end
+  local needed = {}
+  for ware, amount in pairs(neededResources) do
+    local transport, volume = GetWareData(ware, "transport", "volume")
+    needed[transport] = (needed[transport] or 0) + amount * volume
+  end
+  for ware, amount in pairs(neededResources) do
+    local transport = GetWareData(ware, "transport")
+    local available = free[transport] or 0
+    if needed[transport] > available then
+      local scaled = math.floor(amount * available / needed[transport])
+      scpStation.trace(string.format("Ware %s: gap %s scaled to %s, %s free of %s needed in %s", ware, amount, scaled, available, needed[transport], transport))
+      if scaled > 0 then
+        neededResources[ware] = scaled
+      else
+        neededResources[ware] = nil
+        count = count - 1
+      end
+    end
+  end
+  return count
 end
 
 
@@ -174,7 +208,7 @@ function scpStation.applyReservations(container, neededResources, count)
   local buf = ffi.new("WareReservationInfo2[?]", n)
   n = C.GetContainerWareReservations2(buf, n, container64, true, true, true)
   for i = 0, n - 1 do
-    if (not buf[i].missionid ~= 0) and (not buf[i].isvirtual) and (not buf[i].isbuyreservation) then
+    if (not buf[i].isvirtual) and (not buf[i].isbuyreservation) then
       local ware = ffi.string(buf[i].ware)
       if neededResources[ware] then
         neededResources[ware] = neededResources[ware] - buf[i].amount
@@ -210,15 +244,19 @@ function scpStation.fillWaresData(object, neededResources, finishAction, allWare
   end
 end
 
-function scpStation.isValidFillWaresGapStation()
+function scpStation.isValidFillWaresGapStation(toStorage)
   local station = interactMenu.componentSlot.component
   if station == nil then return false end
   local object64 = ConvertStringTo64Bit(tostring(station))
   local owner, realclassid = GetComponentData(object64, "owner", "realclassid")
   if not Helper.isComponentClass(realclassid, "station") then return false end
   if owner == nil or (owner ~= "player" and not scpStation.scp.isExtendedMode()) then return false end
-  local neededResources = scpStation.getStationGap(object64, owner)
+  local neededResources = scpStation.getStationGap(object64, toStorage)
   return next(neededResources) ~= nil
+end
+
+function scpStation.isValidFillStorageStation()
+  return scpStation.isValidFillWaresGapStation(true)
 end
 
 function scpStation.isValidFillWaresGapStationForAllFaction()
@@ -232,7 +270,7 @@ function scpStation.isValidFillWaresGapStationForAllFaction()
 end
 
 
-function scpStation.fillWaresGapStation(station, finishAction, allWaresData)
+function scpStation.fillWaresGapStation(station, finishAction, allWaresData, toStorage)
   local station = station ~= nil and station or interactMenu.componentSlot.component
   scpStation.trace("fillWaresGapStation called with station: " .. tostring(station))
   finishAction = finishAction == nil and true or finishAction
@@ -242,8 +280,8 @@ function scpStation.fillWaresGapStation(station, finishAction, allWaresData)
   local owner, realclassid, name = GetComponentData(object64, "owner", "realclassid", "name")
   if not Helper.isComponentClass(realclassid, "station") then return end
   if owner == nil then return end
-  scpStation.debug("fillWaresGapStation on station: name: " .. name .. ", owner: " .. owner)
-  local neededResources = scpStation.getStationGap(object64, owner)
+  scpStation.debug("fillWaresGapStation on station: name: " .. name .. ", owner: " .. owner .. ", toStorage: " .. tostring(toStorage == true))
+  local neededResources = scpStation.getStationGap(object64, toStorage)
   allWaresData = scpStation.fillWaresData(object64, neededResources, finishAction, allWaresData)
   if finishAction then
     scpStation.helpers.interactMenuFinishAction()
@@ -253,6 +291,14 @@ end
 
 function scpStation.fillWaresGapStationForAllFaction()
   scpStation.processForAllStations(scpStation.fillWaresGapStation)
+end
+
+function scpStation.fillStorageStation(station, finishAction, allWaresData)
+  return scpStation.fillWaresGapStation(station, finishAction, allWaresData, true)
+end
+
+function scpStation.fillStorageStationForAllFaction()
+  scpStation.processForAllStations(scpStation.fillStorageStation)
 end
 
 function scpStation.isValidFillWaresGapBuildStorage()

@@ -1354,6 +1354,40 @@
           </actions>
         </cue>
 
+        <cue name="Scp_Add_Menu_Clear_Fog_In_Sector" instantiate="true" version="1">
+          <conditions>
+            <event_cue_signalled cue="md.Interact_Menu_API.Get_Actions" />
+            <check_value value="@event.param.$object.isclass.{class.sector}" />
+            <check_value value="@event.param.$offsetcomponent == @event.param.$object" />
+          </conditions>
+          <actions>
+            <signal_cue_instantly cue="md.Interact_Menu_API.Add_Action" param="table[
+              $id             = 'scp_clear_fog_sector',
+              $section        = 'scpCheats',
+              $text           = {1972092427, 121},
+              $active         = true,
+              $callback       = Scp_Clear_Fog_In_Sector,
+            ]" />
+          </actions>
+        </cue>
+
+        <cue name="Scp_Clear_Fog_In_Sector" instantiate="true" version="1">
+          <conditions>
+            <event_cue_signalled />
+            <check_value value="@event.param.$object.isclass.{class.sector}" />
+            <check_value value="@event.param.$offsetcomponent == @event.param.$object" />
+          </conditions>
+          <actions>
+            <set_value name="$sector" exact="event.param.$object" />
+            <!-- The bounding box is a diameter; vanilla clears whole sectors with 300-500 km from the centre. -->
+            <set_value name="$range" exact="[$sector.size, 500km].max" />
+            <debug_text text="'SafeCheatPanel: Clearing fog of war in sector %s, size %s, range %s'. [$sector.debugname, $sector.size, $range]" chance="$debugChance" />
+            <clear_fog_of_war sector="$sector" range="$range">
+              <position space="$sector" x="0" y="0" z="0" />
+            </clear_fog_of_war>
+          </actions>
+        </cue>
+
       </cues>
     </cue>
   </cues>

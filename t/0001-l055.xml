@@ -26,6 +26,9 @@
             <t id="115">Destruir objeto</t>
             <t id="117">Editar nave</t>
             <t id="118">Editar estação</t>
+            <t id="119">Encher armazém: estação atual</t>
+            <t id="120">Encher armazém: todas as estações da fação</t>
+            <t id="121">Limpar o nevoeiro de guerra do setor</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Jogador</t>
@@ -55,6 +58,9 @@
             <t id="2001">Batotas do inventário</t>
             <t id="2002">Prime o botão para editar a quantidade</t>
             <t id="2003">Define a quantidade pretendida</t>
+            <t id="2004">Todos os itens desta categoria</t>
+            <t id="2005">Prime o botão para elevar cada item desta categoria a uma quantidade escolhida</t>
+            <t id="2006">Os itens abaixo desta quantidade são elevados até ela, nenhum é reduzido</t>
             <t id="2010">Escolhe uma categoria</t>
             <t id="2901">Peças de modificação</t>
             <t id="2902">Seminários</t>

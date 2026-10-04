@@ -26,6 +26,9 @@
             <t id="115">Destruir objeto</t>
             <t id="117">Editar nave</t>
             <t id="118">Editar estación</t>
+            <t id="119">Llenar almacén: estación actual</t>
+            <t id="120">Llenar almacén: todas las estaciones de la facción</t>
+            <t id="121">Despejar la niebla de guerra del sector</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Jugador</t>
@@ -55,6 +58,9 @@
             <t id="2001">Trucos del inventario</t>
             <t id="2002">Pulsa el botón para editar la cantidad</t>
             <t id="2003">Establece la cantidad deseada</t>
+            <t id="2004">Todos los objetos de esta categoría</t>
+            <t id="2005">Pulsa el botón para elevar cada objeto de esta categoría a una cantidad elegida</t>
+            <t id="2006">Los objetos por debajo de esta cantidad se elevan hasta ella, ninguno se reduce</t>
             <t id="2010">Elige una categoría</t>
             <t id="2901">Piezas de modificación</t>
             <t id="2902">Seminarios</t>
