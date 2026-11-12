@@ -29,6 +29,8 @@
             <t id="119">Lager füllen: Aktuelle Station</t>
             <t id="120">Lager füllen: Alle Stationen der Fraktion</t>
             <t id="121">Nebel des Krieges im Sektor aufdecken</t>
+            <t id="122">Unverwundbar machen</t>
+            <t id="123">Unverwundbarkeit entfernen</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Spieler</t>
@@ -45,6 +47,8 @@
             <t id="1109">Deaktiviert, bis du die Forschung freigeschaltet hast.</t>
             <t id="1110">Der eingegebene Betrag wird auf 0 bis 10.000 begrenzt</t>
             <t id="1111">Bereits freigeschaltet</t>
+            <t id="1112">Unverwundbares Schiff</t>
+            <t id="1113">Das gesteuerte Schiff und der Raumanzug erleiden keinen Hüllenschaden. Das zuletzt gesteuerte Schiff bleibt geschützt, bis ein anderes gesteuert wird.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Raumanzug-Verbesserungen</t>
             <t id="1201">Verbesserung hinzufügen</t>
@@ -52,6 +56,8 @@
             <!-- Spacesuit Ammo -->
             <t id="1300">Raumanzug-Munition</t>
             <t id="1301">Hinzufügen</t>
+            <t id="1400">Spielerschiff</t>
+            <t id="1401">Deaktivieren</t>
 
             <!-- Tab 2: Inventory -->
             <t id="2000">Spielerinventar</t>

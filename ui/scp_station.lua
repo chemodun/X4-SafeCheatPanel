@@ -138,15 +138,74 @@ function scpStation.getBuildStorageGap(station, buildStorage)
   return neededResources
 end
 
+-- Ship-building wares the queued builds of a wharf, shipyard or equipment dock still miss.
+-- Their buy and production limits are 0; the C calls are declared by vanilla's menus.
+local function getMissingShipBuildResources(station64)
+  local ok, missing = pcall(function()
+    local result = {}
+    local n = C.GetNumContainerBuildResources(station64)
+    if n == 0 then return result end
+    local names = ffi.new("const char*[?]", n)
+    n = C.GetContainerBuildResources(names, n, station64)
+    local buildWares = {}
+    for i = 0, n - 1 do
+      buildWares[ffi.string(names[i])] = true
+    end
+    n = C.GetNumMissingBuildResources2(station64, nil, 0, true)
+    if n == 0 then return result end
+    local buf = ffi.new("UIWareInfo[?]", n)
+    n = C.GetMissingBuildResources(buf, n)
+    for i = 0, n - 1 do
+      local ware = ffi.string(buf[i].ware)
+      if buildWares[ware] and buf[i].amount > 0 then
+        result[ware] = buf[i].amount
+      end
+    end
+    return result
+  end)
+  if not ok then
+    scpStation.debug("Missing ship build resources not read: " .. tostring(missing))
+    return {}
+  end
+  return missing
+end
+
+-- What the drone and missile supply pool still lacks; the station builds its units from stock.
+local function getSupplyPoolNeeds(station64)
+  local ok, needs = pcall(function()
+    local result = {}
+    local n = C.GetNumSupplyOrderResources(station64)
+    if n == 0 then return result end
+    local buf = ffi.new("SupplyResourceInfo[?]", n)
+    n = C.GetSupplyOrderResources(buf, n, station64)
+    for i = 0, n - 1 do
+      local need = buf[i].total - buf[i].current
+      if need > 0 then
+        result[ffi.string(buf[i].ware)] = need
+      end
+    end
+    return result
+  end)
+  if not ok then
+    scpStation.debug("Supply pool not read: " .. tostring(needs))
+    return {}
+  end
+  return needs
+end
+
 -- Target minus stock for every ware the station takes in; the target is the buy limit (restock)
--- or the storage target (fill). Not its buy offers: those depend on the trade/supply budget
--- and vanish when the budget is not computed.
+-- or the storage target (fill) plus the supply pool's lack, raised to what queued ship builds miss.
+-- Not its buy offers: those depend on the trade/supply budget and vanish when it is not computed.
 function scpStation.getStationGap(station, toStorage)
   local station64 = ConvertStringTo64Bit(tostring(station))
   local allresources, tradewares, cargo = GetComponentData(station64, "allresources", "tradewares", "cargo")
   cargo = cargo or {}
+  local poolNeeds = getSupplyPoolNeeds(station64)
   local wares = {}
   for _, ware in ipairs(allresources or {}) do
+    wares[ware] = true
+  end
+  for ware in pairs(poolNeeds) do
     wares[ware] = true
   end
   for _, ware in ipairs(tradewares or {}) do
@@ -158,11 +217,21 @@ function scpStation.getStationGap(station, toStorage)
   local count = 0
   for ware in pairs(wares) do
     local limit = toStorage and (GetWareProductionLimit(station64, ware) or 0) or C.GetContainerBuyLimit(station64, ware)
-    local gap = limit - (cargo[ware] or 0)
-    scpStation.trace(string.format("Ware %s: %s %s, stored %s, gap %s", ware, toStorage and "storage" or "buy limit", limit, cargo[ware] or 0, gap))
+    local pool = poolNeeds[ware] or 0
+    local gap = limit + pool - (cargo[ware] or 0)
+    scpStation.trace(string.format("Ware %s: %s %s, supply pool lacks %s, stored %s, gap %s", ware, toStorage and "storage" or "buy limit", limit, pool, cargo[ware] or 0, gap))
     if gap > 0 then
       neededResources[ware] = gap
       count = count + 1
+    end
+  end
+  for ware, amount in pairs(getMissingShipBuildResources(station64)) do
+    scpStation.trace(string.format("Ware %s: queued ship builds miss %s", ware, amount))
+    if amount > (neededResources[ware] or 0) then
+      if neededResources[ware] == nil then
+        count = count + 1
+      end
+      neededResources[ware] = amount
     end
   end
   count = scpStation.applyReservations(station64, neededResources, count)

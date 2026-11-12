@@ -91,12 +91,20 @@
           </actions>
         </cue>
 
-        <cue name="Scp_Destroy_Object" instantiate="true">
+        <cue name="Scp_Destroy_Object" instantiate="true" version="2">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_destroy_object'" />
           </conditions>
           <actions>
             <set_value name="$destroyData" exact="event.param3" />
+            <!-- The invincibility manager asserts when a protected object is destroyed. -->
+            <set_value name="$invObject" exact="$destroyData.$object" />
+            <set_value name="$invRequester" exact="Scp_Invincible_Requester" />
+            <include_actions ref="Scp_Release_Invincibility" />
+            <set_value name="$invRequester" exact="Scp_Invincible_Player_Requester" />
+            <include_actions ref="Scp_Release_Invincibility" />
+            <remove_value name="$invObject" />
+            <remove_value name="$invRequester" />
             <debug_text text="'SafeCheatPanel: Destroying object %s'. [@$destroyData.$object.knownname]" chance="$debugChance" />
             <destroy_object object="$destroyData.$object" explosion="false" />
           </actions>
@@ -442,7 +450,7 @@
           </actions>
         </library>
 
-        <cue name="Scp_Spawn_Ship" instantiate="true" version="2">
+        <cue name="Scp_Spawn_Ship" instantiate="true" version="3">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_ship'" />
           </conditions>
@@ -1391,6 +1399,255 @@
             <clear_fog_of_war sector="$sector" range="$range">
               <position space="$sector" x="0" y="0" z="0" />
             </clear_fog_of_war>
+          </actions>
+        </cue>
+
+        <!-- Requesters for md.LIB_Generic.ObjectInvincibilityManager: a complete cue keeps its requests alive. -->
+        <cue name="Scp_Invincible_Requester" version="1">
+          <actions />
+        </cue>
+
+        <cue name="Scp_Invincible_Player_Requester" version="1">
+          <actions />
+        </cue>
+
+        <!-- In: $invObject, $invRequester. -->
+        <library name="Scp_Grant_Invincibility" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$invEntry" exact="@md.LIB_Generic.ObjectInvincibilityManager.$ObjectTable.{$invObject}" />
+            <do_if value="typeof $invEntry == datatype.table and not $invEntry.$scpPrevMinHull? and not $invEntry.$requestercues.indexof.{Scp_Invincible_Requester} and not $invEntry.$requestercues.indexof.{Scp_Invincible_Player_Requester}">
+              <set_value name="$invEntry.$scpPrevMinHull" exact="$invEntry.$minhull" />
+            </do_if>
+            <run_actions ref="md.LIB_Generic.RequestObjectInvincibility">
+              <param name="Object" value="$invObject" />
+              <param name="MinHull" value="100" />
+              <param name="RequesterCue" value="$invRequester" />
+              <param name="AllowCapturable" value="true" />
+              <param name="IncludeEngines" value="true" />
+              <param name="IncludeShields" value="true" />
+              <param name="IncludeTurrets" value="true" />
+            </run_actions>
+            <do_if value="$invObject.isclass.station">
+              <set_value name="$invMinHull" exact="100" />
+              <include_actions ref="Scp_Station_Surface_Min_Hull" />
+            </do_if>
+            <debug_text text="'SafeCheatPanel: Invincibility granted to %s by %s'.[$invObject.debugname, $invRequester]" chance="$debugChance" />
+            <remove_value name="$invEntry" />
+          </actions>
+        </library>
+
+        <!-- In: $invObject, $invRequester. Restores a story request's min hull when only foreign requests remain. -->
+        <library name="Scp_Release_Invincibility" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$invEntry" exact="@md.LIB_Generic.ObjectInvincibilityManager.$ObjectTable.{$invObject}" />
+            <do_if value="typeof $invEntry == datatype.table and $invEntry.$requestercues.indexof.{$invRequester}">
+              <set_value name="$invRest" exact="$invEntry.$requestercues.clone" />
+              <remove_from_list name="$invRest" exact="$invRequester" />
+              <do_if value="not $invRest.indexof.{Scp_Invincible_Requester} and not $invRest.indexof.{Scp_Invincible_Player_Requester}">
+                <do_if value="$invObject.isclass.station">
+                  <set_value name="$invMinHull" exact="0" />
+                  <include_actions ref="Scp_Station_Surface_Min_Hull" />
+                </do_if>
+                <do_if value="$invRest.count and $invEntry.$scpPrevMinHull?">
+                  <set_value name="$invEntry.$minhull" exact="$invEntry.$scpPrevMinHull" />
+                  <do_if value="$invObject.isclass.station">
+                    <run_actions ref="md.LIB_Generic.SetStationMinHull">
+                      <param name="Station" value="$invObject" />
+                      <param name="MinHullPercent" value="$invEntry.$scpPrevMinHull" />
+                    </run_actions>
+                  </do_if>
+                  <do_else>
+                    <run_actions ref="md.LIB_Generic.SetShipMinHull">
+                      <param name="Ship" value="$invObject" />
+                      <param name="MinHullPercent" value="$invEntry.$scpPrevMinHull" />
+                    </run_actions>
+                  </do_else>
+                </do_if>
+                <remove_value name="$invEntry.$scpPrevMinHull" />
+              </do_if>
+              <run_actions ref="md.LIB_Generic.RequestObjectVulnerability">
+                <param name="Object" value="$invObject" />
+                <param name="RequesterCue" value="$invRequester" />
+              </run_actions>
+              <debug_text text="'SafeCheatPanel: Invincibility removed from %s by %s, other requesters %s'.[$invObject.debugname, $invRequester, $invRest]" chance="$debugChance" />
+            </do_if>
+            <remove_value name="$invEntry" />
+            <remove_value name="$invRest" />
+          </actions>
+        </library>
+
+        <!-- In: $invObject (a station), $invMinHull. Vanilla protects modules only, never their turrets and shields. -->
+        <library name="Scp_Station_Surface_Min_Hull" purpose="include_actions" version="1">
+          <actions>
+            <find_object_component object="$invObject" name="$invModules" class="class.module" multiple="true" />
+            <find_object_component object="$invModules" name="$invElements" surfaceelement="true" multiple="true" />
+            <set_value name="$invCount" exact="0" />
+            <do_for_each name="$invElement" in="$invElements">
+              <do_if value="$invElement.container == $invObject">
+                <set_object_min_hull object="$invElement" exact="$invMinHull" />
+                <set_value name="$invCount" operation="add" />
+              </do_if>
+            </do_for_each>
+            <debug_text text="'SafeCheatPanel: Station %s: %s modules, %s of %s surface elements set to min hull %s'.[$invObject.debugname, $invModules.count, $invCount, $invElements.count, $invMinHull]" chance="$traceChance" />
+            <remove_value name="$invModules" />
+            <remove_value name="$invElements" />
+            <remove_value name="$invElement" />
+            <remove_value name="$invCount" />
+            <remove_value name="$invMinHull" />
+          </actions>
+        </library>
+
+        <!-- Out: $invList, the right-click list Lua reads, without destroyed objects. -->
+        <library name="Scp_Invincible_List" purpose="include_actions" version="1">
+          <actions>
+            <do_if value="typeof @player.entity.$safeCheatPanelInvincible != datatype.list">
+              <set_value name="player.entity.$safeCheatPanelInvincible" exact="[]" />
+            </do_if>
+            <set_value name="$invList" exact="player.entity.$safeCheatPanelInvincible" />
+            <do_for_each name="$invItem" in="$invList" reverse="true">
+              <do_if value="not $invItem.exists or $invItem.iswreck">
+                <remove_from_list name="$invList" exact="$invItem" />
+              </do_if>
+            </do_for_each>
+            <remove_value name="$invItem" />
+          </actions>
+        </library>
+
+        <cue name="Scp_Toggle_Invincibility" instantiate="true" version="1">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_toggle_invincibility'" />
+          </conditions>
+          <actions>
+            <set_value name="$invObject" exact="@event.param3.$object" />
+            <include_actions ref="Scp_Invincible_List" />
+            <do_if value="@$invObject.exists">
+              <set_value name="$invRequester" exact="Scp_Invincible_Requester" />
+              <do_if value="$invList.indexof.{$invObject}">
+                <include_actions ref="Scp_Release_Invincibility" />
+                <remove_from_list name="$invList" exact="$invObject" />
+              </do_if>
+              <do_else>
+                <include_actions ref="Scp_Grant_Invincibility" />
+                <append_to_list name="$invList" exact="$invObject" />
+              </do_else>
+            </do_if>
+            <remove_value name="$invObject" />
+            <remove_value name="$invRequester" />
+            <remove_value name="$invList" />
+          </actions>
+        </cue>
+
+        <!-- In: $config, $invRequester, $invTarget (the controlled object). -->
+        <library name="Scp_Player_Invincible_Follow" purpose="include_actions" version="1">
+          <actions>
+            <do_if value="@$invTarget.exists and $invTarget.isclass.ship">
+              <set_value name="$invSlot" exact="if $invTarget.isclass.spacesuit then '$playerInvincibleSuit' else '$playerInvincibleShip'" />
+              <set_value name="$invObject" exact="@$config.{$invSlot}" />
+              <do_if value="$invObject != $invTarget">
+                <include_actions ref="Scp_Release_Invincibility" />
+                <set_value name="$invObject" exact="$invTarget" />
+                <include_actions ref="Scp_Grant_Invincibility" />
+                <set_value name="$config.{$invSlot}" exact="$invTarget" />
+              </do_if>
+            </do_if>
+            <remove_value name="$invSlot" />
+            <remove_value name="$invObject" />
+          </actions>
+        </library>
+
+        <cue name="Scp_Set_Player_Invincible" instantiate="true" version="1">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_player_invincible'" />
+          </conditions>
+          <actions>
+            <include_actions ref="Scp_DefaultConfig" />
+            <set_value name="$invRequester" exact="Scp_Invincible_Player_Requester" />
+            <do_if value="event.param3 == 1">
+              <set_value name="$config.$playerInvincible" exact="true" />
+              <set_value name="$invTarget" exact="player.occupiedship" />
+              <include_actions ref="Scp_Player_Invincible_Follow" />
+            </do_if>
+            <do_else>
+              <remove_value name="$config.$playerInvincible" />
+              <set_value name="$invObject" exact="@$config.$playerInvincibleShip" />
+              <include_actions ref="Scp_Release_Invincibility" />
+              <set_value name="$invObject" exact="@$config.$playerInvincibleSuit" />
+              <include_actions ref="Scp_Release_Invincibility" />
+              <remove_value name="$config.$playerInvincibleShip" />
+              <remove_value name="$config.$playerInvincibleSuit" />
+            </do_else>
+            <debug_text text="'SafeCheatPanel: Player invincibility %s, ship %s, spacesuit %s'.[@$config.$playerInvincible, @$config.$playerInvincibleShip.debugname, @$config.$playerInvincibleSuit.debugname]" chance="$debugChance" />
+            <raise_lua_event name="'scp_main.playerInvincibleChanged'" />
+            <remove_value name="$invRequester" />
+            <remove_value name="$invTarget" />
+            <remove_value name="$invObject" />
+            <remove_value name="$config" />
+          </actions>
+        </cue>
+
+        <cue name="Scp_Player_Invincible_Started_Control" instantiate="true" version="1">
+          <conditions>
+            <event_player_started_control />
+            <check_value value="@player.entity.$safeCheatPanelConfig.$playerInvincible" />
+          </conditions>
+          <actions>
+            <include_actions ref="Scp_DefaultConfig" />
+            <set_value name="$invRequester" exact="Scp_Invincible_Player_Requester" />
+            <set_value name="$invTarget" exact="event.param" />
+            <include_actions ref="Scp_Player_Invincible_Follow" />
+            <debug_text text="'SafeCheatPanel: Player took control of %s, protected ship %s, spacesuit %s'.[@event.param.debugname, @$config.$playerInvincibleShip.debugname, @$config.$playerInvincibleSuit.debugname]" chance="$debugChance" />
+            <remove_value name="$invRequester" />
+            <remove_value name="$invTarget" />
+            <remove_value name="$config" />
+          </actions>
+        </cue>
+
+        <!-- Released when the player stops piloting it; a spacesuit before it is removed, or the manager asserts. -->
+        <cue name="Scp_Player_Invincible_Stopped_Control" instantiate="true" version="1">
+          <conditions>
+            <event_player_stopped_control />
+            <check_value value="event.param == @player.entity.$safeCheatPanelConfig.$playerInvincibleSuit or event.param == @player.entity.$safeCheatPanelConfig.$playerInvincibleShip" />
+          </conditions>
+          <actions>
+            <include_actions ref="Scp_DefaultConfig" />
+            <set_value name="$invRequester" exact="Scp_Invincible_Player_Requester" />
+            <set_value name="$invObject" exact="event.param" />
+            <include_actions ref="Scp_Release_Invincibility" />
+            <do_if value="event.param == @$config.$playerInvincibleSuit">
+              <remove_value name="$config.$playerInvincibleSuit" />
+            </do_if>
+            <do_else>
+              <remove_value name="$config.$playerInvincibleShip" />
+            </do_else>
+            <debug_text text="'SafeCheatPanel: Player stopped piloting %s, protection released'.[event.param.debugname]" chance="$debugChance" />
+            <remove_value name="$invRequester" />
+            <remove_value name="$invObject" />
+            <remove_value name="$config" />
+          </actions>
+        </cue>
+
+        <!-- Re-applies to modules and equipment a build added to a protected object. -->
+        <cue name="Scp_Invincible_Build_Finished" instantiate="true" version="1">
+          <conditions>
+            <check_any>
+              <event_build_finished_components group="md.LIB_Generic.ObjectInvincibilityManager.$Objects" />
+              <event_build_loadout_applied group="md.LIB_Generic.ObjectInvincibilityManager.$Objects" />
+            </check_any>
+            <!-- A shipyard reports every ship it builds; only builds on the object itself count. -->
+            <check_value value="@event.param3.buildobject == event.object" />
+          </conditions>
+          <actions>
+            <set_value name="$invObject" exact="event.object" />
+            <do_if value="@player.entity.$safeCheatPanelInvincible.indexof.{$invObject}">
+              <set_value name="$invRequester" exact="Scp_Invincible_Requester" />
+              <include_actions ref="Scp_Grant_Invincibility" />
+            </do_if>
+            <do_if value="$invObject == @player.entity.$safeCheatPanelConfig.$playerInvincibleShip">
+              <set_value name="$invRequester" exact="Scp_Invincible_Player_Requester" />
+              <include_actions ref="Scp_Grant_Invincibility" />
+            </do_if>
+            <remove_value name="$invObject" />
+            <remove_value name="$invRequester" />
           </actions>
         </cue>
 

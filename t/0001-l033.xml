@@ -29,6 +29,8 @@
             <t id="119">Remplir le stockage : station actuelle</t>
             <t id="120">Remplir le stockage : toutes les stations de la faction</t>
             <t id="121">Dissiper le brouillard de guerre du secteur</t>
+            <t id="122">Rendre invincible</t>
+            <t id="123">Retirer l'invincibilité</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Joueur</t>
@@ -45,6 +47,8 @@
             <t id="1109">Désactivé tant que vous n'avez pas débloqué la recherche.</t>
             <t id="1110">Le montant saisi sera limité entre 0 et 10 000</t>
             <t id="1111">Déjà débloqué</t>
+            <t id="1112">Vaisseau invincible</t>
+            <t id="1113">Le vaisseau piloté et la combinaison spatiale ne subissent aucun dégât de coque. Le dernier vaisseau piloté reste protégé jusqu'au pilotage d'un autre.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Améliorations de la combinaison</t>
             <t id="1201">Ajouter une amélioration</t>
@@ -52,6 +56,8 @@
             <!-- Spacesuit Ammo -->
             <t id="1300">Munitions de la combinaison</t>
             <t id="1301">Ajouter</t>
+            <t id="1400">Vaisseau du joueur</t>
+            <t id="1401">Désactiver</t>
 
             <!-- Tab 2: Inventory -->
             <t id="2000">Inventaire du joueur</t>

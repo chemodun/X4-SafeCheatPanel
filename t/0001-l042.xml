@@ -29,6 +29,8 @@
             <t id="119">Naplnit sklad: aktuální stanice</t>
             <t id="120">Naplnit sklad: všechny stanice frakce</t>
             <t id="121">Odstranit válečnou mlhu v sektoru</t>
+            <t id="122">Učinit nezničitelným</t>
+            <t id="123">Odebrat nezničitelnost</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Hráč</t>
@@ -45,6 +47,8 @@
             <t id="1109">Nedostupné, dokud neodemkneš výzkum.</t>
             <t id="1110">Zadaná částka bude omezena na rozsah 0 až 10 000</t>
             <t id="1111">Již odemčeno</t>
+            <t id="1112">Nezničitelná loď</t>
+            <t id="1113">Pilotovaná loď a skafandr neutrpí žádné poškození trupu. Naposledy pilotovaná loď zůstává chráněná, dokud není pilotována jiná.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Vylepšení skafandru</t>
             <t id="1201">Přidat vylepšení</t>
@@ -52,6 +56,8 @@
             <!-- Spacesuit Ammo -->
             <t id="1300">Munice skafandru</t>
             <t id="1301">Přidat</t>
+            <t id="1400">Loď hráče</t>
+            <t id="1401">Zakázat</t>
 
             <!-- Tab 2: Inventory -->
             <t id="2000">Inventář hráče</t>

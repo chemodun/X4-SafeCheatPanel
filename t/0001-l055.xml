@@ -29,6 +29,8 @@
             <t id="119">Encher armazém: estação atual</t>
             <t id="120">Encher armazém: todas as estações da fação</t>
             <t id="121">Limpar o nevoeiro de guerra do setor</t>
+            <t id="122">Tornar invencível</t>
+            <t id="123">Remover invencibilidade</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Jogador</t>
@@ -45,6 +47,8 @@
             <t id="1109">Desativado até teres desbloqueado a investigação.</t>
             <t id="1110">O valor introduzido será limitado entre 0 e 10 000</t>
             <t id="1111">Já desbloqueado</t>
+            <t id="1112">Nave invencível</t>
+            <t id="1113">A nave pilotada e o traje espacial não sofrem dano no casco. A última nave pilotada continua protegida até que outra seja pilotada.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Melhorias do fato espacial</t>
             <t id="1201">Adicionar melhoria</t>
@@ -52,6 +56,8 @@
             <!-- Spacesuit Ammo -->
             <t id="1300">Munições do fato espacial</t>
             <t id="1301">Adicionar</t>
+            <t id="1400">Nave do jogador</t>
+            <t id="1401">Desativar</t>
 
             <!-- Tab 2: Inventory -->
             <t id="2000">Inventário do jogador</t>

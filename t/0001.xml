@@ -29,6 +29,8 @@
             <t id="119">Fill Storage: Current Station</t>
             <t id="120">Fill Storage: All Faction Stations</t>
             <t id="121">Clear Fog of War in Sector</t>
+            <t id="122">Make Invincible</t>
+            <t id="123">Remove Invincibility</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Player</t>
@@ -45,6 +47,8 @@
             <t id="1109">Disabled until you have unlocked research.</t>
             <t id="1110">Entered amount will be capped between 0 and 10,000</t>
             <t id="1111">Already unlocked</t>
+            <t id="1112">Invincible Ship</t>
+            <t id="1113">The ship you pilot and your spacesuit take no hull damage. The last ship you piloted stays protected until you pilot another one.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Spacesuit Upgrades</t>
             <t id="1201">Add Upgrade</t>
@@ -52,6 +56,8 @@
             <!-- Spacesuit Ammo -->
             <t id="1300">Spacesuit Ammo</t>
             <t id="1301">Add</t>
+            <t id="1400">Player Ship</t>
+            <t id="1401">Disable</t>
 
             <!-- Tab 2: Inventory -->
             <t id="2000">Player Inventory</t>

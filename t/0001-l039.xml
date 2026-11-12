@@ -29,6 +29,8 @@
             <t id="119">Riempi magazzino: stazione corrente</t>
             <t id="120">Riempi magazzino: tutte le stazioni della fazione</t>
             <t id="121">Rimuovi la nebbia di guerra nel settore</t>
+            <t id="122">Rendi invincibile</t>
+            <t id="123">Rimuovi invincibilità</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Giocatore</t>
@@ -45,6 +47,8 @@
             <t id="1109">Disattivato finché non hai sbloccato la ricerca.</t>
             <t id="1110">L'importo inserito sarà limitato tra 0 e 10.000</t>
             <t id="1111">Già sbloccato</t>
+            <t id="1112">Nave invincibile</t>
+            <t id="1113">La nave pilotata e la tuta spaziale non subiscono danni allo scafo. L'ultima nave pilotata resta protetta finché non se ne pilota un'altra.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Potenziamenti della tuta spaziale</t>
             <t id="1201">Aggiungi potenziamento</t>
@@ -52,6 +56,8 @@
             <!-- Spacesuit Ammo -->
             <t id="1300">Munizioni della tuta spaziale</t>
             <t id="1301">Aggiungi</t>
+            <t id="1400">Nave del giocatore</t>
+            <t id="1401">Disattiva</t>
 
             <!-- Tab 2: Inventory -->
             <t id="2000">Inventario del giocatore</t>

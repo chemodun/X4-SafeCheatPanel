@@ -39,6 +39,11 @@ function scp.init(playerId, configId)
   end
 end
 
+function scp.getConfig()
+  if _playerId == nil then return nil end
+  return GetNPCBlackboard(_playerId, _configId)
+end
+
 function scp.isExtendedMode()
   if _playerId == nil then return false end
   local cfg = GetNPCBlackboard(_playerId, _configId)

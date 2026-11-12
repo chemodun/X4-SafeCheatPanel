@@ -29,6 +29,8 @@
             <t id="119">Llenar almacén: estación actual</t>
             <t id="120">Llenar almacén: todas las estaciones de la facción</t>
             <t id="121">Despejar la niebla de guerra del sector</t>
+            <t id="122">Hacer invencible</t>
+            <t id="123">Quitar invencibilidad</t>
 
             <!-- Tab 1: Player -->
             <t id="1000">Jugador</t>
@@ -45,6 +47,8 @@
             <t id="1109">Desactivado hasta que hayas desbloqueado la investigación.</t>
             <t id="1110">La cantidad introducida se limitará entre 0 y 10.000</t>
             <t id="1111">Ya desbloqueado</t>
+            <t id="1112">Nave invencible</t>
+            <t id="1113">La nave pilotada y el traje espacial no sufren daños en el casco. La última nave pilotada sigue protegida hasta que se pilote otra.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Mejoras del traje espacial</t>
             <t id="1201">Añadir mejora</t>
@@ -52,6 +56,8 @@
             <!-- Spacesuit Ammo -->
             <t id="1300">Munición del traje espacial</t>
             <t id="1301">Añadir</t>
+            <t id="1400">Nave del jugador</t>
+            <t id="1401">Desactivar</t>
 
             <!-- Tab 2: Inventory -->
             <t id="2000">Inventario del jugador</t>

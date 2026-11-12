@@ -74,11 +74,13 @@ scp.inventory    = require("extensions.safe_cheat_panel.ui.scp_inventory")
 scp.factions     = require("extensions.safe_cheat_panel.ui.scp_factions")
 scp.map          = require("extensions.safe_cheat_panel.ui.scp_map")
 scp.destroy      = require("extensions.safe_cheat_panel.ui.scp_destroy")
+scp.invincibility = require("extensions.safe_cheat_panel.ui.scp_invincibility")
 scp.crew         = require("extensions.safe_cheat_panel.ui.scp_crew")
 scp.identify     = require("extensions.safe_cheat_panel.ui.scp_identify")
 scp.crewSize     = require("extensions.safe_cheat_panel.ui.scp_crewsize")
 scp.workforce    = require("extensions.safe_cheat_panel.ui.scp_workforce")
 scp.destroy.join(scp)
+scp.invincibility.join(scp)
 scp.crew.join(scp)
 scp.identify.join(scp)
 scp.crewSize.join(scp)
@@ -286,6 +288,22 @@ local config = {
       text = ReadText(1972092427, 118),
       scriptFunction = function() scp.spawner.startEdit(true) end
     },
+    {
+      id = "makeInvincible",
+      type = "scp_cheat",
+      actiontype = "lua;makeInvincible",
+      isValidFunction = function() return scp.invincibility.isValidMake() end,
+      text = ReadText(1972092427, 122),
+      scriptFunction = function() scp.invincibility.toggle() end
+    },
+    {
+      id = "removeInvincibility",
+      type = "scp_cheat",
+      actiontype = "lua;removeInvincibility",
+      isValidFunction = function() return scp.invincibility.isValidRemove() end,
+      text = ReadText(1972092427, 123),
+      scriptFunction = function() scp.invincibility.toggle() end
+    },
     -- ["teleportPlayerSeat"] = {
     --   type = "scp_cheat",
     --   actiontype = "lua;teleportPlayerSeat",
@@ -356,6 +374,7 @@ local function init()
   -- refreshInfoFrame with the map closed throws and leaves createInfoFrameRunning stuck true
   RegisterEvent("scp_main.researchRemoved", function() if menu.shown then menu.refreshInfoFrame() end end)
   RegisterEvent("scp_main.sectorRevealed", function() if menu.shown then menu.refreshInfoFrame() end end)
+  RegisterEvent("scp_main.playerInvincibleChanged", function() if menu.shown then menu.refreshInfoFrame() end end)
 
   scp.playerId = ConvertStringTo64Bit(tostring(C.GetPlayerID()))
   scp.helpers.init(scp.playerId, config.configId)

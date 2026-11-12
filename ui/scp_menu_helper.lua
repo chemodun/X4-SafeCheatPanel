@@ -71,11 +71,12 @@ end
 ---@param frameTable table
 ---@param id any
 ---@param numDisplayed integer
----@param options table { active, text, mouseOverText, textColIndex, checkBoxColIndex, textColor, fixed }
+---@param options table { checked, active, onClick, text, mouseOverText, textColIndex, checkBoxColIndex, textColor, fixed }
 ---@return integer
 function scp.createCheckBox(frameTable, id, numDisplayed, options)
   local textColumnIndex = options.textColIndex or config.defaultFirstColumn
   local checkboxColumnIndex = options.checkBoxColIndex or config.defaultSecondColumn
+  local numColumns = frameTable.table and frameTable.table.numcolumns or frameTable.numcolumns or 12
 
   local rowProps = { bgColor = Color["row_background_unselectable"] }
   if options.fixed then rowProps.fixed = true end
@@ -83,13 +84,14 @@ function scp.createCheckBox(frameTable, id, numDisplayed, options)
 
   row[textColumnIndex]:setColSpan(checkboxColumnIndex - 1):createText(options.text, { mouseOverText = options.mouseOverText, color = options.textColor })
 
+  row[checkboxColumnIndex]:setColSpan(numColumns - checkboxColumnIndex + 1)
   local checkboxCellWidth = row[checkboxColumnIndex]:getWidth()
   local checkBoxCellHeight = row:getHeight()
   local checkBoxSize = math.min(checkboxCellWidth, checkBoxCellHeight)
   local x = checkboxCellWidth > checkBoxSize and math.floor((checkboxCellWidth - checkBoxSize) / 2) or 0
 
-  row[checkboxColumnIndex]:createCheckBox(scp.spawnCentered, { active = options.active, x = x, width = checkBoxSize, mouseOverText = options.mouseOverText, scaling = false })
-  row[checkboxColumnIndex].handlers.onClick = function(_, checked) scp.spawnCentered = checked end
+  row[checkboxColumnIndex]:createCheckBox(options.checked, { active = options.active, x = x, width = checkBoxSize, height = checkBoxSize, mouseOverText = options.mouseOverText, scaling = false })
+  row[checkboxColumnIndex].handlers.onClick = options.onClick
   return numDisplayed + 1
 end
 

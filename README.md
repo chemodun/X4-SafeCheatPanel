@@ -24,7 +24,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Spawner Tab**: Spawn stations - from a construction plan or as a pre-built installation - plus ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
 - **Editor**: The same tab edits existing objects. Right-click a player-owned ship or station to load it in, then set crew skills, re-equip it, fill empty control posts or set its workforce.
 - **Destroy Object Tab**: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
-- **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), fill station storage (current and all faction stations), teleport the piloted ship or the station the player stands on, teleport player, reveal all stations in sector, clear the fog of war in sector, destroy object.
+- **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), fill station storage (current and all faction stations), teleport the piloted ship or the station the player stands on, teleport player, reveal all stations in sector, clear the fog of war in sector, destroy object, make invincible.
 - **Two modes**: **Normal** (player-owned spawns only) and **Extended** (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
 - **Compatible with X4 8.00 and 9.00**.
 - **Can work with SWI** - please use with the [kuertee UI Extensions and HUD for SW Interworlds adoption mod](https://www.nexusmods.com/x4foundations/mods/2134).
@@ -58,6 +58,7 @@ Open the map and click the **Safe Cheat Panel** icon in the left sidebar to open
 - Set player money (0 - 1 quadrillion).
 - Add spacesuit upgrades.
 - Add spacesuit ammo (0 - 10,000).
+- **Invincible Ship**: the ship the player pilots and the player's spacesuit take no hull damage. A ship loses the protection as soon as the player stops piloting it. Right-click **Remove Invincibility** on that ship turns the switch off.
 
 ![Player Money and Spacesuit Upgrades](docs/images/player_money_and_spacesuit_upgrades.png)
 
@@ -231,9 +232,9 @@ Right-clicking on the map gives access to the following actions, depending on th
 - **Spawn Objects**: Spawns deployable objects at the clicked position using the current Spawner tab settings.
 - **Force Build Completion: Current Station**: Instantly completes the construction of a station that is currently building, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *In* **extended** *mode available for non-player faction stations*.
 - **Force Build Completion: All Faction Stations**: Instantly completes the construction of all stations belonging to the same faction, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
-- **Restock: Current Station**: Instantly restocks the current station's resources and buyable trade wares up to their buy limits, the amount the station would buy itself. Works from the station's own storage numbers, so it also works when the station posts no buy offers. Takes into account incoming ware reservations and the free storage space. *In* **extended** *mode available for non-player faction stations*.
+- **Restock: Current Station**: Instantly restocks the current station's resources and buyable trade wares up to their buy limits, the amount the station would buy itself, plus the wares it still needs to build its drones and at least what queued ship builds at a wharf or shipyard still miss. Works from the station's own storage numbers, so it also works when the station posts no buy offers. Takes into account incoming ware reservations and the free storage space. *In* **extended** *mode available for non-player faction stations*.
 - **Restock: All Faction Stations**: The same restock for all stations belonging to the same faction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
-- **Fill Storage: Current Station**: Instantly fills the current station's resources, intermediate wares and buyable trade wares up to their storage targets (the full bars in the Logical Station Overview), ignoring buy limits. Takes into account incoming ware reservations and the free storage space. *In* **extended** *mode available for non-player faction stations*.
+- **Fill Storage: Current Station**: Instantly fills the current station's resources, intermediate wares and buyable trade wares up to their storage targets (the full bars in the Logical Station Overview), ignoring buy limits, plus the same drone and ship-build wares as **Restock**. Takes into account incoming ware reservations and the free storage space. *In* **extended** *mode available for non-player faction stations*.
 - **Fill Storage: All Faction Stations**: The same fill for all stations belonging to the same faction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
 - **Restock: Current Build Storage**: Instantly restocks the current station's build storage with all required resources. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *In* **extended** *mode available for non-player faction stations*.
 - **Restock: All Faction Build Storages**: Instantly restocks all stations belonging to the same faction with all required resources in their build storages. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
@@ -242,6 +243,7 @@ Right-clicking on the map gives access to the following actions, depending on th
 - **Destroy Object**: Sets the clicked object as the target on the Destroy Object tab. Only offered while that tab is open. The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
 - **Edit Ship**: Loads the clicked ship into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned ships. Stays available while another object is loaded, so you can switch targets directly.
 - **Edit Station**: Loads the clicked station into the Spawner tab for editing. Same conditions as above.
+- **Make Invincible** / **Remove Invincibility**: Switches full invincibility on or off for the clicked ship or station: no hull damage to the object, a ship's engines, shields and turrets, or a station's modules, turrets and shields; shield strength still drops and recharges. Modules and equipment added later are covered too. Only offered while the Spawner tab is open. Player-owned ships and stations; *in* **extended** *mode any ship or station*.
 
 ### Extension Options
 
@@ -272,11 +274,15 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ### [8.00.45] - 2026-10-??
 
+- **Added**
+  - Right-click **Make Invincible** for ships and stations, in the Spawner tab.
+  - Player tab: **Invincible Ship** for the piloted ship and the spacesuit.
 - **Fixed**
   - Removing a research or revealing a sector while the map was closed left the map's info panel unable to refresh.
   - Right-click actions for **All Faction Stations** did nothing.
   - Right-click **Restock: All Faction Build Storages** and **Force Build Completion: All Faction Stations** skipped new construction sites.
   - Spawned laser towers waited for a captain and never fired.
+  - Right-click **Restock** and **Fill Storage** left out the wares for station drones and for queued ship builds.
 
 ### [8.00.44] - 2026-10-04
 
