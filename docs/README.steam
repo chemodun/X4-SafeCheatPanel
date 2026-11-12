@@ -21,7 +21,7 @@ Take in account: id of the mod and folder is changed to [b]safe_cheat_panel[/b].
 [*] [b]Encyclopedia Tab[/b]: Reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - individually, by subcategory, or all at once.
 [*] [b]Factions Tab[/b]: Edit faction relations with the player and between non-player factions.
 [*] [b]Galaxy/Sectors Tab[/b]: Reveal sectors on the map at three levels of detail, or reveal all at once.
-[*] [b]Spawner Tab[/b]: Spawn stations - from a construction plan or as a pre-built installation - plus ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
+[*] [b]Spawner Tab[/b]: Spawn stations - from a construction plan, armed at a loadout preset, or as a pre-built installation - plus ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
 [*] [b]Editor[/b]: The same tab edits existing objects. Right-click a player-owned ship or station to load it in, then set crew skills, re-equip it, fill empty control posts or set its workforce.
 [*] [b]Destroy Object Tab[/b]: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
 [*] [b]Right-click context menu[/b]: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), fill station storage (current and all faction stations), teleport the piloted ship or the station the player stands on, teleport player, reveal all stations in sector, clear the fog of war in sector, destroy object, make invincible.
@@ -176,6 +176,8 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [h3][b]Station Spawner[/b][/h3]
 [list]
 [*] Select a construction plan - your own, or one of the game's pre-defined plans. In extended mode, pre-defined plans and installations are also listed with their id, so entries sharing a name stay apart.
+[*] For a pre-defined plan, choose its loadout: [b]Empty[/b], [b]Low[/b], [b]Medium[/b] or [b]High Preset[/b], as in the station editor. Your own plans keep the loadout saved with them.
+[*] A pre-defined plan spawns as the station type the game gives it: a Xenon defence plan becomes a Xenon Defence Platform, a Xenon shipyard or wharf plan a Xenon shipyard, a trade station plan its race's trading station.
 [*] Or pick [b]Pre-built Installations[/b] instead of a plan (available in extended mode) - Kha'ak installations, the fixed Xenon and pirate stations and the like, listed from the game itself.
 [*] An installation is real and armed, but does not join its owner's defence logic, so it will not breed fleets.
 [*] Select the owning faction (player only in normal mode; any faction in extended mode).
@@ -288,12 +290,13 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [/list]
 [h2][b]Changelog[/b][/h2]
 
-[h2][8.00.45] - 2026-10-??[/h2]
+[h2][8.00.45] - 2026-11-??[/h2]
 [list]
 [*] [b]Added[/b]
 [list]
 [*] Right-click [b]Make Invincible[/b] for ships and stations, in the Spawner tab.
 [*] Player tab: [b]Invincible Ship[/b] for the piloted ship and the spacesuit.
+[*] Station Spawner: [b]Select Loadout[/b] for pre-defined plans, from Empty to High Preset.
 [/list]
 [*] [b]Fixed[/b]
 [list]
@@ -302,6 +305,8 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [*] Right-click [b]Restock: All Faction Build Storages[/b] and [b]Force Build Completion: All Faction Stations[/b] skipped new construction sites.
 [*] Spawned laser towers waited for a captain and never fired.
 [*] Right-click [b]Restock[/b] and [b]Fill Storage[/b] left out the wares for station drones and for queued ship builds.
+[*] Stations from pre-defined plans spawned unarmed and as factories, even Xenon defence platforms and shipyards.
+[*] Two spawns or edits within half a second could give crew skills or workforce to the wrong object.
 [/list]
 [/list]
 [h2][8.00.44] - 2026-10-04[/h2]
