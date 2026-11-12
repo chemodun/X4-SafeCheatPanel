@@ -147,7 +147,7 @@
           </actions>
         </cue>
 
-        <cue name="Scp_Edit_Object" instantiate="true" version="2">
+        <cue name="Scp_Edit_Object" instantiate="true" version="3">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_edit_object'" />
           </conditions>
@@ -226,10 +226,17 @@
               <remove_value name="$scpCrewRace" />
               <remove_value name="$scpCrewExperience" />
             </do_if>
+            <!-- Instances share Scp_Main's namespace; each keeps its own values on this. -->
+            <set_value name="this.$editData" exact="$editData" />
+            <set_value name="this.$object" exact="$object" />
+            <set_value name="this.$scpAllSkills" exact="$scpAllSkills" />
           </actions>
           <!-- A just-created control entity cannot take a skill write in the same block. -->
           <delay min="400ms" max="600ms" />
           <actions>
+            <set_value name="$editData" exact="this.$editData" />
+            <set_value name="$object" exact="this.$object" />
+            <set_value name="$scpAllSkills" exact="this.$scpAllSkills" />
             <do_if value="@$editData.$skills != null">
               <do_if value="@$editData.$isStation == true">
                 <do_for_each name="$scpPost" in="[
@@ -450,7 +457,7 @@
           </actions>
         </library>
 
-        <cue name="Scp_Spawn_Ship" instantiate="true" version="3">
+        <cue name="Scp_Spawn_Ship" instantiate="true" version="4">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_ship'" />
           </conditions>
@@ -598,9 +605,18 @@
               <set_value name="$rows" exact="$rows + 1" />
               <set_value name="$numPerRow" exact="0" />
             </do_while>
+            <!-- Instances share Scp_Main's namespace; each keeps its own values on this. -->
+            <set_value name="this.$ships" exact="$ships" />
+            <set_value name="this.$spawnData" exact="$spawnData" />
+            <set_value name="this.$scpCrewSkills" exact="$scpCrewSkills" />
+            <set_value name="this.$scpAllSkills" exact="$scpAllSkills" />
           </actions>
           <delay min="400ms" max="600ms" />
           <actions>
+            <set_value name="$ships" exact="this.$ships" />
+            <set_value name="$spawnData" exact="this.$spawnData" />
+            <set_value name="$scpCrewSkills" exact="this.$scpCrewSkills" />
+            <set_value name="$scpAllSkills" exact="this.$scpAllSkills" />
             <debug_text text="'SafeCheatPanel: Processing %s ships for crew skills and/or default orders.'. [$ships.count]" chance="$debugChance" />
             <do_if value="@$ships.count gt 0">
               <do_for_each name="$ship" in="$ships">
@@ -702,12 +718,13 @@
           </actions>
         </cue>
 
-        <cue name="Scp_Spawn_Station" instantiate="true" version="2">
+        <cue name="Scp_Spawn_Station" instantiate="true" version="3">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_station'" />
           </conditions>
           <actions>
             <set_value name="$spawnData" exact="event.param3" />
+            <set_value name="$station" exact="null" />
             <!-- A pre-built installation is a bare station macro with no construction plan. -->
             <set_value name="$scpIsInstallation" exact="$spawnData.$stationMacro?" />
             <do_if value="$scpIsInstallation">
@@ -717,11 +734,19 @@
               </create_station>
             </do_if>
             <do_else>
-              <create_station rawname="$spawnData.$name" name="$station" sector="$spawnData.$offsetComponent" macro="macro.station_gen_factory_base_01_macro" constructionplan="$spawnData.$constructionPlan" owner="faction.{$spawnData.$ownerId}" state="componentstate.operational">
+              <set_value name="$scpBaseMacro" exact="macro.station_gen_factory_base_01_macro" />
+              <do_if value="@$spawnData.$planMacros.count gt 0">
+                <include_actions ref="Scp_Find_Plan_Base" />
+              </do_if>
+              <create_station rawname="$spawnData.$name" name="$station" sector="$spawnData.$offsetComponent" macro="$scpBaseMacro" constructionplan="$spawnData.$constructionPlan" owner="faction.{$spawnData.$ownerId}" state="componentstate.operational">
                 <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
                 <safepos includeplotbox="1" />
               </create_station>
+              <remove_value name="$scpBaseMacro" />
             </do_else>
+            <do_if value="$station and $spawnData.$loadoutLevel?">
+              <include_actions ref="Scp_Apply_Station_Loadout" />
+            </do_if>
             <do_if value="$station">
               <do_if value="$station.owner != faction.player">
                 <!-- NPC-owned: 'init station' runs InitStationActions, which adds the manager,
@@ -746,14 +771,21 @@
                 <remove_value name="$controllable" />
               </do_else>
             </do_if>
+            <!-- Instances share Scp_Main's namespace; each keeps its own values on this. -->
+            <set_value name="this.$station" exact="$station" />
+            <set_value name="this.$spawnData" exact="$spawnData" />
+            <set_value name="this.$scpIsInstallation" exact="$scpIsInstallation" />
           </actions>
           <!-- A just-created control entity cannot take a skill write in the same block. -->
           <delay min="400ms" max="600ms" />
           <actions>
+            <set_value name="$station" exact="this.$station" />
+            <set_value name="$spawnData" exact="this.$spawnData" />
+            <set_value name="$scpIsInstallation" exact="this.$scpIsInstallation" />
             <do_if value="@$station != null">
-              <debug_text text="'SafeCheatPanel: Spawned station %s from %s - canequipships %s, posts manager %s / trader %s / defence %s / engineer %s'. [
+              <debug_text text="'SafeCheatPanel: Spawned station %s from %s on %s - turrets %s/%s, canequipships %s, posts manager %s / trader %s / defence %s / engineer %s'. [
                 $station.debugname, if $scpIsInstallation then 'installation macro ' + @$spawnData.$stationMacro else 'plan ' + @$spawnData.$constructionPlan,
-                $station.canequipships, @$station.controlentity.{controlpost.manager}.exists, @$station.controlentity.{controlpost.shiptrader}.exists,
+                $station.macro.id, $station.turrets.all.count, $station.turrets.numslots, $station.canequipships, @$station.controlentity.{controlpost.manager}.exists, @$station.controlentity.{controlpost.shiptrader}.exists,
                 @$station.controlentity.{controlpost.defence}.exists, @$station.controlentity.{controlpost.engineer}.exists]" chance="$debugChance" />
             </do_if>
             <do_if value="@$spawnData.$crewSkills != null and @$station != null">
@@ -781,6 +813,111 @@
             </do_if>
           </actions>
         </cue>
+
+        <!-- The base macro as god.xml types a station: the plan's stations-library tag gives the module-set
+             type, its modules' maker races the race. Expects $spawnData.$planMacros, sets $scpBaseMacro. -->
+        <library name="Scp_Find_Plan_Base" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$scpPlanMacros" exact="$spawnData.$planMacros" />
+            <set_value name="$scpPlanType" exact="null" />
+            <do_for_each name="$scpTagType" in="[
+              [tag.defence, 'defence'], [tag.shipyard, 'shipyard'], [tag.wharf, 'shipyard'],
+              [tag.tradestation, 'tradingstation'], [tag.tradestation_alliancehub, 'tradingstation'],
+              [tag.tradestation_harbour, 'tradingstation'], [tag.tradestation_mooring, 'tradingstation'],
+              [tag.tradestation_port, 'tradingstation'], [tag.tradestation_quay, 'tradingstation'],
+              [tag.tradestation_reservoir, 'tradingstation'], [tag.paranid_palace, 'tradingstation'],
+              [tag.piratebase, 'piratebase'], [tag.piratedock, 'piratebase'], [tag.anarchyport, 'piratebase'],
+              [tag.headquarters, 'headquarters']]">
+              <get_construction_plan result="$scpCandidates" tags="$scpTagType.{1}" multiple="true" />
+              <do_if value="@$scpCandidates.count gt 0">
+                <do_for_each name="$scpCandidate" in="$scpCandidates">
+                  <do_if value="$scpCandidate.count == $scpPlanMacros.count">
+                    <set_value name="$scpSame" exact="true" />
+                    <do_all exact="$scpCandidate.count" counter="$scpI">
+                      <do_if value="$scpCandidate.{$scpI}.macro.id != $scpPlanMacros.{$scpI}">
+                        <set_value name="$scpSame" exact="false" />
+                        <break />
+                      </do_if>
+                    </do_all>
+                    <do_if value="$scpSame">
+                      <set_value name="$scpPlanType" exact="$scpTagType.{2}" />
+                      <break />
+                    </do_if>
+                  </do_if>
+                </do_for_each>
+              </do_if>
+              <do_if value="$scpPlanType">
+                <break />
+              </do_if>
+            </do_for_each>
+            <set_value name="$scpVotes" exact="table[]" />
+            <do_if value="$scpPlanType">
+              <!-- Each distinct module votes with its maker races that have a set of this type. -->
+              <set_value name="$scpSeen" exact="[]" />
+              <do_for_each name="$scpMacroId" in="$scpPlanMacros">
+                <do_if value="$scpSeen.indexof.{$scpMacroId} == 0">
+                  <append_to_list name="$scpSeen" exact="$scpMacroId" />
+                  <set_value name="$scpRaces" exact="@macro.{$scpMacroId}.makerraces" />
+                  <do_if value="@$scpRaces.count gt 0">
+                    <do_for_each name="$scpRace" in="$scpRaces">
+                      <get_module_set_macro result="$scpSetMacro" race="$scpRace" type="$scpPlanType" />
+                      <do_if value="$scpSetMacro">
+                        <set_value name="$scpVotes.{$scpRace}" exact="@$scpVotes.{$scpRace} + 1" />
+                      </do_if>
+                    </do_for_each>
+                  </do_if>
+                </do_if>
+              </do_for_each>
+              <set_value name="$scpBestRace" exact="null" />
+              <do_for_each name="$scpRace" valuename="$scpCount" in="$scpVotes">
+                <do_if value="not $scpBestRace">
+                  <set_value name="$scpBestRace" exact="$scpRace" />
+                </do_if>
+                <do_elseif value="$scpCount gt $scpVotes.{$scpBestRace}">
+                  <set_value name="$scpBestRace" exact="$scpRace" />
+                </do_elseif>
+              </do_for_each>
+              <do_if value="$scpBestRace">
+                <get_module_set_macro result="$scpBaseMacro" race="$scpBestRace" type="$scpPlanType" />
+              </do_if>
+            </do_if>
+            <debug_text text="'SafeCheatPanel: Plan %s - type %s, race votes %s, base %s'. [@$spawnData.$constructionPlan, @$scpPlanType, $scpVotes, $scpBaseMacro.id]" chance="$debugChance" />
+            <remove_value name="$scpPlanMacros" />
+            <remove_value name="$scpPlanType" />
+            <remove_value name="$scpCandidates" />
+            <remove_value name="$scpCandidate" />
+            <remove_value name="$scpSame" />
+            <remove_value name="$scpVotes" />
+            <remove_value name="$scpSeen" />
+            <remove_value name="$scpRaces" />
+            <remove_value name="$scpSetMacro" />
+            <remove_value name="$scpBestRace" />
+          </actions>
+        </library>
+
+        <!-- Generated loadouts replace whatever the modules carry. Expects $station and $spawnData.$loadoutLevel. -->
+        <library name="Scp_Apply_Station_Loadout" purpose="include_actions" version="1">
+          <actions>
+            <set_value name="$scpLevel" exact="$spawnData.$loadoutLevel" />
+            <set_value name="$scpSequence" exact="$station.constructionsequence" />
+            <set_value name="$scpLoadouts" exact="[]" />
+            <set_module_loadout_level object="$station" exact="$scpLevel" />
+            <do_if value="@$scpSequence.count gt 0">
+              <generate_loadout result="$scpLoadouts" sequence="$scpSequence" faction="$station.owner" level="$scpLevel" variation="0" />
+              <do_all exact="$scpLoadouts.count" counter="$scpI">
+                <set_value name="$scpModule" exact="@$station.planmodule.{$scpSequence.{$scpI}.id}" />
+                <do_if value="$scpModule">
+                  <apply_loadout object="$scpModule" loadout="$scpLoadouts.{$scpI}" />
+                </do_if>
+              </do_all>
+            </do_if>
+            <debug_text text="'SafeCheatPanel: Loadout level %s on %s - %s entries, turrets %s/%s'. [$scpLevel, $station.debugname, $scpLoadouts.count, $station.turrets.all.count, $station.turrets.numslots]" chance="$debugChance" />
+            <remove_value name="$scpLevel" />
+            <remove_value name="$scpSequence" />
+            <remove_value name="$scpLoadouts" />
+            <remove_value name="$scpModule" />
+          </actions>
+        </library>
 
         <cue name="Scp_Fix_Station" instantiate="true">
           <conditions>

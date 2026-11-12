@@ -21,7 +21,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Encyclopedia Tab**: Reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - individually, by subcategory, or all at once.
 - **Factions Tab**: Edit faction relations with the player and between non-player factions.
 - **Galaxy/Sectors Tab**: Reveal sectors on the map at three levels of detail, or reveal all at once.
-- **Spawner Tab**: Spawn stations - from a construction plan or as a pre-built installation - plus ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
+- **Spawner Tab**: Spawn stations - from a construction plan, armed at a loadout preset, or as a pre-built installation - plus ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
 - **Editor**: The same tab edits existing objects. Right-click a player-owned ship or station to load it in, then set crew skills, re-equip it, fill empty control posts or set its workforce.
 - **Destroy Object Tab**: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
 - **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), fill station storage (current and all faction stations), teleport the piloted ship or the station the player stands on, teleport player, reveal all stations in sector, clear the fog of war in sector, destroy object, make invincible.
@@ -161,6 +161,8 @@ A **Reveal All** button reveals every sector at all levels at once.
 #### Station Spawner
 
 - Select a construction plan - your own, or one of the game's pre-defined plans. In extended mode, pre-defined plans and installations are also listed with their id, so entries sharing a name stay apart.
+- For a pre-defined plan, choose its loadout: **Empty**, **Low**, **Medium** or **High Preset**, as in the station editor. Your own plans keep the loadout saved with them.
+- A pre-defined plan spawns as the station type the game gives it: a Xenon defence plan becomes a Xenon Defence Platform, a Xenon shipyard or wharf plan a Xenon shipyard, a trade station plan its race's trading station.
 - Or pick **Pre-built Installations** instead of a plan (available in extended mode) - Kha'ak installations, the fixed Xenon and pirate stations and the like, listed from the game itself.
 - An installation is real and armed, but does not join its owner's defence logic, so it will not breed fleets.
 - Select the owning faction (player only in normal mode; any faction in extended mode).
@@ -272,17 +274,20 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
-### [8.00.45] - 2026-10-??
+### [8.00.45] - 2026-11-??
 
 - **Added**
   - Right-click **Make Invincible** for ships and stations, in the Spawner tab.
   - Player tab: **Invincible Ship** for the piloted ship and the spacesuit.
+  - Station Spawner: **Select Loadout** for pre-defined plans, from Empty to High Preset.
 - **Fixed**
   - Removing a research or revealing a sector while the map was closed left the map's info panel unable to refresh.
   - Right-click actions for **All Faction Stations** did nothing.
   - Right-click **Restock: All Faction Build Storages** and **Force Build Completion: All Faction Stations** skipped new construction sites.
   - Spawned laser towers waited for a captain and never fired.
   - Right-click **Restock** and **Fill Storage** left out the wares for station drones and for queued ship builds.
+  - Stations from pre-defined plans spawned unarmed and as factories, even Xenon defence platforms and shipyards.
+  - Two spawns or edits within half a second could give crew skills or workforce to the wrong object.
 
 ### [8.00.44] - 2026-10-04
 

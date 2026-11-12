@@ -377,6 +377,23 @@ local function planMacros(planId)
   return macros
 end
 
+---Module macros of a stored plan in entry order, as MD lists a construction sequence.
+function scpIdentify.planMacrosInOrder(planId)
+  local n = tonumber(C.GetNumConstructionPlanInfo(planId))
+  local buf = ffi.new("UIConstructionPlanEntry[?]", n)
+  n = tonumber(C.GetConstructionPlanInfo(buf, n, planId))
+  local entries = {}
+  for i = 0, n - 1 do
+    entries[#entries + 1] = { idx = tonumber(buf[i].idx), macro = ffi.string(buf[i].macroid) }
+  end
+  table.sort(entries, function(a, b) return a.idx < b.idx end)
+  local macros = {}
+  for i, entry in ipairs(entries) do
+    macros[i] = entry.macro
+  end
+  return macros
+end
+
 ---Sorted module-macro multiset of a stored construction plan.
 local function planSignature(planId)
   if planSignatures[planId] then

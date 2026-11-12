@@ -182,6 +182,7 @@ local state = {
     ownerId          = nil,
     addManager       = false,
     addTrader        = false,
+    loadout          = "high",
   },
   object = {
     consumableType = "civilian",
@@ -225,6 +226,21 @@ local stationPlanTypes = {
   { id = "player",       text = ReadText(1972092427, 7103), active = true, icon = "", displayremoveoption = false },
   { id = "installation", text = ReadText(1972092427, 7106), active = true, icon = "", displayremoveoption = false },
 }
+
+-- The station editor's module presets (menu_station_configuration.lua getPresetLoadouts).
+local stationLoadoutPresets = {
+  { id = "empty",  text = ReadText(1001, 7990), level = 0,   active = true, icon = "", displayremoveoption = false },
+  { id = "low",    text = ReadText(1001, 7910), level = 0.1, active = true, icon = "", displayremoveoption = false },
+  { id = "medium", text = ReadText(1001, 7911), level = 0.5, active = true, icon = "", displayremoveoption = false },
+  { id = "high",   text = ReadText(1001, 7912), level = 1.0, active = true, icon = "", displayremoveoption = false },
+}
+
+local function stationLoadoutLevel(id)
+  for _, preset in ipairs(stationLoadoutPresets) do
+    if preset.id == id then return preset.level end
+  end
+  return nil
+end
 
 -- Pre-built installations are an Extended-mode feature; the other two types are always offered.
 local function getStationPlanTypes()
@@ -914,6 +930,8 @@ function scpSpawner.setStationSpawnData(id, dataType)
   elseif dataType == "addTrader" then
     state.station.addTrader = id
     if not id then state.crew.targets.trader = nil end
+  elseif dataType == "loadout" then
+    state.station.loadout = id
   else
     state.station.ownerId = id
   end
@@ -1109,6 +1127,27 @@ function scpSpawner.createStationMenu(frameTable, numDisplayed, scp)
       text             = nil,
       textOverride     = "",
       onConfirmed      = function(_, id) scpSpawner.setStationSpawnData(id, "station") end,
+      textColIndex     = 1,
+      dropDownColIndex = 1,
+      dropDownSpan     = 12,
+      textColor        = nil,
+      fixed            = nil,
+      isHeader         = nil,
+    })
+
+    -- Player plans and installations keep the loadout they carry.
+    numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
+      text  = ReadText(1001, 7905),
+      fixed = nil,
+    })
+    rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
+    numDisplayed = scp.menuHelper.createDropDown(rowGroup, true, numDisplayed, {
+      active           = true,
+      dropDownData     = stationLoadoutPresets,
+      startOption      = state.station.loadout,
+      text             = nil,
+      textOverride     = "",
+      onConfirmed      = function(_, id) scpSpawner.setStationSpawnData(id, "loadout") end,
       textColIndex     = 1,
       dropDownColIndex = 1,
       dropDownSpan     = 12,
@@ -1863,11 +1902,15 @@ end
 function scpSpawner.spawnStation(stationName, constructionPlan, ownerId)
   -- An installation travels as a macro instead, and MD builds it with no constructionplan.
   local isInstallation = state.station.planType == "installation"
+  local isInGamePlan = state.station.planType == "inGame"
   local data = {
     name = stationName,
     offsetComponent = ConvertStringToLuaID(tostring(interactMenu.offsetcomponent)),
     constructionPlan = (not isInstallation) and constructionPlan or nil,
     stationMacro = isInstallation and constructionPlan or nil,
+    -- MD matches the entries against the stations library to pick the base macro.
+    planMacros = isInGamePlan and scpIdentify.planMacrosInOrder(constructionPlan) or nil,
+    loadoutLevel = isInGamePlan and stationLoadoutLevel(state.station.loadout) or nil,
     ownerId = ownerId,
     -- Vanilla withholds both posts from player-owned stations; these two put them back.
     addManager = ownerId == "player" and state.station.addManager or false,
