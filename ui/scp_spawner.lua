@@ -1803,6 +1803,12 @@ scpSpawner.state = state
 -- *** Spawn action functions (called from safe_cheat_panel luaActions) ***
 
 function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow, loadoutFaction, assignPurpose, purpose)
+  -- A laser tower's gun and engine carry no ware, so a preset built from the ware pool leaves it unarmed.
+  local isLaserTower = GetMacroData(ship, "shiptype") == "lasertower"
+  if isLaserTower and (loadout == "scpDefaultLow" or loadout == "scpDefaultMedium" or loadout == "scpDefaultHigh") then
+    scpHelpers.debug(string.format("Spawn: %s is a laser tower, preset %s replaced by its hull default", ship, loadout))
+    loadout = "scpDefaultFull"
+  end
   local preset, crew = scpSpawner.PresetAndCrewForSpawnShip(ship, loadout)
   -- MD reconciles the ship against these counts instead of adding to what the loadout left.
   -- A macro with no crew berths sends neither key, so MD leaves its crew alone.
@@ -1813,7 +1819,7 @@ function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow
   -- Must match the faction MD creates the ship under, so both sides judge equipment alike.
   local spawnFaction = (preset > 0 and loadoutFaction) or ownerId
   -- Player-owned ships stay under direct player control; never auto-assign them a job.
-  local purposeOrderId = (ownerId ~= "player" and assignPurpose) and getShipPurposeOrderId(purpose) or nil
+  local purposeOrderId = (ownerId ~= "player" and assignPurpose and not isLaserTower) and getShipPurposeOrderId(purpose) or nil
   local mdLoadout, equipment, fillFlags = loadoutRequest(ship, loadout, preset, spawnFaction)
   local data = {
     ship = ship,
@@ -1829,6 +1835,7 @@ function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow
     ownerRace = ownerRace,
     loadoutFaction = loadoutFaction,
     purposeOrderId = purposeOrderId,
+    isLaserTower = isLaserTower or nil,
     -- Absent unless the checkbox is on, so an untouched spawn keeps the preset's ranges.
     crewSkills = state.crew.enabled and scpCrew.pickCategories(state.crew, scpCrew.shipCategories) or nil,
     allSkills = state.crew.enabled and state.crew.allSkills or false,

@@ -38,14 +38,14 @@ local PAGE_ID = 1972092427
 local scpStation = {
 }
 
--- Runs an action over every station of the picked station's owner. Only the last one gets
--- the finishAction flag, so the whole batch reaches MD as a single event.
+-- Runs an action over every station of the picked station's owner, construction sites included;
+-- the gathered wares reach MD as a single event after the last one.
 function scpStation.processForAllStations(functionToProcess)
   local station = interactMenu.componentSlot.component
   if station == nil then return end
   local object64 = ConvertStringTo64Bit(tostring(station))
   local owner = GetComponentData(object64, "owner")
-  local stations = GetContainedStationsByOwner(owner)
+  local stations = GetContainedStationsByOwner(owner, nil, true)
   scpStation.debug(string.format("Processing all stations (%d) for owner: %s", #stations, owner))
   local allWaresData = {}
   for i = 1, #stations do
@@ -53,10 +53,12 @@ function scpStation.processForAllStations(functionToProcess)
     local object64 = ConvertStringTo64Bit(tostring(station))
     local owner, realclassid, name = GetComponentData(object64, "owner", "realclassid", "name")
     if Helper.isComponentClass(realclassid, "station") and owner ~= nil and (owner == "player" or scpStation.scp.isExtendedMode()) then
-      scpStation.trace(string.format("Processing station %d/%d: name: %s, owner: %s, object: %s, other: %s", i, #stations, name, owner, station))
-      allWaresData = functionToProcess(station, i == #stations, allWaresData)
+      scpStation.trace(string.format("Processing station %d/%d: name: %s, owner: %s, object: %s", i, #stations, name, owner, tostring(station)))
+      allWaresData = functionToProcess(station, false, allWaresData) or allWaresData
     end
   end
+  scpStation.sendWaresData(allWaresData)
+  scpStation.helpers.interactMenuFinishAction()
 end
 
 function scpStation.isValidForceBuildCompletion()
@@ -222,26 +224,32 @@ function scpStation.applyReservations(container, neededResources, count)
   return count
 end
 
+function scpStation.sendWaresData(allWaresData)
+  if allWaresData == nil or #allWaresData == 0 then return end
+  scpStation.debug(string.format("Sending wares for %d container(s) to MD", #allWaresData))
+  AddUITriggeredEvent("scp_main", "scp_add_wares", allWaresData)
+end
+
 function scpStation.fillWaresData(object, neededResources, finishAction, allWaresData)
   allWaresData = allWaresData or {}
   finishAction = finishAction == nil and true or finishAction
-  if next(neededResources) == nil then return allWaresData end
-  local waresData = {
-    object = ConvertStringToLuaID(tostring(object)),
-    wares = {},
-    amounts = {}
-  }
-  for ware, amount in pairs(neededResources) do
-    table.insert(waresData.wares, ware)
-    table.insert(waresData.amounts, amount)
+  if next(neededResources) ~= nil then
+    local waresData = {
+      object = ConvertStringToLuaID(tostring(object)),
+      wares = {},
+      amounts = {}
+    }
+    for ware, amount in pairs(neededResources) do
+      table.insert(waresData.wares, ware)
+      table.insert(waresData.amounts, amount)
+    end
+    allWaresData[#allWaresData + 1] = waresData
   end
-  allWaresData[#allWaresData + 1] = waresData
   if finishAction then
-    AddUITriggeredEvent("scp_main", "scp_add_wares", allWaresData)
+    scpStation.sendWaresData(allWaresData)
     return {}
-  else 
-    return allWaresData
   end
+  return allWaresData
 end
 
 function scpStation.isValidFillWaresGapStation(toStorage)

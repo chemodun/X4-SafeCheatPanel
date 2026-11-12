@@ -353,8 +353,9 @@ local function init()
     scp.reset()
   end)
 
-  RegisterEvent("scp_main.researchRemoved", function() menu.refreshInfoFrame() end)
-  RegisterEvent("scp_main.sectorRevealed", function() menu.refreshInfoFrame() end)
+  -- refreshInfoFrame with the map closed throws and leaves createInfoFrameRunning stuck true
+  RegisterEvent("scp_main.researchRemoved", function() if menu.shown then menu.refreshInfoFrame() end end)
+  RegisterEvent("scp_main.sectorRevealed", function() if menu.shown then menu.refreshInfoFrame() end end)
 
   scp.playerId = ConvertStringTo64Bit(tostring(C.GetPlayerID()))
   scp.helpers.init(scp.playerId, config.configId)

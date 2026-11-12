@@ -473,6 +473,8 @@
             <debug_text text="'SafeCheatPanel: loadout for %s - asked for %s at preset %s, plan present %s, loadout resolved %s'. [
               $spawnData.$ship, @$spawnData.$loadout, $spawnData.$preset,
               @$spawnData.$equipment != null, @$scpLoadout != null]" chance="$debugChance" />
+            <!-- Laser towers are flown by a drone pilot, as vanilla's own. -->
+            <set_value name="$pilotRace" exact="if @$spawnData.$isLaserTower then race.drone else race.{$spawnData.$ownerRace}" />
             <do_while value="$rows lt $spawnData.$rows">
               <do_while value="$numPerRow lt $spawnData.$numPerRow">
                 <!-- Two shapes: <loadout> is static, it cannot be conditional inside one create_ship. -->
@@ -480,7 +482,7 @@
                   <create_ship name="$ship" macro="$spawnData.$ship" sector="$spawnData.$offsetComponent">
                     <owner exact="faction.{$spawnOwner}" overridenpc="true" />
                     <pilot>
-                      <select race="race.{$spawnData.$ownerRace}" tags="tag.aipilot" />
+                      <select race="$pilotRace" tags="tag.aipilot" />
                     </pilot>
                     <loadout loadout="$scpLoadout" />
                     <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
@@ -490,7 +492,7 @@
                   <create_ship name="$ship" macro="$spawnData.$ship" sector="$spawnData.$offsetComponent">
                     <owner exact="faction.{$spawnOwner}" overridenpc="true" />
                     <pilot>
-                      <select race="race.{$spawnData.$ownerRace}" tags="tag.aipilot" />
+                      <select race="$pilotRace" tags="tag.aipilot" />
                     </pilot>
                     <position x="$spawnData.$position.$x" y="$spawnData.$position.$y" z="$spawnData.$position.$z" />
                   </create_ship>
@@ -619,6 +621,10 @@
                         <include_actions ref="Scp_Set_Template_Skills" />
                       </do_elseif>
                     </do_for_each>
+                  </do_if>
+                  <do_if value="@$spawnData.$isLaserTower">
+                    <create_order object="$ship" id="'Lasertower'" default="true" />
+                    <debug_text text="'SafeCheatPanel: Assigned default order Lasertower to %s, pilot %s'. [$ship.debugname, @$ship.pilot.debugname]" chance="$debugChance" />
                   </do_if>
                   <do_if value="@$spawnData.$purposeOrderId != null">
                     <!-- Patrol has no self-computed default for $space (required, "Mandatory for UI"),

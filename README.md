@@ -270,6 +270,14 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
+### [8.00.45] - 2026-10-??
+
+- **Fixed**
+  - Removing a research or revealing a sector while the map was closed left the map's info panel unable to refresh.
+  - Right-click actions for **All Faction Stations** did nothing.
+  - Right-click **Restock: All Faction Build Storages** and **Force Build Completion: All Faction Stations** skipped new construction sites.
+  - Spawned laser towers waited for a captain and never fired.
+
 ### [8.00.44] - 2026-10-04
 
 - **Added**
