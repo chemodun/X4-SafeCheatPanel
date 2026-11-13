@@ -1497,7 +1497,7 @@
         </cue>
 
         <!-- Handles confirmation of any dropdown in the options menu. -->
-        <cue name="Scp_Handle_Option_Changed" instantiate="true" version="1">
+        <cue name="Scp_Handle_Option_Changed" instantiate="true" version="2">
           <conditions>
             <event_cue_signalled />
           </conditions>
@@ -1601,15 +1601,28 @@
             <do_if value="typeof $invEntry == datatype.table and not $invEntry.$scpPrevMinHull? and not $invEntry.$requestercues.indexof.{Scp_Invincible_Requester} and not $invEntry.$requestercues.indexof.{Scp_Invincible_Player_Requester}">
               <set_value name="$invEntry.$scpPrevMinHull" exact="$invEntry.$minhull" />
             </do_if>
-            <run_actions ref="md.LIB_Generic.RequestObjectInvincibility">
-              <param name="Object" value="$invObject" />
-              <param name="MinHull" value="100" />
-              <param name="RequesterCue" value="$invRequester" />
-              <param name="AllowCapturable" value="true" />
-              <param name="IncludeEngines" value="true" />
-              <param name="IncludeShields" value="true" />
-              <param name="IncludeTurrets" value="true" />
-            </run_actions>
+            <!-- 8.00's library has no AllowCapturable and rejects it. -->
+            <do_if value="player.gameversion ge 900">
+              <run_actions ref="md.LIB_Generic.RequestObjectInvincibility">
+                <param name="Object" value="$invObject" />
+                <param name="MinHull" value="100" />
+                <param name="RequesterCue" value="$invRequester" />
+                <param name="AllowCapturable" value="true" />
+                <param name="IncludeEngines" value="true" />
+                <param name="IncludeShields" value="true" />
+                <param name="IncludeTurrets" value="true" />
+              </run_actions>
+            </do_if>
+            <do_else>
+              <run_actions ref="md.LIB_Generic.RequestObjectInvincibility">
+                <param name="Object" value="$invObject" />
+                <param name="MinHull" value="100" />
+                <param name="RequesterCue" value="$invRequester" />
+                <param name="IncludeEngines" value="true" />
+                <param name="IncludeShields" value="true" />
+                <param name="IncludeTurrets" value="true" />
+              </run_actions>
+            </do_else>
             <do_if value="$invObject.isclass.station">
               <set_value name="$invMinHull" exact="100" />
               <include_actions ref="Scp_Station_Surface_Min_Hull" />

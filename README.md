@@ -285,7 +285,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
-### [8.00.45] - 2026-11-??
+### [8.00.45] - 2026-11-13
 
 - **Added**
   - **Invincibility** tab: right-click **Make Invincible** for ships and stations, the list of invincible objects, and **Invincible Ship** for the piloted ship and the spacesuit.
