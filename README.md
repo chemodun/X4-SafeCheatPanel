@@ -21,8 +21,8 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Encyclopedia Tab**: Reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - individually, by subcategory, or all at once.
 - **Factions Tab**: Edit faction relations with the player and between non-player factions.
 - **Galaxy/Sectors Tab**: Reveal sectors on the map at three levels of detail, or reveal all at once.
-- **Spawner Tab**: Spawn stations - from a construction plan, armed at a loadout preset, or as a pre-built installation - plus ships (loadout, crew skills, job assignment) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
-- **Editor**: The same tab edits existing objects. Right-click a player-owned ship or station to load it in, then set crew skills, re-equip it, fill empty control posts or set its workforce.
+- **Spawner Tab**: Spawn stations - from a construction plan, armed at a loadout preset, or as a pre-built installation - plus ships (loadout, crew skills, job assignment, cargo) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
+- **Editor**: The same tab edits existing objects. Right-click a player-owned ship or station to load it in, then set crew skills, re-equip it, change a ship's cargo, fill empty control posts or set its workforce. In extended mode any ship's cargo can be changed.
 - **Destroy Object Tab**: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
 - **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), fill station storage (current and all faction stations), teleport the piloted ship or the station the player stands on, teleport player, reveal all stations in sector, clear the fog of war in sector, destroy object, make invincible.
 - **Two modes**: **Normal** (player-owned spawns only) and **Extended** (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
@@ -155,6 +155,7 @@ A **Reveal All** button reveals every sector at all levels at once.
   - ![Crew Size and Composition](docs/images/crew_size_and_composition.png)
 - Optionally set Pilot/Captain, Marines and Service Crew skill levels via 1-5 star sliders. Left off, the crew keeps the loadout preset's randomised range.
   - ![Pilot and Crew Skills](docs/images/crew_skills.png)
+- Optionally load cargo: pick wares from **Add new ware** - only those the ship's hold can carry - and set each amount with its slider. A new ware starts with all the space still free; the free space of the hold is shown below the list. Every spawned ship gets the same cargo.
 
 - Set the number of ships per row (up to 10) and the number of rows (up to 10).
 
@@ -181,7 +182,7 @@ A **Reveal All** button reveals every sector at all levels at once.
 
 #### Editing an Existing Ship or Station
 
-Right-click a player-owned ship or station while the Spawner tab is open and choose **Edit Ship** or **Edit Station**. The tab switches to edit mode and loads its current configuration. Spawning is unavailable until it is released; right-clicking another object switches to it.
+Right-click a player-owned ship or station while the Spawner tab is open and choose **Edit Ship** or **Edit Station**. The tab switches to edit mode and loads its current configuration. Spawning is unavailable until it is released; right-clicking another object switches to it. In extended mode **Edit Ship** also takes another faction's ship, for its cargo only.
 
 For a ship:
 
@@ -194,6 +195,7 @@ For a ship:
 - The crew race is shown for information only, or **Mixed** when they differ.
 - The same two crew sliders as on a spawn, but starting on what the ship actually has, so an untouched slider changes nothing. Raising the crew hires; lowering it dismisses the weakest first. Moving the marine share re-assigns crew already on board before anybody is dismissed.
 - Set Pilot/Captain, Marines and Service Crew skill levels via 1-5 star sliders; each label shows the current average.
+- The cargo: a slider for each ware on board, and **Add new ware** for more. On apply every ware is set to exactly its amount; 0 removes it.
 
 For a station:
 
@@ -243,8 +245,8 @@ Right-clicking on the map gives access to the following actions, depending on th
 - **Teleport Here**: Teleports the player's currently piloted ship to the clicked position. When the player is not piloting but standing on a station, teleports that station with the player aboard: a player-owned station in normal mode, any station in extended mode.
 - **Teleport To**: Teleports the player character to the clicked object or position.
 - **Destroy Object**: Sets the clicked object as the target on the Destroy Object tab. Only offered while that tab is open. The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
-- **Edit Ship**: Loads the clicked ship into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned ships. Stays available while another object is loaded, so you can switch targets directly.
-- **Edit Station**: Loads the clicked station into the Spawner tab for editing. Same conditions as above.
+- **Edit Ship**: Loads the clicked ship into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned ships; *in* **extended** *mode any ship, for its cargo only*. Stays available while another object is loaded, so you can switch targets directly.
+- **Edit Station**: Loads the clicked station into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned stations. Stays available while another object is loaded.
 - **Make Invincible** / **Remove Invincibility**: Switches full invincibility on or off for the clicked ship or station: no hull damage to the object, a ship's engines, shields and turrets, or a station's modules, turrets and shields; shield strength still drops and recharges. Modules and equipment added later are covered too. Only offered while the Spawner tab is open. Player-owned ships and stations; *in* **extended** *mode any ship or station*.
 
 ### Extension Options
@@ -280,6 +282,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
   - Right-click **Make Invincible** for ships and stations, in the Spawner tab.
   - Player tab: **Invincible Ship** for the piloted ship and the spacesuit.
   - Station Spawner: **Select Loadout** for pre-defined plans, from Empty to High Preset.
+  - Ship Spawner and ship editing: **Cargo**, set ware by ware; in extended mode for any faction's ship.
 - **Fixed**
   - Removing a research or revealing a sector while the map was closed left the map's info panel unable to refresh.
   - Right-click actions for **All Faction Stations** did nothing.
@@ -288,6 +291,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
   - Right-click **Restock** and **Fill Storage** left out the wares for station drones and for queued ship builds.
   - Stations from pre-defined plans spawned unarmed and as factories, even Xenon defence platforms and shipyards.
   - Two spawns or edits within half a second could give crew skills or workforce to the wrong object.
+  - Editing a ship always showed its crew race as Unknown.
 
 ### [8.00.44] - 2026-10-04
 

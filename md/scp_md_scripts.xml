@@ -135,14 +135,15 @@
               </do_elseif>
             </do_for_each>
             <debug_text text="'SafeCheatPanel: Inspected %s - crew race %s, mixed %s'. [$object.debugname, @$crewRace, $crewMixed]" chance="$debugChance" />
+            <!-- A table param reaches Lua as nil, so the race travels as its id string. -->
             <do_if value="$crewMixed">
-              <raise_lua_event name="'scp_main.objectInspected'" param="table[$race = 'scpMixed']" />
+              <raise_lua_event name="'scp_main.objectInspected'" param="'scpMixed'" />
             </do_if>
             <do_elseif value="@$crewRace != null">
-              <raise_lua_event name="'scp_main.objectInspected'" param="table[$race = $crewRace.id]" />
+              <raise_lua_event name="'scp_main.objectInspected'" param="$crewRace.id" />
             </do_elseif>
             <do_else>
-              <raise_lua_event name="'scp_main.objectInspected'" param="table[$race = null]" />
+              <raise_lua_event name="'scp_main.objectInspected'" param="''" />
             </do_else>
           </actions>
         </cue>
@@ -225,6 +226,13 @@
               <remove_value name="$scpCrewService" />
               <remove_value name="$scpCrewRace" />
               <remove_value name="$scpCrewExperience" />
+            </do_if>
+            <do_if value="@$editData.$cargo != null">
+              <set_value name="$scpObject" exact="$object" />
+              <set_value name="$scpCargo" exact="$editData.$cargo" />
+              <include_actions ref="Scp_Set_Cargo" />
+              <remove_value name="$scpObject" />
+              <remove_value name="$scpCargo" />
             </do_if>
             <!-- Instances share Scp_Main's namespace; each keeps its own values on this. -->
             <set_value name="this.$editData" exact="$editData" />
@@ -457,6 +465,38 @@
           </actions>
         </library>
 
+        <!-- Sets each listed ware to its exact amount, removals first so they free the space.
+             Expects $scpObject and $scpCargo ($wares, $amounts). -->
+        <library name="Scp_Set_Cargo" purpose="include_actions" version="1">
+          <actions>
+            <do_for_each name="$scpPass" in="['remove', 'add']">
+              <do_for_each name="$scpWareId" in="$scpCargo.$wares" counter="$scpIndex">
+                <set_value name="$scpWare" exact="ware.{$scpWareId}" />
+                <set_value name="$scpWant" exact="$scpCargo.$amounts.{$scpIndex}" />
+                <set_value name="$scpHave" exact="$scpObject.cargo.{$scpWare}.count" />
+                <set_value name="$scpDone" exact="0" />
+                <do_if value="$scpPass == 'remove' and $scpWant lt $scpHave">
+                  <remove_cargo object="$scpObject" ware="$scpWare" exact="$scpHave - $scpWant" result="$scpDone" />
+                  <debug_text text="'SafeCheatPanel: %s cargo %s: %s -> %s, removed %s'. [
+                    $scpObject.debugname, $scpWareId, $scpHave, $scpWant, $scpDone]" chance="$debugChance" />
+                </do_if>
+                <do_elseif value="$scpPass == 'add' and $scpWant gt $scpHave">
+                  <add_cargo object="$scpObject" ware="$scpWare" exact="$scpWant - $scpHave" result="$scpDone" />
+                  <debug_text text="'SafeCheatPanel: %s cargo %s: %s -> %s, added %s'. [
+                    $scpObject.debugname, $scpWareId, $scpHave, $scpWant, $scpDone]" chance="$debugChance" />
+                </do_elseif>
+              </do_for_each>
+            </do_for_each>
+            <remove_value name="$scpPass" />
+            <remove_value name="$scpWareId" />
+            <remove_value name="$scpIndex" />
+            <remove_value name="$scpWare" />
+            <remove_value name="$scpWant" />
+            <remove_value name="$scpHave" />
+            <remove_value name="$scpDone" />
+          </actions>
+        </library>
+
         <cue name="Scp_Spawn_Ship" instantiate="true" version="4">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_ship'" />
@@ -590,6 +630,13 @@
                     <remove_value name="$scpCrewService" />
                     <remove_value name="$scpCrewRace" />
                     <remove_value name="$scpCrewExperience" />
+                  </do_if>
+                  <do_if value="@$spawnData.$cargo != null">
+                    <set_value name="$scpObject" exact="$ship" />
+                    <set_value name="$scpCargo" exact="$spawnData.$cargo" />
+                    <include_actions ref="Scp_Set_Cargo" />
+                    <remove_value name="$scpObject" />
+                    <remove_value name="$scpCargo" />
                   </do_if>
                   <!-- Every ship: the delayed block writes crew skills, not just orders. -->
                   <add_to_group groupname="$ships" object="$ship" />
@@ -1458,8 +1505,7 @@
             <include_actions ref="Scp_DefaultConfig" />
             <set_value name="$resultTable" exact="$config" />
             <include_actions ref="md.Options_Helper.Process_Dropdown_Changed" />
-            <raise_lua_event name="'scp_main.ConfigChanged'"
-              param="table[$mode = $config.$mode, $debugMode = $config.$debugMode]" />
+            <raise_lua_event name="'scp_main.ConfigChanged'" />
             <remove_value name="$resultTable" />
             <include_actions ref="Scp_DefaultConfig" />
             <remove_value name="$config" />

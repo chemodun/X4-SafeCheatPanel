@@ -145,6 +145,7 @@ local scpIdentify   = require("extensions.safe_cheat_panel.ui.scp_identify")
 local scpCrewSize   = require("extensions.safe_cheat_panel.ui.scp_crewsize")
 local scpWorkforce  = require("extensions.safe_cheat_panel.ui.scp_workforce")
 local scpInstallations = require("extensions.safe_cheat_panel.ui.scp_installations")
+local scpCargo      = require("extensions.safe_cheat_panel.ui.scp_cargo")
 
 local menu         = Helper.getMenu("MapMenu")
 local interactMenu = Helper.getMenu("InteractMenu")
@@ -210,6 +211,8 @@ local state = {
   crew = scpCrew.newState(),
   crewSize = scpCrewSize.newState(),
   workforce = scpWorkforce.newState(),
+  -- Spawn cargo; an edited ship keeps its own in state.target.cargo.
+  cargo = scpCargo.newState(),
 }
 
 -- *** Config (static tables referenced in UI) ***
@@ -685,16 +688,22 @@ end
 local function validateTarget()
   local object = state.target.object
   if object == nil then return nil end
-  if not IsValidComponent(object) or GetComponentData(object, "isplayerowned") ~= true then
+  if not IsValidComponent(object) then
+    dropTarget()
+    return nil
+  end
+  local isPlayerOwned = GetComponentData(object, "isplayerowned") == true
+  if isPlayerOwned ~= state.target.isPlayerOwned or not (isPlayerOwned or scpSpawner.scp.isExtendedMode()) then
     dropTarget()
     return nil
   end
   return object
 end
 
----Shared validity for both edit actions: a player-owned ship or station, while the tab is shown.
+---Shared validity for both edit actions: a player-owned ship or station, while the tab is shown;
+---`allowForeign` also takes another faction's object in Extended mode.
 ---Stays available with a target already loaded, so another object can be picked up directly.
-local function isValidEditTarget(className)
+local function isValidEditTarget(className, allowForeign)
   if menu.infoTableMode ~= "safeCheatPanel" or scpSpawner.scp.tableMode ~= "scpObjectSpawn" then
     return false
   end
@@ -709,11 +718,11 @@ local function isValidEditTarget(className)
   if not IsValidComponent(converted) then
     return false
   end
-  return GetComponentData(converted, "isplayerowned") == true
+  return GetComponentData(converted, "isplayerowned") == true or (allowForeign and scpSpawner.scp.isExtendedMode())
 end
 
 function scpSpawner.isValidEditShip()
-  return isValidEditTarget("ship")
+  return isValidEditTarget("ship", true)
 end
 
 function scpSpawner.isValidEditStation()
@@ -729,13 +738,25 @@ function scpSpawner.startEdit(isStation)
   scpWorkforce.resetState(state.workforce)
   state.crew.enabled = true
   state.target = {
-    object     = object,
-    isStation  = isStation,
-    macro      = GetComponentData(object, "macro"),
-    addManager = false,
-    addTrader  = false,
+    object        = object,
+    isStation     = isStation,
+    isPlayerOwned = GetComponentData(object, "isplayerowned") == true,
+    macro         = GetComponentData(object, "macro"),
+    addManager    = false,
+    addTrader     = false,
   }
+  if not isStation then
+    state.target.cargo = scpCargo.newState()
+    scpCargo.seed(state.target.cargo, object)
+  end
   -- Crew baselines are seeded on every render, not here, so they stay right after an apply.
+  if not state.target.isPlayerOwned then
+    -- Another faction's ship: cargo only, so neither the loadout nor the crew race is needed.
+    scpSpawner.scp.debug("Edit: target set to " .. tostring(object) .. " (foreign ship, cargo only)")
+    scpHelpers.interactMenuFinishAction()
+    menu.refreshInfoFrame()
+    return
+  end
   if isStation then
     scpSpawner.initStations()
     -- An installation has no modules, so plan matching could only report "unknown".
@@ -775,6 +796,9 @@ function scpSpawner.resetEdit()
   state.target.newLoadout = state.target.loadout
   state.target.addManager = false
   state.target.addTrader = false
+  if state.target.cargo ~= nil then
+    scpCargo.revert(state.target.cargo)
+  end
   menu.refreshInfoFrame()
 end
 
@@ -784,12 +808,13 @@ function scpSpawner.hasEditChanges()
     return state.target.addManager or state.target.addTrader or scpWorkforce.hasChanges(state.workforce)
   end
   return state.target.newLoadout ~= state.target.loadout or scpCrewSize.hasChanges(state.crewSize)
+      or scpCargo.hasChanges(state.target.cargo)
 end
 
 function scpSpawner.onObjectInspected(_, param)
-  if type(param) ~= "table" or state.target.object == nil then return end
-  state.target.race = param.race
-  scpSpawner.scp.debug("Edit: crew race reported as " .. tostring(param.race))
+  if type(param) ~= "string" or state.target.object == nil then return end
+  state.target.race = (param ~= "") and param or nil
+  scpSpawner.scp.debug("Edit: crew race reported as " .. tostring(state.target.race))
   menu.refreshInfoFrame()
 end
 
@@ -803,6 +828,9 @@ function scpSpawner.onObjectEdited()
   state.target.addTrader = false
   if state.target.object ~= nil and not state.target.isStation then
     state.target.loadout = state.target.newLoadout
+    if IsValidComponent(state.target.object) then
+      scpCargo.seed(state.target.cargo, state.target.object)
+    end
   end
   menu.refreshInfoFrame()
 end
@@ -838,8 +866,12 @@ function scpSpawner.applyEdit()
     data.equipment      = equipment
     data.fillFlags      = fillFlags
   end
+  if not state.target.isStation then
+    data.cargo = scpCargo.getChange(state.target.cargo)
+  end
   scpSpawner.scp.debug("Edit: apply pressed, allSkills=" .. tostring(data.allSkills) .. ", loadout=" .. tostring(data.loadout)
     .. ", workforce=" .. tostring(data.workforce)
+    .. ", cargo=" .. scpCargo.describe(data.cargo)
     .. ", crew=" .. (data.crewSize and (data.crewSize.marines .. " marines / " .. data.crewSize.service .. " service") or "unchanged"))
   AddUITriggeredEvent("scp_main", "scp_edit_object", data)
 end
@@ -1036,7 +1068,7 @@ function scpSpawner.createSection(frameTable, numDisplayed, consumableTypes, scp
     textOverride     = "",
     onConfirmed      = function(_, id) scpSpawner.setMode(id) end,
     textColIndex     = nil,
-    dropDownColIndex = nil,
+    dropDownColIndex = 7,
     dropDownSpan     = nil,
     textColor        = nil,
     fixed            = nil,
@@ -1356,7 +1388,7 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
         textOverride     = "",
         onConfirmed      = function(_, id) scpSpawner.setShipSpawnData(id, "purpose") end,
         textColIndex     = nil,
-        dropDownColIndex = nil,
+        dropDownColIndex = 7,
         dropDownSpan     = nil,
         textColor        = nil,
         fixed            = nil,
@@ -1384,6 +1416,8 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
     numDisplayed = scpCrew.addAllSkillsRow(rowGroup, numDisplayed, scp, state.crew, true)
   end
 
+  numDisplayed = scpCargo.addRows(frameTable, numDisplayed, scp, state.cargo, scpCargo.macroGroups(state.ships_sel.id))
+
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7007),
     fixed = nil,
@@ -1401,7 +1435,7 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
     max                 = nil,
     step                = nil,
     textColIndex        = nil,
-    sliderColIndex      = nil,
+    sliderColIndex      = 7,
     sliderSpan          = nil,
     textColor           = nil,
   })
@@ -1417,7 +1451,7 @@ function scpSpawner.createShipMenu(frameTable, numDisplayed, scp)
     max                 = nil,
     step                = nil,
     textColIndex        = nil,
-    sliderColIndex      = nil,
+    sliderColIndex      = 7,
     sliderSpan          = nil,
     textColor           = nil,
   })
@@ -1503,6 +1537,14 @@ function scpSpawner.createShipEditMenu(frameTable, numDisplayed, scp)
   local rowGroup = isV9 and frameTable:addRowGroup({}) or frameTable
   numDisplayed = addTargetInfoRow(rowGroup, numDisplayed, scp, object)
 
+  if not state.target.isPlayerOwned then
+    numDisplayed = scpCargo.addRows(frameTable, numDisplayed, scp, state.target.cargo, scpCargo.shipGroups(object))
+    if not isV9 then
+      frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
+    end
+    return addEditButtons(frameTable, numDisplayed)
+  end
+
   -- The ship itself is fixed: a target's macro may not even be in the spawnable ware list.
   numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
     text  = ReadText(1972092427, 7200),
@@ -1578,6 +1620,8 @@ function scpSpawner.createShipEditMenu(frameTable, numDisplayed, scp)
   scpCrew.seedInitial(state.crew, crewData, scpCrew.shipCategories)
   numDisplayed = scpCrew.addShipRows(rowGroup, numDisplayed, scp, state.crew, crewData, true)
   numDisplayed = scpCrew.addAllSkillsRow(rowGroup, numDisplayed, scp, state.crew, true)
+
+  numDisplayed = scpCargo.addRows(frameTable, numDisplayed, scp, state.target.cargo, scpCargo.shipGroups(object))
 
   if not isV9 then
     frameTable:addEmptyRow(Helper.standardTextHeight / 2, { fixed = true })
@@ -1732,7 +1776,7 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, 
     textOverride     = "",
     onConfirmed      = function(_, id) scpSpawner.setObjectSpawnData(id, "type", getConsumables) end,
     textColIndex     = nil,
-    dropDownColIndex = nil,
+    dropDownColIndex = 7,
     dropDownSpan     = nil,
     textColor        = nil,
     fixed            = nil,
@@ -1753,7 +1797,7 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, 
     textOverride     = "",
     onConfirmed      = function(_, id) scpSpawner.setObjectSpawnData(id, "item", getConsumables) end,
     textColIndex     = nil,
-    dropDownColIndex = nil,
+    dropDownColIndex = 7,
     dropDownSpan     = nil,
     textColor        = nil,
     fixed            = nil,
@@ -1797,7 +1841,7 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, 
     max                 = nil,
     step                = nil,
     textColIndex        = nil,
-    sliderColIndex      = nil,
+    sliderColIndex      = 7,
     sliderSpan          = nil,
     textColor           = nil,
   })
@@ -1813,7 +1857,7 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, 
     max                 = nil,
     step                = nil,
     textColIndex        = nil,
-    sliderColIndex      = nil,
+    sliderColIndex      = 7,
     sliderSpan          = nil,
     textColor           = nil,
   })
@@ -1829,7 +1873,7 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, 
     max                 = 100000,
     step                = 100,
     textColIndex        = nil,
-    sliderColIndex      = nil,
+    sliderColIndex      = 7,
     sliderSpan          = nil,
     textColor           = nil,
   })
@@ -1884,9 +1928,11 @@ function scpSpawner.spawnShip(ship, loadout, ownerId, ownerRace, rows, numPerRow
       z = interactMenu.offset.z
     },
     rows = rows,
-    numPerRow = numPerRow
+    numPerRow = numPerRow,
+    cargo = scpCargo.getFittedChange(state.cargo, scpCargo.macroGroups(ship)),
   }
   scpSpawner.scp.debug("Spawn: " .. tostring(ship) .. " x" .. tostring(rows * numPerRow)
+    .. ", cargo " .. scpCargo.describe(data.cargo)
     .. " for " .. tostring(ownerId) .. "/" .. tostring(ownerRace)
     .. ", loadout " .. tostring(loadout) .. " sent as " .. tostring(mdLoadout)
     .. ", preset " .. tostring(preset)
