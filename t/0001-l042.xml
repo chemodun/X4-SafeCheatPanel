@@ -48,7 +48,7 @@
             <t id="1110">Zadaná částka bude omezena na rozsah 0 až 10 000</t>
             <t id="1111">Již odemčeno</t>
             <t id="1112">Nezničitelná loď</t>
-            <t id="1113">Pilotovaná loď a skafandr neutrpí žádné poškození trupu. Naposledy pilotovaná loď zůstává chráněná, dokud není pilotována jiná.</t>
+            <t id="1113">Pilotovaná loď a skafandr neutrpí žádné poškození trupu. Loď ochranu ztratí, jakmile přestane být pilotována.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Vylepšení skafandru</t>
             <t id="1201">Přidat vylepšení</t>
@@ -203,6 +203,12 @@
             <t id="10021">Vše odhaleno</t>
             <t id="10022">Odhalit</t>
             <t id="10023">Odhaleno</t>
+
+            <!-- Tab 11: Invincibility -->
+            <t id="11000">Nezničitelnost</t>
+            <t id="11001">Lodě a stanice, které neutrpí žádné poškození</t>
+            <t id="11010">Nezničitelné objekty</t>
+            <t id="11011">Žádné nezničitelné objekty. Nech tuto kartu otevřenou a použij nabídku pravého tlačítka na lodi nebo stanici.</t>
 
             <!-- Settings (Options Menu) -->
             <t id="90000">Nastavení</t>

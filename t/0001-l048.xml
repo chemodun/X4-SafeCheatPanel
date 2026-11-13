@@ -48,7 +48,7 @@
             <t id="1110">Wprowadzona kwota zostanie ograniczona do przedziału od 0 do 10 000</t>
             <t id="1111">Już odblokowane</t>
             <t id="1112">Niezniszczalny statek</t>
-            <t id="1113">Pilotowany statek i skafander nie otrzymują obrażeń kadłuba. Ostatnio pilotowany statek pozostaje chroniony do czasu pilotowania innego.</t>
+            <t id="1113">Pilotowany statek i skafander nie otrzymują obrażeń kadłuba. Statek traci ochronę, gdy tylko przestaje być pilotowany.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Ulepszenia skafandra</t>
             <t id="1201">Dodaj ulepszenie</t>
@@ -203,6 +203,12 @@
             <t id="10021">Wszystko odkryte</t>
             <t id="10022">Odkryj</t>
             <t id="10023">Odkryte</t>
+
+            <!-- Tab 11: Invincibility -->
+            <t id="11000">Niezniszczalność</t>
+            <t id="11001">Statki i stacje, które nie otrzymują obrażeń</t>
+            <t id="11010">Niezniszczalne obiekty</t>
+            <t id="11011">Brak niezniszczalnych obiektów. Zostaw tę kartę otwartą i użyj menu prawego przycisku na statku lub stacji.</t>
 
             <!-- Settings (Options Menu) -->
             <t id="90000">Ustawienia</t>

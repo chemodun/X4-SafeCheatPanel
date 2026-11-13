@@ -48,7 +48,7 @@
             <t id="1110">La cantidad introducida se limitará entre 0 y 10.000</t>
             <t id="1111">Ya desbloqueado</t>
             <t id="1112">Nave invencible</t>
-            <t id="1113">La nave pilotada y el traje espacial no sufren daños en el casco. La última nave pilotada sigue protegida hasta que se pilote otra.</t>
+            <t id="1113">La nave pilotada y el traje espacial no sufren daños en el casco. Una nave pierde la protección en cuanto deja de pilotarse.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Mejoras del traje espacial</t>
             <t id="1201">Añadir mejora</t>
@@ -203,6 +203,12 @@
             <t id="10021">Todo revelado</t>
             <t id="10022">Revelar</t>
             <t id="10023">Revelado</t>
+
+            <!-- Tab 11: Invincibility -->
+            <t id="11000">Invencibilidad</t>
+            <t id="11001">Naves y estaciones que no sufren daños</t>
+            <t id="11010">Objetos invencibles</t>
+            <t id="11011">Ningún objeto invencible. Deja esta pestaña abierta y usa el menú del clic derecho sobre una nave o estación.</t>
 
             <!-- Settings (Options Menu) -->
             <t id="90000">Ajustes</t>

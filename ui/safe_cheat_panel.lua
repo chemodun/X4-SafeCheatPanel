@@ -120,6 +120,7 @@ local config = {
     { category = "scpMap",         name = ReadText(1001, 9181),    icon = "tlt_map",        helpOverlayID = "help_category_cheatsmap",       helpOverlayText = ReadText(1001, 9181), display = function() return true end },
     { category = "scpObjectSpawn", name = ReadText(1972092427, 7000), icon = "scp_objectspawn", helpOverlayID = "help_category_cheatsspawn",     helpOverlayText = ReadText(1972092427, 7001), display = function() return true end },
     { category = "scpDestroy",     name = ReadText(1972092427, 9000), icon = "order_attack",   helpOverlayID = "help_category_cheatsdestroy",   helpOverlayText = ReadText(1972092427, 9001), display = function() return true end },
+    { category = "scpInvincible",  name = ReadText(1972092427, 11000), icon = "shipbuildst_shield", helpOverlayID = "help_category_cheatsinvincible", helpOverlayText = ReadText(1972092427, 11001), display = function() return true end },
     {
       category = "scpDevMode",
       name = ReadText(1972092427, 8000),
@@ -365,6 +366,7 @@ local function init()
 
   menu.registerCallback("ic_onRowChanged", scp.onRowChanged)
   menu.registerCallback("ic_onSelectElement", scp.onSelectElement)
+  menu.registerCallback("ic_onTableRightMouseClick", scp.onTableRightMouseClick)
 
   RegisterEvent("scp_main.relationsData", scp.factions.onRelationsData)
 
@@ -376,7 +378,13 @@ local function init()
   -- refreshInfoFrame with the map closed throws and leaves createInfoFrameRunning stuck true
   RegisterEvent("scp_main.researchRemoved", function() if menu.shown then menu.refreshInfoFrame() end end)
   RegisterEvent("scp_main.sectorRevealed", function() if menu.shown then menu.refreshInfoFrame() end end)
-  RegisterEvent("scp_main.playerInvincibleChanged", function() if menu.shown then menu.refreshInfoFrame() end end)
+  local function refreshInvincibleTab()
+    if menu.shown and scp.invincibility.isTabShown() then
+      menu.refreshInfoFrame()
+    end
+  end
+  RegisterEvent("scp_main.playerInvincibleChanged", refreshInvincibleTab)
+  RegisterEvent("scp_main.invincibleListChanged", refreshInvincibleTab)
 
   scp.playerId = ConvertStringTo64Bit(tostring(C.GetPlayerID()))
   scp.helpers.init(scp.playerId, config.configId)
@@ -496,6 +504,15 @@ function scp.onSelectElement(uiTable, modified, row, isDblClick, input)
     end
   end
 end
+
+function scp.onTableRightMouseClick(uiTable, row, posX, posY)
+  if menu.infoTableMode ~= "safeCheatPanel" or not (scp.table and scp.table.id == uiTable) then
+    return
+  end
+  if scp.tableMode == "scpInvincible" and scp.table.rows[row] then
+    scp.invincibility.onTableRightMouseClick(scp.table.rows[row].rowdata, posX, posY)
+  end
+end
 --endregion
 
 --region Lua Action Helpers
@@ -592,6 +609,8 @@ function scp.createCheatMenu(frame, _)
     numdisplayed = scp.spawner.createSection(mainTable, numdisplayed, config.consumableTypes, scp)
   elseif scp.tableMode == "scpDestroy" then
     numdisplayed = scp.destroy.createSection(mainTable, numdisplayed, scp)
+  elseif scp.tableMode == "scpInvincible" then
+    numdisplayed = scp.invincibility.createSection(mainTable, numdisplayed, scp)
   elseif scp.tableMode == "scpBlueprint" then
     numdisplayed = scp.blueprints.createSection(mainTable, numdisplayed, scp)
   elseif scp.tableMode == "scpEncyclopedia" then

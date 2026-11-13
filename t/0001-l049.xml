@@ -48,7 +48,7 @@
             <t id="1110">Der eingegebene Betrag wird auf 0 bis 10.000 begrenzt</t>
             <t id="1111">Bereits freigeschaltet</t>
             <t id="1112">Unverwundbares Schiff</t>
-            <t id="1113">Das gesteuerte Schiff und der Raumanzug erleiden keinen Hüllenschaden. Das zuletzt gesteuerte Schiff bleibt geschützt, bis ein anderes gesteuert wird.</t>
+            <t id="1113">Das gesteuerte Schiff und der Raumanzug erleiden keinen Hüllenschaden. Ein Schiff verliert den Schutz, sobald es nicht mehr gesteuert wird.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Raumanzug-Verbesserungen</t>
             <t id="1201">Verbesserung hinzufügen</t>
@@ -203,6 +203,12 @@
             <t id="10021">Alle aufgedeckt</t>
             <t id="10022">Aufdecken</t>
             <t id="10023">Aufgedeckt</t>
+
+            <!-- Tab 11: Invincibility -->
+            <t id="11000">Unverwundbarkeit</t>
+            <t id="11001">Schiffe und Stationen, die keinen Schaden nehmen</t>
+            <t id="11010">Unverwundbare Objekte</t>
+            <t id="11011">Keine unverwundbaren Objekte. Lass diesen Reiter offen und benutze das Rechtsklickmenü auf einem Schiff oder einer Station.</t>
 
             <!-- Settings (Options Menu) -->
             <t id="90000">Einstellungen</t>

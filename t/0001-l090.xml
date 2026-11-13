@@ -48,7 +48,7 @@
             <t id="1110">Girilen tutar 0 ile 10.000 arasına sınırlanır</t>
             <t id="1111">Zaten açık</t>
             <t id="1112">Yok edilemez gemi</t>
-            <t id="1113">Kullanılan gemi ve uzay giysisi gövde hasarı almaz. Son kullanılan gemi, başka bir gemi kullanılana kadar korunur.</t>
+            <t id="1113">Kullanılan gemi ve uzay giysisi gövde hasarı almaz. Bir gemi, artık kullanılmadığı anda korumasını kaybeder.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Uzay giysisi yükseltmeleri</t>
             <t id="1201">Yükseltme ekle</t>
@@ -203,6 +203,12 @@
             <t id="10021">Tümü gösterildi</t>
             <t id="10022">Göster</t>
             <t id="10023">Gösterildi</t>
+
+            <!-- Tab 11: Invincibility -->
+            <t id="11000">Yok edilemezlik</t>
+            <t id="11001">Hasar almayan gemiler ve istasyonlar</t>
+            <t id="11010">Yok edilemez nesneler</t>
+            <t id="11011">Yok edilemez nesne yok. Bu sekmeyi açık bırak ve bir gemide veya istasyonda sağ tık menüsünü kullan.</t>
 
             <!-- Settings (Options Menu) -->
             <t id="90000">Ayarlar</t>

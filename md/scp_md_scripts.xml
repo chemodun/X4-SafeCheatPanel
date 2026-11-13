@@ -1709,14 +1709,16 @@
                 <include_actions ref="Scp_Release_Invincibility" />
                 <remove_from_list name="$invList" exact="$invObject" />
               </do_if>
-              <do_else>
+              <!-- $release: the Invincibility tab's Remove, never a grant from a stale row. -->
+              <do_elseif value="not @event.param3.$release">
                 <include_actions ref="Scp_Grant_Invincibility" />
                 <append_to_list name="$invList" exact="$invObject" />
-              </do_else>
+              </do_elseif>
             </do_if>
             <remove_value name="$invObject" />
             <remove_value name="$invRequester" />
             <remove_value name="$invList" />
+            <raise_lua_event name="'scp_main.invincibleListChanged'" />
           </actions>
         </cue>
 

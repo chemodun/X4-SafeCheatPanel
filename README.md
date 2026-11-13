@@ -24,6 +24,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Spawner Tab**: Spawn stations - from a construction plan, armed at a loadout preset, or as a pre-built installation - plus ships (loadout, crew skills, job assignment, cargo) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
 - **Editor**: The same tab edits existing objects. Right-click a player-owned ship or station to load it in, then set crew skills, re-equip it, change a ship's cargo, fill empty control posts or set its workforce. In extended mode any ship's cargo can be changed.
 - **Destroy Object Tab**: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
+- **Invincibility Tab**: Make ships and stations invincible via the right-click context menu, see and release them in one list, and switch on invincibility for the ship the player pilots and the spacesuit.
 - **Right-click context menu**: Spawn station, fix station, spawn ships, spawn objects, edit ship, edit station, force station build completion (current and all faction stations), restock station and station build storage (current and all faction stations), fill station storage (current and all faction stations), teleport the piloted ship or the station the player stands on, teleport player, reveal all stations in sector, clear the fog of war in sector, destroy object, make invincible.
 - **Two modes**: **Normal** (player-owned spawns only) and **Extended** (NPC-faction-owned spawns, additional faction options) - switchable via Extension Options.
 - **Compatible with X4 8.00 and 9.00**.
@@ -58,7 +59,6 @@ Open the map and click the **Safe Cheat Panel** icon in the left sidebar to open
 - Set player money (0 - 1 quadrillion).
 - Add spacesuit upgrades.
 - Add spacesuit ammo (0 - 10,000).
-- **Invincible Ship**: the ship the player pilots and the player's spacesuit take no hull damage. A ship loses the protection as soon as the player stops piloting it. Right-click **Remove Invincibility** on that ship turns the switch off.
 
 ![Player Money and Spacesuit Upgrades](docs/images/player_money_and_spacesuit_upgrades.png)
 
@@ -156,6 +156,7 @@ A **Reveal All** button reveals every sector at all levels at once.
 - Optionally set Pilot/Captain, Marines and Service Crew skill levels via 1-5 star sliders. Left off, the crew keeps the loadout preset's randomised range.
   - ![Pilot and Crew Skills](docs/images/crew_skills.png)
 - Optionally load cargo: pick wares from **Add new ware** - only those the ship's hold can carry - and set each amount with its slider. A new ware starts with all the space still free; the free space of the hold is shown below the list. Every spawned ship gets the same cargo.
+  - ![Ship Cargo](docs/images/ship_cargo.png)
 
 - Set the number of ships per row (up to 10) and the number of rows (up to 10).
 
@@ -224,6 +225,14 @@ In both cases:
 
 ![Destroy Object](docs/images/object_destroy.png)
 
+### Invincibility Tab
+
+- **Invincible Ship**: the ship the player pilots and the player's spacesuit take no hull damage. A ship loses the protection as soon as the player stops piloting it. Right-click **Remove Invincibility** on that ship turns the switch off.
+- **Invincible Objects**: every ship and station made invincible via the right-click **Make Invincible** action, which is only offered while this tab is open. Shows the name, ID code and sector of each. **Remove** releases the object; a list of more than 180 objects shows no **Remove** buttons. Right-clicking a row opens the object's context menu, as in the map's object list, with **Remove Invincibility** among its actions. The ship protected only by **Invincible Ship** is not listed.
+
+![Invincibility](docs/images/invincibility.png)
+![Invincibility Context Menu](docs/images/invincibility_context_menu.png)
+
 ### Right-click Context Menu on Map
 
 Right-clicking on the map gives access to the following actions, depending on the current panel mode and active tab:
@@ -247,7 +256,7 @@ Right-clicking on the map gives access to the following actions, depending on th
 - **Destroy Object**: Sets the clicked object as the target on the Destroy Object tab. Only offered while that tab is open. The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
 - **Edit Ship**: Loads the clicked ship into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned ships; *in* **extended** *mode any ship, for its cargo only*. Stays available while another object is loaded, so you can switch targets directly.
 - **Edit Station**: Loads the clicked station into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned stations. Stays available while another object is loaded.
-- **Make Invincible** / **Remove Invincibility**: Switches full invincibility on or off for the clicked ship or station: no hull damage to the object, a ship's engines, shields and turrets, or a station's modules, turrets and shields; shield strength still drops and recharges. Modules and equipment added later are covered too. Only offered while the Spawner tab is open. Player-owned ships and stations; *in* **extended** *mode any ship or station*.
+- **Make Invincible** / **Remove Invincibility**: Switches full invincibility on or off for the clicked ship or station: no hull damage to the object, a ship's engines, shields and turrets, or a station's modules, turrets and shields; shield strength still drops and recharges. Modules and equipment added later are covered too. Only offered while the Invincibility tab is open. Player-owned ships and stations; *in* **extended** *mode any ship or station*.
 
 ### Extension Options
 
@@ -279,8 +288,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 ### [8.00.45] - 2026-11-??
 
 - **Added**
-  - Right-click **Make Invincible** for ships and stations, in the Spawner tab.
-  - Player tab: **Invincible Ship** for the piloted ship and the spacesuit.
+  - **Invincibility** tab: right-click **Make Invincible** for ships and stations, the list of invincible objects, and **Invincible Ship** for the piloted ship and the spacesuit.
   - Station Spawner: **Select Loadout** for pre-defined plans, from Empty to High Preset.
   - Ship Spawner and ship editing: **Cargo**, set ware by ware; in extended mode for any faction's ship.
 - **Fixed**

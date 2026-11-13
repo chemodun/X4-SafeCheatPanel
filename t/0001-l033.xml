@@ -48,7 +48,7 @@
             <t id="1110">Le montant saisi sera limité entre 0 et 10 000</t>
             <t id="1111">Déjà débloqué</t>
             <t id="1112">Vaisseau invincible</t>
-            <t id="1113">Le vaisseau piloté et la combinaison spatiale ne subissent aucun dégât de coque. Le dernier vaisseau piloté reste protégé jusqu'au pilotage d'un autre.</t>
+            <t id="1113">Le vaisseau piloté et la combinaison spatiale ne subissent aucun dégât de coque. Un vaisseau perd la protection dès qu'il n'est plus piloté.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Améliorations de la combinaison</t>
             <t id="1201">Ajouter une amélioration</t>
@@ -203,6 +203,12 @@
             <t id="10021">Tout révélé</t>
             <t id="10022">Révéler</t>
             <t id="10023">Révélé</t>
+
+            <!-- Tab 11: Invincibility -->
+            <t id="11000">Invincibilité</t>
+            <t id="11001">Vaisseaux et stations qui ne subissent aucun dégât</t>
+            <t id="11010">Objets invincibles</t>
+            <t id="11011">Aucun objet invincible. Laissez cet onglet ouvert et utilisez le menu clic droit sur un vaisseau ou une station.</t>
 
             <!-- Settings (Options Menu) -->
             <t id="90000">Paramètres</t>

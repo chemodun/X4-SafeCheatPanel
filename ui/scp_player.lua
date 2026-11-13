@@ -132,25 +132,6 @@ function scpPlayer.createSection(frameTable, numDisplayed, scp)
     })
   end
 
-  -- Invincibility
-  numDisplayed = scp.menuHelper.createTitle(frameTable, numDisplayed, {
-    text  = ReadText(PAGE_ID, 1400),
-    fixed = true,
-  })
-
-  rowGroup = scp.isV9 and frameTable:addRowGroup({}) or frameTable
-
-  local isInvincible = scp.invincibility.isPlayerInvincible()
-  numDisplayed = scp.menuHelper.createButton(rowGroup, "player_invincible", numDisplayed, {
-    active        = true,
-    text          = ReadText(PAGE_ID, 1112),
-    mouseOverText = ReadText(PAGE_ID, 1113),
-    buttonText    = isInvincible and ReadText(PAGE_ID, 1401) or ReadText(1001, 8986),
-    buttonTextColor = isInvincible and Color["text_negative"] or Color["text_positive"],
-    onClick       = function() scp.invincibility.setPlayerInvincible(not isInvincible) end,
-    fixed         = true,
-  })
-
   return numDisplayed
 end
 

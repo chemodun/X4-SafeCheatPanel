@@ -48,7 +48,7 @@
             <t id="1110">Entered amount will be capped between 0 and 10,000</t>
             <t id="1111">Already unlocked</t>
             <t id="1112">Invincible Ship</t>
-            <t id="1113">The ship you pilot and your spacesuit take no hull damage. The last ship you piloted stays protected until you pilot another one.</t>
+            <t id="1113">The ship you pilot and your spacesuit take no hull damage. A ship loses the protection as soon as you stop piloting it.</t>
             <!-- Spacesuit Upgrades -->
             <t id="1200">Spacesuit Upgrades</t>
             <t id="1201">Add Upgrade</t>
@@ -203,6 +203,12 @@
             <t id="10021">All Revealed</t>
             <t id="10022">Reveal</t>
             <t id="10023">Revealed</t>
+
+            <!-- Tab 11: Invincibility -->
+            <t id="11000">Invincibility</t>
+            <t id="11001">Ships and stations that take no damage</t>
+            <t id="11010">Invincible Objects</t>
+            <t id="11011">No invincible objects. Keep this tab open and use the right-click menu on a ship or station.</t>
 
             <!-- Settings (Options Menu) -->
             <t id="90000">Settings</t>
