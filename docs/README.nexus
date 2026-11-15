@@ -49,6 +49,10 @@ Take in account: id of the mod and folder is changed to [b]safe_cheat_panel[/b].
 [list]
 [*] Available on Nexus Mods: [url=https://www.nexusmods.com/x4foundations/mods/2191]Print Extension List[/url]
 [/list]
+[*] [b]Extra UI API[/b] (optional) by [url=https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659]Chem O`Dun[/url], version [b]1.00[/b] or higher. Needed only for the right-click [b]Teleport to Pilot Seat[/b]:
+[list]
+[*] Available on Nexus Mods: [url=https://www.nexusmods.com/x4foundations/mods/2602]Extra UI API[/url]
+[/list]
 [/list]
 [size=3][u][b]Installation[/b][/u][/size]
 [list]
@@ -195,6 +199,7 @@ A [b]Reveal All[/b] button reveals every sector at all levels at once.
 [list]
 [*] Select a deployable object to spawn.
 [*] Set the number per row (up to 10), number of rows (up to 10), and spacing between objects (up to 100 km).
+[*] Set the number of layers (up to 10), stacked vertically with the same spacing and centred on the clicked plane, and a height offset (up to 50 km above or below it) for the whole block, for example a 3D minefield.
 [/list]
 [img]https://raw.githubusercontent.com/chemodun/X4-SafeCheatPanel/refs/heads/main/docs/images/object_spawner.png[/img]
 
@@ -270,6 +275,7 @@ Right-clicking on the map gives access to the following actions, depending on th
 [*] [b]Restock: All Faction Build Storages[/b]: Instantly restocks all stations belonging to the same faction with all required resources in their build storages. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. [i]Only available in[/i] [b]extended[/b] [i]mode, as for player as for non-player faction stations[/i].
 [*] [b]Teleport Here[/b]: Teleports the player's currently piloted ship to the clicked position. When the player is not piloting but standing on a station, teleports that station with the player aboard: a player-owned station in normal mode, any station in extended mode.
 [*] [b]Teleport To[/b]: Teleports the player character to the clicked object or position.
+[*] [b]Teleport to Pilot Seat[/b]: Puts the player at the helm of the clicked player-owned ship, from anywhere; a pilot on the post leaves it and returns once the player gets up. Only with [b]Extra UI API[/b] installed.
 [*] [b]Destroy Object[/b]: Sets the clicked object as the target on the Destroy Object tab. Only offered while that tab is open. The player's own currently-piloted ship, gates, highway entry/exit gates, and super highways cannot be targeted.
 [*] [b]Edit Ship[/b]: Loads the clicked ship into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned ships; [i]in[/i] [b]extended[/b] [i]mode any ship, for its cargo only[/i]. Stays available while another object is loaded, so you can switch targets directly.
 [*] [b]Edit Station[/b]: Loads the clicked station into the Spawner tab for editing. Only offered while that tab is open, and only for player-owned stations. Stays available while another object is loaded.
@@ -303,6 +309,14 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [/list]
 [size=3][u][b]Changelog[/b][/u][/size]
 
+[size=3][u][i][8.00.46] - 2026-11-??[/i][/u][/size]
+[list]
+[*] [b]Added[/b]
+[list]
+[*] Right-click [b]Teleport to Pilot Seat[/b] for player-owned ships, with the optional [b]Extra UI API[/b].
+[*] Objects Spawner: [b]Number of layers[/b] and [b]Height offset[/b], for blocks of objects in 3D.
+[/list]
+[/list]
 [size=3][u][i][8.00.45] - 2026-11-13[/i][/u][/size]
 [list]
 [*] [b]Added[/b]
