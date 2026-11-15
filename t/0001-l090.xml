@@ -150,6 +150,10 @@
             <t id="7304">Oluşturulacak sıra sayısı</t>
             <t id="7305">Metre cinsinden aralık</t>
             <t id="7306">Nesneler arasındaki metre cinsinden mesafe</t>
+            <t id="7307">Number of layers</t>
+            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
+            <t id="7309">Height offset in meters</t>
+            <t id="7310">Moves the whole block above or below the clicked plane</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">Nesne düzenleyici</t>
             <t id="7401">Düzenleme kipi</t>

@@ -61,4 +61,5 @@
   <dependency id="ws_2042901274" optional="false" name="SirNukes Mod Support APIs" version="195"></dependency>
   <dependency id="ws_3715253556" optional="false" name="Options Helper" version="100"></dependency>
   <dependency id="ws_3770927339" optional="false" name="Print Extension List" version="101"></dependency>
+  <dependency id="ws_3839783822" optional="true" name="Extra UI API" version="100"></dependency>
 </content>

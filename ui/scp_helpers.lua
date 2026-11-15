@@ -251,15 +251,15 @@ function scp.sortResearch(a, b)
   return a.name < b.name
 end
 
--- Closes the interact menu, or tears its frame down by hand when it is already gone.
-function scp.interactMenuFinishAction()
+-- Closes the interact menu, or tears its frame down by hand when it is already gone; closeMap closes the map too.
+function scp.interactMenuFinishAction(closeMap)
   if interactMenu.shown then
     interactMenu.onCloseElement("close")
   else
     Helper.resetUpdateHandler()
     local _config = interactMenu.uix_getConfig()
     Helper.clearFrame(interactMenu, _config.layer)
-    Helper.returnFromInteractMenu(interactMenu.currentOverTable, "refresh")
+    Helper.returnFromInteractMenu(interactMenu.currentOverTable, closeMap and "close" or "refresh")
     interactMenu.cleanup()
   end
 end

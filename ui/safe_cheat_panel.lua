@@ -184,7 +184,8 @@ local config = {
       text = ReadText(1972092427, 103),
       scriptFunction = function()
         local s = scp.spawner.state
-        scp.spawner.spawnObject(s.object.macro, s.object.rows, s.object.numPerRow, s.object.spacing, s.object.ownerId)
+        scp.spawner.spawnObject(s.object.macro, s.object.rows, s.object.numPerRow, s.object.spacing, s.object.ownerId,
+          s.object.layers, s.object.height)
       end
     },
     {
@@ -266,6 +267,14 @@ local config = {
       isValidFunction = function() return scp.player.isValidTeleportPlayer() end,
       text = ReadText(1972092427, 105),
       scriptFunction = function() scp.player.teleportPlayer(false) end
+    },
+    {
+      id = "pilotShip",
+      type = "scp_cheat",
+      actiontype = "lua;pilotShip",
+      isValidFunction = function() return scp.isValidPilotShip() end,
+      text = ReadText(1972092427, 106),
+      scriptFunction = function() scp.pilotShip() end
     },
     {
       id = "destroyObject",
@@ -573,6 +582,41 @@ function scp.teleportObject()
   }
   AddUITriggeredEvent("scp_main", "scp_teleport_object", data)
   scp.helpers.interactMenuFinishAction()
+end
+
+-- Extra UI API is optional; without it the action is not offered.
+local function pilotShipTarget()
+  local eua = ExtraUI
+  if type(eua) ~= "table" or type(eua.CanTeleportToAndTakeControlPosition) ~= "function" then return nil end
+  local component = interactMenu.componentSlot and interactMenu.componentSlot.component
+  if component == nil then return nil end
+  local ship = ConvertStringTo64Bit(tostring(component))
+  if ship == 0 or not C.IsComponentClass(ship, "ship") then return nil end
+  local ok, reason = eua.CanTeleportToAndTakeControlPosition(ship, "pilot", true)
+  if not ok then
+    scp.trace("Pilot ship " .. tostring(ship) .. " refused: " .. tostring(reason))
+    return nil
+  end
+  return ship
+end
+
+function scp.isValidPilotShip()
+  return pilotShipTarget() ~= nil
+end
+
+function scp.pilotShip()
+  local ship = pilotShipTarget()
+  scp.helpers.interactMenuFinishAction(ship ~= nil)
+  if ship == nil then return end
+  local name = GetComponentData(ship, "name") .. " (" .. tostring(GetComponentData(ship, "idcode")) .. ")"
+  local started, reason = ExtraUI.TeleportToAndTakeControlPosition(ship, "pilot", true, function(ok, why)
+    if ok then
+      scp.debug("Pilot ship " .. name .. ": seated")
+    else
+      scp.info("Pilot ship " .. name .. " failed: " .. tostring(why))
+    end
+  end)
+  scp.debug("Pilot ship " .. name .. ": " .. (started and "started" or ("refused: " .. tostring(reason))))
 end
 
 --endregion

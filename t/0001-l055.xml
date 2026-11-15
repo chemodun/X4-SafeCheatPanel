@@ -150,6 +150,10 @@
             <t id="7304">Número de filas a gerar</t>
             <t id="7305">Espaçamento em metros</t>
             <t id="7306">Distância entre objetos em metros</t>
+            <t id="7307">Number of layers</t>
+            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
+            <t id="7309">Height offset in meters</t>
+            <t id="7310">Moves the whole block above or below the clicked plane</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">Editor de objetos</t>
             <t id="7401">Modo de edição</t>

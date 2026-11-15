@@ -150,6 +150,10 @@
             <t id="7304">생성할 줄의 수</t>
             <t id="7305">간격(미터)</t>
             <t id="7306">오브젝트 사이의 거리(미터)</t>
+            <t id="7307">Number of layers</t>
+            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
+            <t id="7309">Height offset in meters</t>
+            <t id="7310">Moves the whole block above or below the clicked plane</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">오브젝트 편집기</t>
             <t id="7401">편집 모드</t>

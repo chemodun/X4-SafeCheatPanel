@@ -193,6 +193,8 @@ local state = {
     rows           = 1,
     numPerRow      = 1,
     spacing        = 500,
+    layers         = 1,
+    height         = 0,
   },
   -- Existing object pulled in through the "Edit Ship"/"Edit Station" interact action. While
   -- `object` is set the tab renders in edit mode and every spawn action is withheld.
@@ -1877,6 +1879,39 @@ function scpSpawner.createObjectMenu(frameTable, numDisplayed, consumableTypes, 
     sliderSpan          = nil,
     textColor           = nil,
   })
+  numDisplayed = scp.menuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
+    text                = ReadText(1972092427, 7307),
+    mouseOverText       = ReadText(1972092427, 7308),
+    startValue          = state.object.layers,
+    onSliderChanged     = function(_, value) state.object.layers = value end,
+    onSliderConfirm     = nil,
+    onSliderActivated   = nil,
+    onSliderDeactivated = nil,
+    min                 = nil,
+    max                 = nil,
+    step                = nil,
+    textColIndex        = nil,
+    sliderColIndex      = 7,
+    sliderSpan          = nil,
+    textColor           = nil,
+  })
+  numDisplayed = scp.menuHelper.createSliderRow(rowGroup, nil, numDisplayed, {
+    text                = ReadText(1972092427, 7309),
+    mouseOverText       = ReadText(1972092427, 7310),
+    startValue          = state.object.height,
+    onSliderChanged     = function(_, value) state.object.height = value end,
+    onSliderConfirm     = nil,
+    onSliderActivated   = nil,
+    onSliderDeactivated = nil,
+    min                 = -50000,
+    max                 = 50000,
+    step                = 100,
+    fromCenter          = true,
+    textColIndex        = nil,
+    sliderColIndex      = 7,
+    sliderSpan          = nil,
+    textColor           = nil,
+  })
 
   return numDisplayed
 end
@@ -1982,30 +2017,39 @@ function scpSpawner.fixStation()
   scpHelpers.interactMenuFinishAction()
 end
 
-function scpSpawner.spawnObject(macro, rows, numPerRow, spacing, ownerId)
+function scpSpawner.spawnObject(macro, rows, numPerRow, spacing, ownerId, layers, height)
   macro = macro or "eq_arg_satellite_02_macro"
   rows = rows or 1
   numPerRow = numPerRow or 1
   spacing = spacing or 500
   ownerId = ownerId or "player"
+  layers = layers or 1
+  height = height or 0
   local baseX = interactMenu.offset.x - (numPerRow - 1) * spacing / 2
+  local baseY = interactMenu.offset.y + height - (layers - 1) * spacing / 2
   local baseZ = interactMenu.offset.z + (rows - 1) * spacing / 2
-  for row = 0, rows - 1 do
-    for col = 0, numPerRow - 1 do
-      local pos = ffi.new("UIPosRot", {
-        x = baseX + col * spacing,
-        y = interactMenu.offset.y,
-        z = baseZ - row * spacing,
-        yaw = interactMenu.offset.yaw,
-        pitch = interactMenu.offset.pitch,
-        roll = interactMenu.offset.roll
-      })
-      local object = C.SpawnObjectAtPos2(macro, interactMenu.offsetcomponent, pos, ownerId)
-      if object ~= 0 then
-        C.SetObjectForcedRadarVisible(object, true)
+  local spawned = 0
+  for layer = 0, layers - 1 do
+    for row = 0, rows - 1 do
+      for col = 0, numPerRow - 1 do
+        local pos = ffi.new("UIPosRot", {
+          x = baseX + col * spacing,
+          y = baseY + layer * spacing,
+          z = baseZ - row * spacing,
+          yaw = interactMenu.offset.yaw,
+          pitch = interactMenu.offset.pitch,
+          roll = interactMenu.offset.roll
+        })
+        local object = C.SpawnObjectAtPos2(macro, interactMenu.offsetcomponent, pos, ownerId)
+        if object ~= 0 then
+          C.SetObjectForcedRadarVisible(object, true)
+          spawned = spawned + 1
+        end
       end
     end
   end
+  scpSpawner.scp.debug("Spawn object: " .. tostring(macro) .. " x" .. spawned .. " of " .. (rows * numPerRow * layers)
+    .. ", grid " .. numPerRow .. "x" .. rows .. "x" .. layers .. ", spacing " .. spacing .. ", height " .. height)
   scpHelpers.interactMenuFinishAction()
 end
 

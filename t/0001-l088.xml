@@ -150,6 +150,10 @@
             <t id="7304">要生成的列數</t>
             <t id="7305">間距（公尺）</t>
             <t id="7306">物件之間的距離（公尺）</t>
+            <t id="7307">Number of layers</t>
+            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
+            <t id="7309">Height offset in meters</t>
+            <t id="7310">Moves the whole block above or below the clicked plane</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">物件編輯器</t>
             <t id="7401">編輯模式</t>
