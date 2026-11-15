@@ -49,7 +49,7 @@ Take in account: id of the mod and folder is changed to [b]safe_cheat_panel[/b].
 [list]
 [*] Available on Nexus Mods: [url=https://www.nexusmods.com/x4foundations/mods/2191]Print Extension List[/url]
 [/list]
-[*] [b]Extra UI API[/b] (optional) by [url=https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659]Chem O`Dun[/url], version [b]1.00[/b] or higher. Needed only for the right-click [b]Teleport to Pilot Seat[/b]:
+[*] [b]Extra UI API[/b] (optional) by [url=https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659]Chem O`Dun[/url], version [b]1.01[/b] or higher. Needed only for the right-click [b]Teleport to Pilot Seat[/b]:
 [list]
 [*] Available on Nexus Mods: [url=https://www.nexusmods.com/x4foundations/mods/2602]Extra UI API[/url]
 [/list]
@@ -294,6 +294,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [size=130][u]Videos[/u][/size]
 [list]
 [*] [url=https://www.youtube.com/watch?v=VUtxeSGaLhc]Galaxy/Sectors Tab Demo[/url]
+[*] [url=https://www.youtube.com/watch?v=2qakblzPhv4]Teleport to Pilot Seat Demo, with the Extra UI API[/url]
 [/list]
 [size=130][u]Credits[/u][/size]
 [list]
@@ -308,7 +309,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 [/list]
 [size=130][u]Changelog[/u][/size]
 
-[size=125][u][8.00.46] - 2026-11-??[/u][/size]
+[size=125][u][8.00.46] - 2026-11-15[/u][/size]
 [list]
 [*] [b]Added[/b]
 [list]
