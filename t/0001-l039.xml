@@ -150,10 +150,10 @@
             <t id="7304">Numero di file da generare</t>
             <t id="7305">Spaziatura in metri</t>
             <t id="7306">Distanza tra gli oggetti in metri</t>
-            <t id="7307">Number of layers</t>
-            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
-            <t id="7309">Height offset in meters</t>
-            <t id="7310">Moves the whole block above or below the clicked plane</t>
+            <t id="7307">Numero di strati</t>
+            <t id="7308">Numero di strati impilati in verticale, centrati sul piano cliccato</t>
+            <t id="7309">Spostamento in altezza in metri</t>
+            <t id="7310">Sposta l'intero blocco sopra o sotto il piano cliccato</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">Editor di oggetti</t>
             <t id="7401">Modalità di modifica</t>

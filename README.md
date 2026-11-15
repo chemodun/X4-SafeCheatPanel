@@ -41,7 +41,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
   - Available on Nexus Mods: [Options Helper](https://www.nexusmods.com/x4foundations/mods/2089)
 - **Print Extension List** by [Chem O`Dun](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659), version **1.01** or higher. Writes the game version and enabled extensions to the debug log at startup, so any log sent with a bug report identifies the setup:
   - Available on Nexus Mods: [Print Extension List](https://www.nexusmods.com/x4foundations/mods/2191)
-- **Extra UI API** (optional) by [Chem O`Dun](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659), version **1.00** or higher. Needed only for the right-click **Teleport to Pilot Seat**:
+- **Extra UI API** (optional) by [Chem O`Dun](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659), version **1.01** or higher. Needed only for the right-click **Teleport to Pilot Seat**:
   - Available on Nexus Mods: [Extra UI API](https://www.nexusmods.com/x4foundations/mods/2602)
 
 ## Installation
@@ -275,6 +275,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 ## Videos
 
 - [Galaxy/Sectors Tab Demo](https://www.youtube.com/watch?v=VUtxeSGaLhc)
+- [Teleport to Pilot Seat Demo, with the Extra UI API](https://www.youtube.com/watch?v=2qakblzPhv4)
 
 ## Credits
 
@@ -289,7 +290,7 @@ Debug logging can be enabled to write detailed information about the mod's opera
 
 ## Changelog
 
-### [8.00.46] - 2026-11-??
+### [8.00.46] - 2026-11-15
 
 - **Added**
   - Right-click **Teleport to Pilot Seat** for player-owned ships, with the optional **Extra UI API**.

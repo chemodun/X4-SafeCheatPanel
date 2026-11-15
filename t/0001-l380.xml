@@ -150,10 +150,10 @@
             <t id="7304">Кількість рядів для створення</t>
             <t id="7305">Відстань у метрах</t>
             <t id="7306">Відстань між об'єктами в метрах</t>
-            <t id="7307">Number of layers</t>
-            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
-            <t id="7309">Height offset in meters</t>
-            <t id="7310">Moves the whole block above or below the clicked plane</t>
+            <t id="7307">Кількість шарів</t>
+            <t id="7308">Кількість шарів, складених вертикально, з центром на клацнутій площині</t>
+            <t id="7309">Зміщення по висоті в метрах</t>
+            <t id="7310">Переміщує весь блок вище або нижче клацнутої площини</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">Редактор об'єктів</t>
             <t id="7401">Режим редагування</t>

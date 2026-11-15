@@ -4,12 +4,12 @@
   name="Safe Cheat Panel"
   description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, encyclopedia entries, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface."
   author="Chem O`Dun"
-  version="80045"
-  date="2026-11-13"
+  version="80046"
+  date="2026-11-15"
   save="false"
   enabled="true"
   sync="false"
-  lastupdate="1794572265">
+  lastupdate="1794770068">
   <text language="7"
     description="A UI-based cheat panel accessible from the left sidebar in the map menu. Provides tools to edit player stats, inventory, research, blueprints, encyclopedia entries, faction relations and galaxy exploration state, to spawn and edit ships and stations, and to spawn or destroy objects - all through a clean, tab-based interface."></text>
   <!-- French -->
@@ -61,5 +61,5 @@
   <dependency id="ws_2042901274" optional="false" name="SirNukes Mod Support APIs" version="195"></dependency>
   <dependency id="ws_3715253556" optional="false" name="Options Helper" version="100"></dependency>
   <dependency id="ws_3770927339" optional="false" name="Print Extension List" version="101"></dependency>
-  <dependency id="ws_3839783822" optional="true" name="Extra UI API" version="100"></dependency>
+  <dependency id="ws_3839783822" optional="true" name="Extra UI API" version="101"></dependency>
 </content>

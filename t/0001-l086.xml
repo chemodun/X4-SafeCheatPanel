@@ -150,10 +150,10 @@
             <t id="7304">要生成的行数</t>
             <t id="7305">间距（米）</t>
             <t id="7306">物体之间的距离（米）</t>
-            <t id="7307">Number of layers</t>
-            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
-            <t id="7309">Height offset in meters</t>
-            <t id="7310">Moves the whole block above or below the clicked plane</t>
+            <t id="7307">层数</t>
+            <t id="7308">垂直堆叠的层数，以点击的平面为中心</t>
+            <t id="7309">高度偏移（米）</t>
+            <t id="7310">将整个方块移到点击平面的上方或下方</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">物体编辑器</t>
             <t id="7401">编辑模式</t>

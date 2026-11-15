@@ -150,10 +150,10 @@
             <t id="7304">Liczba rzędów do utworzenia</t>
             <t id="7305">Odstęp w metrach</t>
             <t id="7306">Odległość między obiektami w metrach</t>
-            <t id="7307">Number of layers</t>
-            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
-            <t id="7309">Height offset in meters</t>
-            <t id="7310">Moves the whole block above or below the clicked plane</t>
+            <t id="7307">Liczba warstw</t>
+            <t id="7308">Liczba warstw ułożonych pionowo, wyśrodkowanych na klikniętej płaszczyźnie</t>
+            <t id="7309">Przesunięcie wysokości w metrach</t>
+            <t id="7310">Przesuwa cały blok nad lub pod klikniętą płaszczyznę</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">Edytor obiektów</t>
             <t id="7401">Tryb edycji</t>

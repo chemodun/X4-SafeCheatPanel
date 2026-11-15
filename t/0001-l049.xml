@@ -150,10 +150,10 @@
             <t id="7304">Anzahl der zu erzeugenden Reihen</t>
             <t id="7305">Abstand in Metern</t>
             <t id="7306">Abstand zwischen den Objekten in Metern</t>
-            <t id="7307">Number of layers</t>
-            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
-            <t id="7309">Height offset in meters</t>
-            <t id="7310">Moves the whole block above or below the clicked plane</t>
+            <t id="7307">Anzahl der Ebenen</t>
+            <t id="7308">Anzahl der vertikal gestapelten Ebenen, zentriert auf der angeklickten Ebene</t>
+            <t id="7309">Höhenversatz in Metern</t>
+            <t id="7310">Verschiebt den gesamten Block über oder unter die angeklickte Ebene</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">Objekteditor</t>
             <t id="7401">Bearbeitungsmodus</t>

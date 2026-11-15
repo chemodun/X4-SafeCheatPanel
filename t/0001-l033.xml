@@ -150,10 +150,10 @@
             <t id="7304">Nombre de rangées à créer</t>
             <t id="7305">Espacement en mètres</t>
             <t id="7306">Distance entre les objets en mètres</t>
-            <t id="7307">Number of layers</t>
-            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
-            <t id="7309">Height offset in meters</t>
-            <t id="7310">Moves the whole block above or below the clicked plane</t>
+            <t id="7307">Nombre de couches</t>
+            <t id="7308">Nombre de couches empilées verticalement, centrées sur le plan cliqué</t>
+            <t id="7309">Décalage en hauteur en mètres</t>
+            <t id="7310">Déplace tout le bloc au-dessus ou en dessous du plan cliqué</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">Éditeur d'objets</t>
             <t id="7401">Mode édition</t>

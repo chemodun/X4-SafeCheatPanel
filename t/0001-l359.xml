@@ -150,10 +150,10 @@
             <t id="7304">Брой редове за създаване</t>
             <t id="7305">Разстояние в метри</t>
             <t id="7306">Разстояние между обектите в метри</t>
-            <t id="7307">Number of layers</t>
-            <t id="7308">Number of layers stacked vertically, centred on the clicked plane</t>
-            <t id="7309">Height offset in meters</t>
-            <t id="7310">Moves the whole block above or below the clicked plane</t>
+            <t id="7307">Брой слоеве</t>
+            <t id="7308">Брой слоеве, подредени вертикално, центрирани спрямо щракнатата равнина</t>
+            <t id="7309">Отместване по височина в метри</t>
+            <t id="7310">Премества целия блок над или под щракнатата равнина</t>
             <!-- Edit Mode (existing object loaded into the tab) -->
             <t id="7400">Редактор на обекти</t>
             <t id="7401">Режим на редактиране</t>
