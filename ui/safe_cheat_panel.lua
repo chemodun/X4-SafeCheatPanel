@@ -613,7 +613,7 @@ function scp.pilotShip()
     if ok then
       scp.debug("Pilot ship " .. name .. ": seated")
     else
-      scp.info("Pilot ship " .. name .. " failed: " .. tostring(why))
+      scp.warning("Pilot ship " .. name .. " failed: " .. tostring(why))
     end
   end)
   scp.debug("Pilot ship " .. name .. ": " .. (started and "started" or ("refused: " .. tostring(reason))))

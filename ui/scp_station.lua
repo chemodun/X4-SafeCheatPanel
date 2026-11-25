@@ -241,23 +241,45 @@ function scpStation.getStationGap(station, toStorage)
 end
 
 -- Scales the gaps down per transport type when a manual storage level over-allocates the modules.
+-- A storage entry may carry several tags (universal: "container liquid solid"); single-tag ones fill first.
 function scpStation.applyFreeCapacity(container64, neededResources, count)
-  local free = {}
+  local storages = {}
   local n = C.GetNumCargoTransportTypes(container64, true)
   local buf = ffi.new("StorageInfo[?]", n)
   n = C.GetCargoTransportTypes(buf, n, container64, true, false)
   for i = 0, n - 1 do
-    free[ffi.string(buf[i].transport)] = math.max(0, buf[i].capacity - buf[i].spaceused)
+    local storage = { tags = {}, numTags = 0, free = math.max(0, buf[i].capacity - buf[i].spaceused) }
+    for tag in string.gmatch(ffi.string(buf[i].transport), "%S+") do
+      storage.tags[tag] = true
+      storage.numTags = storage.numTags + 1
+    end
+    storages[#storages + 1] = storage
   end
-  local needed = {}
+  table.sort(storages, function(a, b) return a.numTags < b.numTags end)
+  local needed, missing = {}, {}
   for ware, amount in pairs(neededResources) do
     local transport, volume = GetWareData(ware, "transport", "volume")
     needed[transport] = (needed[transport] or 0) + amount * volume
+    missing[transport] = needed[transport]
+  end
+  for _, storage in ipairs(storages) do
+    local demand = 0
+    for tag in pairs(storage.tags) do
+      demand = demand + (missing[tag] or 0)
+    end
+    if demand > 0 then
+      local share = math.min(1, storage.free / demand)
+      for tag in pairs(storage.tags) do
+        if missing[tag] then
+          missing[tag] = missing[tag] * (1 - share)
+        end
+      end
+    end
   end
   for ware, amount in pairs(neededResources) do
     local transport = GetWareData(ware, "transport")
-    local available = free[transport] or 0
-    if needed[transport] > available then
+    local available = needed[transport] - missing[transport]
+    if missing[transport] > 0 then
       local scaled = math.floor(amount * available / needed[transport])
       scpStation.trace(string.format("Ware %s: gap %s scaled to %s, %s free of %s needed in %s", ware, amount, scaled, available, needed[transport], transport))
       if scaled > 0 then

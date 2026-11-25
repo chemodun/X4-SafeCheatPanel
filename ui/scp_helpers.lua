@@ -57,18 +57,22 @@ function scp.isDeveloperMode()
 end
 
 function scp.info(msg)
-  DebugError("SafeCheatPanel [info]: " .. msg)
+  UIInfo("SafeCheatPanel: " .. msg)
+end
+
+function scp.warning(msg)
+  UIWarning("SafeCheatPanel: " .. msg)
 end
 
 function scp.debug(msg)
   if debugLevel ~= "none" then
-    DebugError("SafeCheatPanel [debug]: " .. msg)
+    UIDebug("SafeCheatPanel: " .. msg)
   end
 end
 
 function scp.trace(msg)
   if debugLevel == "trace" then
-    DebugError("SafeCheatPanel [trace]: " .. msg)
+    UITrace("SafeCheatPanel: " .. msg)
   end
 end
 

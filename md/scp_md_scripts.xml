@@ -497,7 +497,7 @@
           </actions>
         </library>
 
-        <cue name="Scp_Spawn_Ship" instantiate="true" version="4">
+        <cue name="Scp_Spawn_Ship" instantiate="true" version="5">
           <conditions>
             <event_ui_triggered screen="'scp_main'" control="'scp_spawn_ship'" />
           </conditions>
@@ -530,6 +530,32 @@
               @$spawnData.$equipment != null, @$scpLoadout != null]" chance="$debugChance" />
             <!-- Laser towers are flown by a drone pilot, as vanilla's own. -->
             <set_value name="$pilotRace" exact="if @$spawnData.$isLaserTower then race.drone else race.{$spawnData.$ownerRace}" />
+            <!-- Vanilla ships get their loot from the ShipDB entry, which a macro spawn skips: the same lists by
+                 owner, size and purpose. Player-owned ships carry none, as vanilla's own builds. -->
+            <set_value name="$scpDrop" exact="null" />
+            <set_value name="$scpShipMacro" exact="macro.{$spawnData.$ship}" />
+            <do_if value="$spawnData.$ownerId != 'player' and not @$spawnData.$isLaserTower and $scpShipMacro.isclass.{[class.ship_s, class.ship_m, class.ship_l, class.ship_xl]}">
+              <set_value name="$scpIsLarge" exact="$scpShipMacro.isclass.{[class.ship_l, class.ship_xl]}" />
+              <do_if value="$spawnData.$ownerId == 'xenon'">
+                <set_value name="$scpDrop" exact="if $scpShipMacro.isclass.ship_s then 'ship_small_xenon' else if $scpShipMacro.isclass.ship_m then 'ship_medium_xenon' else if $scpShipMacro.isclass.ship_l then 'ship_large_xenon_tf' else 'ship_large_xenon'" />
+              </do_if>
+              <do_elseif value="$spawnData.$ownerId == 'khaak'">
+                <set_value name="$scpDrop" exact="if $scpIsLarge then 'ship_large_khaak' else 'ship_small_khaak'" />
+              </do_elseif>
+              <do_elseif value="$scpIsLarge">
+                <set_value name="$scpDrop" exact="if $scpShipMacro.primarypurpose == purpose.fight then 'ship_large_military' else 'ship_large_civilian'" />
+              </do_elseif>
+              <do_elseif value="['scaleplate', 'yaki'].indexof.{$spawnData.$ownerId}">
+                <set_value name="$scpDrop" exact="'ship_small_pirate'" />
+              </do_elseif>
+              <do_elseif value="$scpShipMacro.primarypurpose == purpose.fight">
+                <set_value name="$scpDrop" exact="'ship_small_military'" />
+              </do_elseif>
+              <do_else>
+                <set_value name="$scpDrop" exact="if $scpShipMacro.isclass.ship_s then 'ship_small_civilian' else 'ship_medium_civilian'" />
+              </do_else>
+            </do_if>
+            <debug_text text="'SafeCheatPanel: drop list for %s owned by %s: %s'. [$spawnData.$ship, $spawnData.$ownerId, $scpDrop]" chance="$debugChance" />
             <do_while value="$rows lt $spawnData.$rows">
               <do_while value="$numPerRow lt $spawnData.$numPerRow">
                 <!-- Two shapes: <loadout> is static, it cannot be conditional inside one create_ship. -->
@@ -553,6 +579,9 @@
                   </create_ship>
                 </do_else>
                 <do_if value="@$ship != null">
+                  <do_if value="$scpDrop">
+                    <set_drop_object object="$ship" drop="$scpDrop" />
+                  </do_if>
                   <do_if value="@$ship.aipilot != null">
                     <!-- Fallback ranges only; exact stars are written in the delayed block. -->
                     <do_if value="not $scpCrewSkills.$pilot?">
@@ -1534,20 +1563,43 @@
           </actions>
         </cue>
 
-        <cue name="Scp_Reveal_Stations_In_Sector" instantiate="true" version="1">
+        <cue name="Scp_Reveal_Stations_In_Sector" instantiate="true" version="2">
           <conditions>
             <event_cue_signalled />
             <check_value value="@event.param.$object.isclass.{class.sector}" />
             <check_value value="@event.param.$offsetcomponent == @event.param.$object" />
           </conditions>
           <actions>
-            <debug_text text="'SafeCheatPanel: Reveal stations action triggered from interact menu for sector %s'. [event.param.$object.name]" chance="$debugChance" />
-            <find_station name="$stations" space="@event.param.$object" active="true" functional="true" multiple="true" known="false" checkoperational="true" />
-            <debug_text text="'SafeCheatPanel: Found %s unknown stations in sector %s that are active, functional and operational to reveal'. [$stations.count, @event.param.$object.name]" chance="$debugChance" />
-            <do_for_each name="$station" in="$stations">
-              <debug_text text="'SafeCheatPanel: Revealing station %s (is known %s) with owner %s (is known %s) in sector %s'. [$station.debugname, $station.isknown, $station.owner.name, @$station.owner.isknown, @event.param.$object.name]" chance="$debugChance" />
-              <set_known object="$station" known="true" updatesnapshot="true" />
+            <set_value name="$scpSector" exact="event.param.$object" />
+            <include_actions ref="Scp_Reveal_Sector_Stations" />
+            <debug_text text="'SafeCheatPanel: Revealed %s stations in sector %s'. [$scpRevealed, $scpSector.debugname]" chance="$debugChance" />
+          </actions>
+        </cue>
+
+        <!-- Expects $scpSector; leaves the number of stations revealed in $scpRevealed. -->
+        <library name="Scp_Reveal_Sector_Stations" purpose="include_actions" version="1">
+          <actions>
+            <find_station name="$scpStations" space="$scpSector" active="true" functional="true" multiple="true" known="false" checkoperational="true" />
+            <do_for_each name="$scpStation" in="$scpStations">
+              <debug_text text="'SafeCheatPanel: Revealing station %s with owner %s (is known %s) in sector %s'. [$scpStation.debugname, $scpStation.owner.name, @$scpStation.owner.isknown, $scpSector.debugname]" chance="$traceChance" />
+              <set_known object="$scpStation" known="true" updatesnapshot="true" />
             </do_for_each>
+            <set_value name="$scpRevealed" exact="$scpStations.count" />
+          </actions>
+        </library>
+
+        <cue name="Scp_Reveal_All_Stations" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_reveal_all_stations'" />
+          </conditions>
+          <actions>
+            <find_sector name="$scpSectors" space="player.galaxy" known="true" multiple="true" />
+            <set_value name="$scpTotal" exact="0" />
+            <do_for_each name="$scpSector" in="$scpSectors">
+              <include_actions ref="Scp_Reveal_Sector_Stations" />
+              <set_value name="$scpTotal" operation="add" exact="$scpRevealed" />
+            </do_for_each>
+            <debug_text text="'SafeCheatPanel: Revealed %s stations in %s known sectors'. [$scpTotal, $scpSectors.count]" chance="$debugChance" />
           </actions>
         </cue>
 
@@ -1568,20 +1620,41 @@
           </actions>
         </cue>
 
-        <cue name="Scp_Clear_Fog_In_Sector" instantiate="true" version="1">
+        <cue name="Scp_Clear_Fog_In_Sector" instantiate="true" version="2">
           <conditions>
             <event_cue_signalled />
             <check_value value="@event.param.$object.isclass.{class.sector}" />
             <check_value value="@event.param.$offsetcomponent == @event.param.$object" />
           </conditions>
           <actions>
-            <set_value name="$sector" exact="event.param.$object" />
+            <set_value name="$scpSector" exact="event.param.$object" />
+            <include_actions ref="Scp_Clear_Sector_Fog" />
+            <debug_text text="'SafeCheatPanel: Cleared fog of war in sector %s'. [$scpSector.debugname]" chance="$debugChance" />
+          </actions>
+        </cue>
+
+        <!-- Expects $scpSector. -->
+        <library name="Scp_Clear_Sector_Fog" purpose="include_actions" version="1">
+          <actions>
             <!-- The bounding box is a diameter; vanilla clears whole sectors with 300-500 km from the centre. -->
-            <set_value name="$range" exact="[$sector.size, 500km].max" />
-            <debug_text text="'SafeCheatPanel: Clearing fog of war in sector %s, size %s, range %s'. [$sector.debugname, $sector.size, $range]" chance="$debugChance" />
-            <clear_fog_of_war sector="$sector" range="$range">
-              <position space="$sector" x="0" y="0" z="0" />
+            <set_value name="$scpRange" exact="[$scpSector.size, 500km].max" />
+            <debug_text text="'SafeCheatPanel: Clearing fog of war in sector %s, size %s, range %s'. [$scpSector.debugname, $scpSector.size, $scpRange]" chance="$traceChance" />
+            <clear_fog_of_war sector="$scpSector" range="$scpRange">
+              <position space="$scpSector" x="0" y="0" z="0" />
             </clear_fog_of_war>
+          </actions>
+        </library>
+
+        <cue name="Scp_Clear_All_Fog" instantiate="true">
+          <conditions>
+            <event_ui_triggered screen="'scp_main'" control="'scp_clear_all_fog'" />
+          </conditions>
+          <actions>
+            <find_sector name="$scpSectors" space="player.galaxy" known="true" multiple="true" />
+            <do_for_each name="$scpSector" in="$scpSectors">
+              <include_actions ref="Scp_Clear_Sector_Fog" />
+            </do_for_each>
+            <debug_text text="'SafeCheatPanel: Cleared fog of war in %s known sectors'. [$scpSectors.count]" chance="$debugChance" />
           </actions>
         </cue>
 

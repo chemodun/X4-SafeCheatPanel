@@ -129,6 +129,39 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
     fixed = true,
   })
 
+  -- Both act on the known sectors only; MD cannot be asked cheaply what is left, so they stay active.
+  -- Above the sector row, which turns into the list's Name / Status header once all are revealed.
+  numDisplayed = scp.menuHelper.createButton(frameTable, "map_reveal_all_stations", numDisplayed, {
+    text            = ReadText(1001, 4),
+    active          = true,
+    mouseOverText   = "",
+    buttonText      = ReadText(PAGE_ID, 6002),
+    onClick         = function()
+      AddUITriggeredEvent("scp_main", "scp_reveal_all_stations")
+    end,
+    textColIndex    = nil,
+    buttonColIndex  = nil,
+    textColor       = nil,
+    buttonTextColor = nil,
+    fixed           = true,
+    isHeader        = true,
+  })
+  numDisplayed = scp.menuHelper.createButton(frameTable, "map_clear_all_fog", numDisplayed, {
+    text            = ReadText(PAGE_ID, 6008),
+    active          = true,
+    mouseOverText   = "",
+    buttonText      = ReadText(1001, 73),
+    onClick         = function()
+      AddUITriggeredEvent("scp_main", "scp_clear_all_fog")
+    end,
+    textColIndex    = nil,
+    buttonColIndex  = nil,
+    textColor       = nil,
+    buttonTextColor = nil,
+    fixed           = true,
+    isHeader        = true,
+  })
+
   if isAllRevealed then
     if isUnknownGates then
       numDisplayed = scp.menuHelper.createButton(frameTable, "map_reveal_all", numDisplayed, {
@@ -154,7 +187,7 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
         isHeader        = true,
       })
     else
-        numDisplayed = scp.menuHelper.createDoubleText(frameTable, false, numDisplayed, {
+      numDisplayed = scp.menuHelper.createDoubleText(frameTable, false, numDisplayed, {
         text               = ReadText(1001, 2809),
         mouseOverText      = "",
         secondText         = ReadText(1001, 12),
@@ -164,7 +197,7 @@ function scpMap.createSection(frameTable, numDisplayed, scp)
         secondTextColor    = Color["text_positive"],
         fixed              = true,
         isHeader           = true,
-        })
+      })
     end
   else
     numDisplayed = scp.menuHelper.createButton(frameTable, "map_reveal_all", numDisplayed, {

@@ -105,6 +105,7 @@
             <t id="6005">Reveal Path</t>
             <t id="6006">Reveal Gates</t>
             <t id="6007">Reveal All Gates</t>
+            <t id="6008">Fog of War</t>
 
             <!-- Tab 7: Object Spawner -->
             <t id="7000">Objects Spawner</t>

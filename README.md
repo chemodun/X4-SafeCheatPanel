@@ -20,7 +20,7 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
 - **Blueprints Tab**: Unlock blueprints individually, by subcategory, or all at once.
 - **Encyclopedia Tab**: Reveal encyclopedia entries for races, factions and their licences, ships, station modules, weapons, equipment and wares - individually, by subcategory, or all at once.
 - **Factions Tab**: Edit faction relations with the player and between non-player factions.
-- **Galaxy/Sectors Tab**: Reveal sectors on the map at three levels of detail, or reveal all at once.
+- **Galaxy/Sectors Tab**: Reveal sectors on the map at three levels of detail, or reveal all at once. Reveal every station, or clear the fog of war, in all known sectors.
 - **Spawner Tab**: Spawn stations - from a construction plan, armed at a loadout preset, or as a pre-built installation - plus ships (loadout, crew skills, job assignment, cargo) and deployable objects. Player stations can be given a manager, a ship trader and a starting workforce - none of which the game assigns itself.
 - **Editor**: The same tab edits existing objects. Right-click a player-owned ship or station to load it in, then set crew skills, re-equip it, change a ship's cargo, fill empty control posts or set its workforce. In extended mode any ship's cargo can be changed.
 - **Destroy Object Tab**: Destroy any destructible map object, selected via the right-click context menu, with a confirmation checkbox before the button arms.
@@ -41,6 +41,8 @@ Take in account: id of the mod and folder is changed to `safe_cheat_panel`.
   - Available on Nexus Mods: [Options Helper](https://www.nexusmods.com/x4foundations/mods/2089)
 - **Print Extension List** by [Chem O`Dun](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659), version **1.01** or higher. Writes the game version and enabled extensions to the debug log at startup, so any log sent with a bug report identifies the setup:
   - Available on Nexus Mods: [Print Extension List](https://www.nexusmods.com/x4foundations/mods/2191)
+- **Lua Log API** by [Chem O`Dun](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659), version **1.01** or higher. Writes the panel's log messages:
+  - Available on Nexus Mods: [Lua Log API](https://www.nexusmods.com/x4foundations/mods/2473)
 - **Extra UI API** (optional) by [Chem O`Dun](https://next.nexusmods.com/profile/ChemODun/mods?gameId=2659), version **1.01** or higher. Needed only for the right-click **Teleport to Pilot Seat**:
   - Available on Nexus Mods: [Extra UI API](https://www.nexusmods.com/x4foundations/mods/2602)
 
@@ -134,6 +136,13 @@ Reveal sectors on the map at three levels of detail:
 
 A **Reveal All** button reveals every sector at all levels at once.
 
+Two more buttons work on every known sector - reveal the sectors first to include the others:
+
+- **Stations - Reveal All**: reveals all stations, with their names and positions.
+- **Fog of War - Clear All**: clears the map's fog of war. Reveals the space only, not the objects in it.
+
+The right-click menu on the map does the same for a single sector (**Reveal Stations in Sector**, **Clear Fog of War in Sector**).
+
 ![Sectors](docs/images/sectors.png)
 
 ### Spawner Tab
@@ -161,6 +170,8 @@ A **Reveal All** button reveals every sector at all levels at once.
   - ![Ship Cargo](docs/images/ship_cargo.png)
 
 - Set the number of ships per row (up to 10) and the number of rows (up to 10).
+
+Ships spawned for any faction other than the player carry the game's own loot for their faction, size and role, so destroying them drops wares, mod parts and ammo as the game's own ships do.
 
 #### Station Spawner
 
@@ -248,9 +259,9 @@ Right-clicking on the map gives access to the following actions, depending on th
 - **Spawn Objects**: Spawns deployable objects at the clicked position using the current Spawner tab settings.
 - **Force Build Completion: Current Station**: Instantly completes the construction of a station that is currently building, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *In* **extended** *mode available for non-player faction stations*.
 - **Force Build Completion: All Faction Stations**: Instantly completes the construction of all stations belonging to the same faction, by finishing all build tasks and spawning all missing modules and sub-entities. Appears only on stations that are currently under construction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
-- **Restock: Current Station**: Instantly restocks the current station's resources and buyable trade wares up to their buy limits, the amount the station would buy itself, plus the wares it still needs to build its drones and at least what queued ship builds at a wharf or shipyard still miss. Works from the station's own storage numbers, so it also works when the station posts no buy offers. Takes into account incoming ware reservations and the free storage space. *In* **extended** *mode available for non-player faction stations*.
+- **Restock: Current Station**: Instantly restocks the current station's resources and buyable trade wares up to their buy limits, the amount the station would buy itself, plus the wares it still needs to build its drones and at least what queued ship builds at a wharf or shipyard still miss. Works from the station's own storage numbers, so it also works when the station posts no buy offers. Takes into account incoming ware reservations and the free storage space, universal storage modules (added by some mods) included. *In* **extended** *mode available for non-player faction stations*.
 - **Restock: All Faction Stations**: The same restock for all stations belonging to the same faction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
-- **Fill Storage: Current Station**: Instantly fills the current station's resources, intermediate wares and buyable trade wares up to their storage targets (the full bars in the Logical Station Overview), ignoring buy limits, plus the same drone and ship-build wares as **Restock**. Takes into account incoming ware reservations and the free storage space. *In* **extended** *mode available for non-player faction stations*.
+- **Fill Storage: Current Station**: Instantly fills the current station's resources, intermediate wares and buyable trade wares up to their storage targets (the full bars in the Logical Station Overview), ignoring buy limits, plus the same drone and ship-build wares as **Restock**. Takes into account incoming ware reservations and the free storage space, universal storage modules (added by some mods) included. *In* **extended** *mode available for non-player faction stations*.
 - **Fill Storage: All Faction Stations**: The same fill for all stations belonging to the same faction. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
 - **Restock: Current Build Storage**: Instantly restocks the current station's build storage with all required resources. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *In* **extended** *mode available for non-player faction stations*.
 - **Restock: All Faction Build Storages**: Instantly restocks all stations belonging to the same faction with all required resources in their build storages. Appears only on stations that are currently under construction. Takes into account the trade offers and ware reservation. *Only available in* **extended** *mode, as for player as for non-player faction stations*.
@@ -289,6 +300,16 @@ Debug logging can be enabled to write detailed information about the mod's opera
 - [SirNukes](https://next.nexusmods.com/profile/sirnukes?gameId=2659) - for the `Mod Support APIs` that power the UI hooks and options menu.
 
 ## Changelog
+
+### [8.00.47] - 2026-11-25
+
+- **Added**
+  - Galaxy/Sectors tab: **Stations - Reveal All** and **Fog of War - Clear All**, for every known sector.
+- **Changed**
+  - Log messages go through the **Lua Log API**, now a required mod.
+- **Fixed**
+  - Right-click **Restock** and **Fill Storage** ignored universal storage modules (added by some mods).
+  - Ships spawned for other factions dropped no loot when destroyed.
 
 ### [8.00.46] - 2026-11-15
 
